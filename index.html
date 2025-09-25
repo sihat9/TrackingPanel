@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel Claims Portal</title>
+  <style>
+    :root{
+      --bg:#f8f9fb; --fg:#111; --muted:#555; --border:#e5e7eb; --soft:#f1f3f5;
+      --brand:#111; --ok:#22c55e; --warn:#facc15; --bad:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--fg)}
+    header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:10}
+    .tabs{display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
+    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;user-select:none}
+    .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:999px;background:var(--brand);color:#fff;text-align:center;font-size:12px;margin-left:6px}
+    .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap}
+    input[type="text"], select, input[type="date"]{padding:8px 10px;border:1px solid #d1d5db;border-radius:10px;min-width:220px;background:#fff}
+    button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
+    button.secondary{background:#fff;color:var(--brand)}
+    button[disabled]{opacity:.5;cursor:not-allowed}
+    .container{display:grid;grid-template-columns:1fr}
+    @media(min-width:1000px){.container{grid-template-columns:48% 52%}}
+    .left{padding:16px}
+    .right{padding:16px;border-left:1px solid var(--border);background:#fff;min-height:60vh}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border)}
+    th,td{border-bottom:1px solid var(--soft);padding:10px;text-align:left;font-size:14px;vertical-align:top}
+    th{background:#fafafa;font-weight:600}
+    .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
+    .chip.inprocess{background:#fffbe6;border-color:var(--warn)}
+    .chip.done{background:#e6ffed;border-color:var(--ok)}
+    .chip.rejected{background:#ffe6e6;border-color:var(--bad)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .right .hint{font-size:13px;color:var(--muted)}
+    .toolbar{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+    .toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.2s}
+    .toast.show{opacity:1;transform:translateY(0)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="tabs">
+      <div class="tab active" data-tab="inprocess">Panel (In Process) <span id="badge-inprocess" class="badge">0</span></div>
+      <div class="tab" data-tab="done">Panel (Done) <span id="badge-done" class="badge">0</span></div>
+      <div class="tab" data-tab="rejected">Panel (Rejected) <span id="badge-rejected" class="badge">0</span></div>
+    </div>
+    <div class="search">
+      <input id="search" type="text" placeholder="Cari nama/IC..." />
+      <select id="pageSize" title="Rekod per halaman">
+        <option>25</option><option selected>50</option><option>100</option>
+      </select>
+      <button id="refresh" class="secondary" title="Muat semula">Refresh</button>
+      <span style="flex:1 1 auto"></span>
+      <input id="cutoff" type="date" title="Tarikh cutoff arkib" />
+      <button id="btn-archive" title="Arkibkan rekod Done/Rejected sebelum tarikh">Archive</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="left">
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>IC</th>
+            <th>Telefon</th>
+            <th>Tarikh Hadir</th>
+            <th>Ubat</th>
+            <th>Status</th>
+            <th>Tindakan</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+
+      <div class="toolbar">
+        <button id="prev" class="secondary">Prev</button>
+        <span id="pageInfo"></span>
+        <button id="next" class="secondary">Next</button>
+      </div>
+    </section>
+
+    <aside class="right">
+      <h3>Panduan "Side-by-Side"</h3>
+      <p class="hint">Pilih rekod di kiri, klik <b>Open</b> (panel claim) atau <b>WhatsApp</b>. Tetingkap akan dibuka. Gunakan <b>Win+→</b> (Windows) / <b>Tile Right</b> (macOS) untuk snap ke kanan. Panel kawalan di kiri kekal terbuka.</p>
+      <div id="detail"></div>
+    </aside>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- (Optional) Firebase for realtime updates
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  -->
+
+  <script>
+  // ========= CONFIG =========
+  const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
+
+  // ========= STATE =========
+  let state = { tab:'inprocess', page:1, pageSize:50, q:'', total:0 };
+
+  // ========= HELPERS =========
+  const el = s => document.querySelector(s);
+  const tbody = el('#tbody');
+  const pageInfo = el('#pageInfo');
+  const toastEl = el('#toast');
+
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(()=> toastEl.classList.remove('show'), 2200);
+  }
+
+  function escapeHtml(s){
+    return String(s ?? '').replace(/[&<>"]/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+
+  function toMsisdn(raw){
+    if(!raw) return '';
+    let s = String(raw).trim().replace(/[^\d+]/g,'');
+    if(s.startsWith('+')) s = s.slice(1);
+    if(s.startsWith('0')) s = '60' + s.slice(1); // Malaysia default
+    return s;
+  }
+
+  function setActiveTab(tab){
+    state.tab = tab; state.page = 1; load();
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+  }
+
+  function setPager(total){
+    state.total = total;
+    const pages = Math.max(1, Math.ceil(total / state.pageSize));
+    const p = Math.min(state.page, pages);
+    state.page = p;
+    pageInfo.textContent = `Halaman ${p}/${pages} • ${total} rekod`;
+    el('#prev').disabled = (p<=1);
+    el('#next').disabled = (p>=pages);
+  }
+
+  // ========= DATA LOAD =========
+  async function load(){
+    const url = `${API_BASE}?action=listrecords&statusTab=${encodeURIComponent(state.tab)}&page=${state.page}&pageSize=${state.pageSize}&q=${encodeURIComponent(state.q)}`;
+    try{
+      const res = await fetch(url);
+      const json = await res.json();
+      if(json.status!=='ok') throw new Error(json.message||'Gagal memuat data');
+      const {total, page, pageSize, items} = json.data;
+      setPager(total);
+      tbody.innerHTML = items.map(r => renderRow(r)).join('');
+      items.forEach(r => wireRow(r));
+    }catch(e){
+      console.error(e);
+      toast('Ralat memuat data');
+    }
+  }
+
+  function renderRow(r){
+    const status = (r.status_claim||'Not Started');
+    const chipClass = status==='Done'||status==='Submitted' ? 'done' : (status==='Rejected' ? 'rejected' : 'inprocess');
+    const phone = r.no_telefon || ''; // akan kosong jika lajur tak wujud
+    const hasPhone = String(phone).trim().length > 0;
+
+    return `<tr data-id="${escapeHtml(r.record_id)}">
+      <td>${escapeHtml(r.nama_pesakit||'')}</td>
+      <td>${escapeHtml(r.no_ic||'')}</td>
+      <td>${escapeHtml(phone||'')}</td>
+      <td>${escapeHtml(r.tarikh_hadir||'')}</td>
+      <td>${escapeHtml(r.jenis_ubat||'')}</td>
+      <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
+      <td class="actions">
+        <button class="secondary btn-open"    title="Buka laman panel">Open</button>
+        <button class="secondary btn-wa" ${hasPhone?'':'disabled'} title="WhatsApp pesakit">WhatsApp</button>
+        <button class="btn-submit"            title="Tandakan Submitted">Submit claim</button>
+      </td>
+    </tr>`;
+  }
+
+  function wireRow(r){
+    const selector = `tr[data-id="${CSS.escape(String(r.record_id))}"]`;
+    const tr = tbody.querySelector(selector);
+    const openBtn = tr.querySelector('.btn-open');
+    const waBtn   = tr.querySelector('.btn-wa');
+    const subBtn  = tr.querySelector('.btn-submit');
+
+    openBtn.addEventListener('click', ()=>{
+      const url = r.panel_claim_url || '';
+      if(!url){ toast('URL panel tiada'); return; }
+      const w = window.open(url, '_blank');
+      if(!w) alert('Sila benarkan pop-up untuk domain ini.');
+    });
+
+    if(waBtn && !waBtn.disabled){
+      waBtn.addEventListener('click', ()=>{
+        const intl = toMsisdn(r.no_telefon);
+        if(!intl){ toast('Nombor telefon tidak sah'); return; }
+        const text = encodeURIComponent(`Assalamualaikum/Hi ${r.nama_pesakit||''}. Ini pihak klinik.`);
+        const wa = `https://wa.me/${intl}?text=${text}`;
+        const w = window.open(wa, '_blank');
+        if(!w) alert('Sila benarkan pop-up untuk domain ini.');
+      });
+    }
+
+    subBtn.addEventListener('click', async ()=>{
+      const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
+      await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
+    });
+  }
+
+  async function updateStatus(record_id, payload){
+    try{
+      const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
+      if(tr){
+        const chip = tr.querySelector('.chip');
+        chip.textContent = 'Submitted';
+        chip.className = 'chip done';
+      }
+      const res = await fetch(`${API_BASE}?action=updateclaimstatus`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ record_id, ...payload })
+      });
+      const json = await res.json();
+      if(json.status!=='ok') throw new Error(json.message||'Gagal kemas status');
+      toast('Status dikemas kini');
+    }catch(e){
+      toast('Gagal kemas status');
+      await load();
+    }
+  }
+
+  // ========= ARCHIVE =========
+  async function archiveNow(){
+    const cutoff = el('#cutoff').value;
+    if(!cutoff){ alert('Sila pilih tarikh cutoff'); return; }
+    const year = cutoff.slice(0,4);
+    if(!confirm(`Arkibkan rekod Done/Rejected sebelum ${cutoff} ke ARCHIVE_${year}?`)) return;
+    try{
+      const res = await fetch(`${API_BASE}?action=archiverecords`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ cutoffDate: cutoff, statuses:['Done','Rejected'] })
+      });
+      const json = await res.json();
+      if(json.status!=='ok') throw new Error(json.message||'Gagal arkib');
+      toast(`Diarkib: ${json.data.moved} ➜ ${json.data.archiveSheet}`);
+      await load();
+    }catch(e){
+      console.error(e);
+      alert('Gagal arkib. Sila cuba lagi.');
+    }
+  }
+
+  // ========= EVENTS =========
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
+  el('#search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
+  el('#pageSize').addEventListener('change', e => { state.pageSize = parseInt(e.target.value,10)||50; state.page=1; load(); });
+  el('#refresh').addEventListener('click', load);
+  el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
+  el('#next').addEventListener('click', ()=>{ const pages=Math.max(1,Math.ceil(state.total/state.pageSize)); if(state.page<pages){ state.page++; load(); }});
+  el('#btn-archive').addEventListener('click', archiveNow);
+
+  // ========= INITIAL =========
+  (async ()=>{ await load(); })();
+
+  // ========= (Optional) Firebase realtime =========
+  /*
+  const firebaseConfig = {
+    apiKey: 'YOUR_FIREBASE_API_KEY',
+    authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
+    databaseURL: 'https://YOUR_PROJECT_ID.firebaseio.com',
+    projectId: 'YOUR_PROJECT_ID',
+    appId: 'YOUR_APP_ID'
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  db.ref('record_deltas').limitToLast(50).on('child_added', snap => {
+    const delta = snap.val();
+    if(delta && delta.record_id){ load(); }
+  });
+  */
+  </script>
+</body>
+</html>
