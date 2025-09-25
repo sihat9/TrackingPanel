@@ -16,10 +16,8 @@
     .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;user-select:none}
     .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
     .badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:999px;background:var(--brand);color:#fff;text-align:center;font-size:12px;margin-left:6px}
-    .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .spacer{flex:1 1 auto}
+    .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap}
     input[type="text"], select, input[type="date"]{padding:8px 10px;border:1px solid #d1d5db;border-radius:10px;min-width:220px;background:#fff}
-    label.switch{display:flex;gap:8px;align-items:center;font-size:13px;color:#333;user-select:none}
     button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
     button.secondary{background:#fff;color:var(--brand)}
     button[disabled]{opacity:.5;cursor:not-allowed}
@@ -35,7 +33,7 @@
     .chip.done{background:#e6ffed;border-color:var(--ok)}
     .chip.rejected{background:#ffe6e6;border-color:var(--bad)}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .right .hint{font-size:13px;color:#555}
+    .right .hint{font-size:13px;color:var(--muted)}
     .toolbar{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
     .toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.2s}
     .toast.show{opacity:1;transform:translateY(0)}
@@ -54,14 +52,9 @@
         <option>25</option><option selected>50</option><option>100</option>
       </select>
       <button id="refresh" class="secondary" title="Muat semula">Refresh</button>
-
-      <span class="spacer"></span>
-
-      <label class="switch" title="Jika ON, tetingkap kanan akan auto-buka semula jika tertutup oleh laman/pelayar">
-        <input id="keepAliveToggle" type="checkbox" checked />
-        Kekalkan tetingkap kanan (auto-buka semula)
-      </label>
-      <button id="recenter" class="secondary" title="Posisi & saiz semula tetingkap kanan">Re-center</button>
+      <span style="flex:1 1 auto"></span>
+      <input id="cutoff" type="date" title="Tarikh cutoff arkib" />
+      <button id="btn-archive" title="Arkibkan rekod Done/Rejected sebelum tarikh">Archive</button>
     </div>
   </header>
 
@@ -91,7 +84,7 @@
 
     <aside class="right">
       <h3>Panduan "Side-by-Side"</h3>
-      <p class="hint">Klik <b>Open</b> / <b>WhatsApp</b>. Tetingkap kanan dibuka, dikitar semula, dan jika tertutup oleh laman/pelayar ia akan <b>auto-buka semula</b> (boleh matikan di toggle). Benarkan pop-up pada pelayar.</p>
+      <p class="hint">Klik <b>Open</b> / <b>WhatsApp</b>. Tetingkap kanan dibuka sekali dan kekal sehingga anda sendiri tutup. Benarkan pop-up pada pelayar.</p>
       <div id="detail"></div>
     </aside>
   </div>
@@ -111,10 +104,9 @@
   const pageInfo = el('#pageInfo');
   const toastEl = el('#toast');
 
+  // Pegang rujukan tetingkap kanan — kita TIDAK auto-buka or auto-reopen
   let panelWin = null;
-  let lastPanelURL = '';         // URL terakhir dibuka di kanan
-  let keepAlive = true;          // auto-buka semula bila tertutup
-  const CHECK_MS = 2000;         // selang semak 2s
+  let lastOpenTs = 0; // untuk anti double-click
 
   function toast(msg){
     toastEl.textContent = msg;
@@ -132,59 +124,48 @@
     return s;
   }
 
-  // ========== Tetingkap Kanan (lebih kecil & kekal) ==========
-  function openOrReusePanel(url, {recenter=false} = {}){
+  // ========== Tetingkap Kanan (sekali buka & kekal) ==========
+  function openOrReusePanel(url){
+    // anti double-click (300ms)
+    const now = Date.now();
+    if (now - lastOpenTs < 300) return;
+    lastOpenTs = now;
+
     const sw = window.screen.availWidth;
     const sh = window.screen.availHeight;
-    const w  = Math.max(600, Math.round(sw * 0.38)); // ~38% lebar
+    // Lebar kecil (≈38% skrin), min 600px
+    const w  = Math.max(600, Math.round(sw * 0.38));
     const h  = Math.max(600, sh);
     const left = Math.max(0, sw - w);
     const top  = 0;
 
     const features = [
       'popup=yes','toolbar=no','location=no','status=no','menubar=no',
-      'scrollbars=yes','resizable=yes','noopener=yes','noreferrer=yes',
+      'scrollbars=yes','resizable=yes',
       `width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`
     ].join(',');
 
     try {
-      lastPanelURL = url || lastPanelURL || '';
-      if (!lastPanelURL) return null;
-
-      // Jika sudah ada, navigasi (kita tak tutup popup)
+      // jika sudah ada & belum ditutup → hanya navigasi, JANGAN buka baharu
       if (panelWin && !panelWin.closed) {
-        if (recenter) try { panelWin.moveTo(left, top); panelWin.resizeTo(w, h); } catch(e){}
+        panelWin.location.href = url;
         panelWin.focus();
-        panelWin.location.href = lastPanelURL;
         return panelWin;
       }
-      // Buka baru
-      panelWin = window.open(lastPanelURL, 'panel_claim_window', features);
+      // jika belum wujud/ sudah ditutup → buka SATU tetingkap baharu dengan nama tetap
+      panelWin = window.open(url, 'panel_claim_window', features);
       if (!panelWin) throw new Error('Popup diblok');
       panelWin.focus();
       return panelWin;
     } catch (e){
-      alert('Sila benarkan pop-up untuk laman ini. Fallback akan buka tab baharu.');
-      window.open(lastPanelURL, '_blank'); // fallback
+      alert('Sila benarkan pop-up untuk laman ini. Fallback: buka tab baharu sekali.');
+      // fallback: sekali sahaja — guna nama unik supaya pelayar reuse kalau ada
+      window.open(url, 'panel_claim_tab');
       return null;
     }
   }
 
-  // Keep-alive: jika popup tertutup oleh laman/pelayar, buka semula ke URL terakhir
-  setInterval(()=> {
-    if (!keepAlive) return;
-    if (lastPanelURL && (!panelWin || panelWin.closed)) {
-      // cuba buka semula, senyap (tanpa alert)
-      try {
-        panelWin = window.open(lastPanelURL, 'panel_claim_window',
-          'popup=yes,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,noopener=yes,noreferrer=yes');
-        if(panelWin) panelWin.focus();
-      } catch(e){}
-    }
-  }, CHECK_MS);
-
-  // Jika user sendiri tutup popup, kita hanya kosongkan ref (tak auto tutup dari kiri)
-  window.addEventListener('focus', ()=> { if (panelWin && panelWin.closed) panelWin = null; });
+  // Tiada keep-alive, tiada auto-reopen. Jika user tutup, kita biarkan.
 
   function setActiveTab(tab){
     state.tab = tab; state.page = 1; load();
@@ -307,9 +288,6 @@
   el('#refresh').addEventListener('click', load);
   el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
   el('#next').addEventListener('click', ()=>{ const pages=Math.max(1,Math.ceil(state.total/state.pageSize)); if(state.page<pages){ state.page++; load(); }});
-
-  el('#keepAliveToggle').addEventListener('change', e => { keepAlive = e.target.checked; });
-  el('#recenter').addEventListener('click', ()=> openOrReusePanel('', {recenter:true}));
 
   // ========= INITIAL =========
   (async ()=>{ await load(); })();
