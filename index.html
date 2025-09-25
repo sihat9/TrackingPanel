@@ -84,7 +84,7 @@
 
     <aside class="right">
       <h3>Panduan "Side-by-Side"</h3>
-      <p class="hint">Klik <b>Open</b> (panel claim) atau <b>WhatsApp</b>. Tetingkap kanan dibuka & dikitar semula. Benarkan pop-up pada pelayar.</p>
+      <p class="hint">Klik <b>Open</b> (panel claim) / <b>WhatsApp</b>. Tetingkap kanan dibuka & dikitar semula (tak pernah ditutup automatik). Benarkan pop-up pada pelayar.</p>
       <div id="detail"></div>
     </aside>
   </div>
@@ -109,7 +109,7 @@
   const pageInfo = el('#pageInfo');
   const toastEl = el('#toast');
 
-  // Simpan rujukan tetingkap kanan untuk diguna semula
+  // Pegang rujukan tetingkap kanan; kita takkan tutupnya
   let panelWin = null;
 
   function toast(msg){
@@ -128,11 +128,12 @@
     return s;
   }
 
-  // Buka atau guna semula tetingkap kanan (popup separuh skrin)
+  // ========== Tetingkap Kanan (lebih kecil & kekal) ==========
   function openOrReusePanel(url){
     const sw = window.screen.availWidth;
     const sh = window.screen.availHeight;
-    const w  = Math.max(800, Math.round(sw/2));
+    // Lebar lebih kecil (≈38% skrin), minimum 600px
+    const w  = Math.max(600, Math.round(sw * 0.38));
     const h  = Math.max(600, sh);
     const left = Math.max(0, sw - w);
     const top  = 0;
@@ -144,8 +145,10 @@
     ].join(',');
 
     try {
+      // Jangan tutup tetingkap — hanya guna semula bila klik Open/WhatsApp
       if (panelWin && !panelWin.closed) {
         panelWin.focus();
+        // Navigasi hanya bila user klik Open/WhatsApp
         panelWin.location.href = url;
         return panelWin;
       }
@@ -159,7 +162,7 @@
       return null;
     }
   }
-  // Reset ref jika ditutup
+  // Jika user sendiri tutup popup, kosongkan rujukan (kita tak pernah tutup popup secara automatik)
   window.addEventListener('focus', ()=> { if (panelWin && panelWin.closed) panelWin = null; });
 
   function setActiveTab(tab){
