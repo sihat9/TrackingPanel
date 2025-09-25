@@ -84,7 +84,7 @@
 
     <aside class="right">
       <h3>Panduan "Side-by-Side"</h3>
-      <p class="hint">Pilih rekod di kiri, klik <b>Open</b> (panel claim) atau <b>WhatsApp</b>. Tetingkap akan dibuka. Gunakan <b>Win+→</b> (Windows) / <b>Tile Right</b> (macOS) untuk snap ke kanan. Panel kawalan di kiri kekal terbuka.</p>
+      <p class="hint">Klik <b>Open</b> (panel claim) atau <b>WhatsApp</b>. Tetingkap kanan dibuka & dikitar semula. Benarkan pop-up pada pelayar.</p>
       <div id="detail"></div>
     </aside>
   </div>
@@ -109,16 +109,17 @@
   const pageInfo = el('#pageInfo');
   const toastEl = el('#toast');
 
+  // Simpan rujukan tetingkap kanan untuk diguna semula
+  let panelWin = null;
+
   function toast(msg){
     toastEl.textContent = msg;
     toastEl.classList.add('show');
     setTimeout(()=> toastEl.classList.remove('show'), 2200);
   }
-
   function escapeHtml(s){
     return String(s ?? '').replace(/[&<>"]/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   }
-
   function toMsisdn(raw){
     if(!raw) return '';
     let s = String(raw).trim().replace(/[^\d+]/g,'');
@@ -127,11 +128,44 @@
     return s;
   }
 
+  // Buka atau guna semula tetingkap kanan (popup separuh skrin)
+  function openOrReusePanel(url){
+    const sw = window.screen.availWidth;
+    const sh = window.screen.availHeight;
+    const w  = Math.max(800, Math.round(sw/2));
+    const h  = Math.max(600, sh);
+    const left = Math.max(0, sw - w);
+    const top  = 0;
+
+    const features = [
+      'popup=yes','toolbar=no','location=no','status=no','menubar=no',
+      'scrollbars=yes','resizable=yes',
+      `width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`
+    ].join(',');
+
+    try {
+      if (panelWin && !panelWin.closed) {
+        panelWin.focus();
+        panelWin.location.href = url;
+        return panelWin;
+      }
+      panelWin = window.open(url, 'panel_claim_window', features);
+      if (!panelWin) throw new Error('Popup diblok');
+      panelWin.focus();
+      return panelWin;
+    } catch (e){
+      alert('Sila benarkan pop-up untuk laman ini. Fallback akan buka tab baharu.');
+      window.open(url, '_blank'); // fallback
+      return null;
+    }
+  }
+  // Reset ref jika ditutup
+  window.addEventListener('focus', ()=> { if (panelWin && panelWin.closed) panelWin = null; });
+
   function setActiveTab(tab){
     state.tab = tab; state.page = 1; load();
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
   }
-
   function setPager(total){
     state.total = total;
     const pages = Math.max(1, Math.ceil(total / state.pageSize));
@@ -149,10 +183,11 @@
       const res = await fetch(url);
       const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat data');
-      const {total, page, pageSize, items} = json.data;
+      const {total, items} = json.data;
       setPager(total);
       tbody.innerHTML = items.map(r => renderRow(r)).join('');
       items.forEach(r => wireRow(r));
+      updateBadgesApprox(items);
     }catch(e){
       console.error(e);
       toast('Ralat memuat data');
@@ -162,7 +197,7 @@
   function renderRow(r){
     const status = (r.status_claim||'Not Started');
     const chipClass = status==='Done'||status==='Submitted' ? 'done' : (status==='Rejected' ? 'rejected' : 'inprocess');
-    const phone = r.no_telefon || ''; // akan kosong jika lajur tak wujud
+    const phone = r.no_telefon || '';
     const hasPhone = String(phone).trim().length > 0;
 
     return `<tr data-id="${escapeHtml(r.record_id)}">
@@ -190,8 +225,7 @@
     openBtn.addEventListener('click', ()=>{
       const url = r.panel_claim_url || '';
       if(!url){ toast('URL panel tiada'); return; }
-      const w = window.open(url, '_blank');
-      if(!w) alert('Sila benarkan pop-up untuk domain ini.');
+      openOrReusePanel(url);
     });
 
     if(waBtn && !waBtn.disabled){
@@ -199,9 +233,7 @@
         const intl = toMsisdn(r.no_telefon);
         if(!intl){ toast('Nombor telefon tidak sah'); return; }
         const text = encodeURIComponent(`Assalamualaikum/Hi ${r.nama_pesakit||''}. Ini pihak klinik.`);
-        const wa = `https://wa.me/${intl}?text=${text}`;
-        const w = window.open(wa, '_blank');
-        if(!w) alert('Sila benarkan pop-up untuk domain ini.');
+        openOrReusePanel(`https://wa.me/${intl}?text=${text}`);
       });
     }
 
@@ -229,6 +261,19 @@
       toast('Gagal kemas status');
       await load();
     }
+  }
+
+  function updateBadgesApprox(items){
+    const count = {inprocess:0, done:0, rejected:0};
+    items.forEach(r=>{
+      const s = (r.status_claim||'Not Started');
+      if(s==='Done' || s==='Submitted') count.done++;
+      else if(s==='Rejected') count.rejected++;
+      else count.inprocess++;
+    });
+    el('#badge-inprocess').textContent = String(count.inprocess);
+    el('#badge-done').textContent = String(count.done);
+    el('#badge-rejected').textContent = String(count.rejected);
   }
 
   // ========= ARCHIVE =========
