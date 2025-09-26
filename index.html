@@ -7,34 +7,35 @@
   <style>
     :root{--bg:#f8f9fb;--fg:#111;--muted:#555;--border:#e5e7eb;--soft:#f1f3f5;--brand:#111;--ok:#22c55e;--warn:#facc15;--bad:#ef4444;--wa:#25D366;}
     *{box-sizing:border-box}
-    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--fg)}
-    header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:10}
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#f8f9fb;color:#111}
+    header{position:sticky;top:0;background:#fff;border-bottom:1px solid #e5e7eb;z-index:10}
     .tabs{display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
-    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer}
-    .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
-    .badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:999px;background:var(--brand);color:#fff;text-align:center;font-size:12px;margin-left:6px}
+    .tab{padding:8px 12px;border-radius:10px;border:1px solid #e5e7eb;background:#fff;cursor:pointer}
+    .tab.active{background:#111;color:#fff;border-color:#111}
+    .badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:999px;background:#111;color:#fff;text-align:center;font-size:12px;margin-left:6px}
     .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     input[type="text"], input[type="url"], input[type="tel"], select, input[type="date"], textarea{padding:8px 10px;border:1px solid #d1d5db;border-radius:10px;min-width:170px;background:#fff}
-    button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
-    button.secondary{background:#fff;color:var(--brand)} button[disabled]{opacity:.5;cursor:not-allowed}
+    button{padding:8px 12px;border-radius:10px;border:1px solid #111;background:#111;color:#fff;cursor:pointer}
+    button.secondary{background:#fff;color:#111} button[disabled]{opacity:.6;cursor:not-allowed}
     .container{display:grid;grid-template-columns:1fr}
     @media(min-width:1000px){.container{grid-template-columns:62% 38%}}
-    .left{padding:16px} .right{padding:16px;border-left:1px solid var(--border);background:#fff;min-height:60vh}
-    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border)}
-    th,td{border-bottom:1px solid var(--soft);padding:10px;text-align:left;font-size:14px;vertical-align:top}
+    .left{padding:16px} .right{padding:16px;border-left:1px solid #e5e7eb;background:#fff;min-height:60vh}
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb}
+    th,td{border-bottom:1px solid #f1f3f5;padding:10px;text-align:left;font-size:14px;vertical-align:top}
     th{background:#fafafa;font-weight:600}
-    .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
-    .chip.inprocess{background:#fffbe6;border-color:var(--warn)} .chip.done{background:#e6ffed;border-color:var(--ok)} .chip.rejected{background:#ffe6e6;border-color:var(--bad)}
+    .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #e5e7eb}
+    .chip.inprocess{background:#fffbe6;border-color:#facc15}
+    .chip.done{background:#e6ffed;border-color:#22c55e}
+    .chip.rejected{background:#ffe6e6;border-color:#ef4444}
     .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.2s}
     .toast.show{opacity:1;transform:translateY(0)}
     .price{font-size:12px;color:#333;line-height:1.3}
-    .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
-    /* Butang ikon WhatsApp (rasmi hijau) */
-    .wa{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--wa);text-decoration:none}
-    .wa:hover{background:#f4fff8}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px}
+    /* Ikon WhatsApp rasmi (bulat hijau) */
+    .wa{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid #e5e7eb;border-radius:999px;background:#fff;text-decoration:none}
     .wa .icon{width:18px;height:18px;display:block}
-    .label-mini{font-size:11px;color:#333;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 6px;margin-left:6px}
+    .label-mini{font-size:11px;color:#333;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:2px 6px;margin-left:6px}
   </style>
 </head>
 <body>
@@ -48,9 +49,7 @@
     <div class="search" id="searchBar">
       <input id="search" type="text" placeholder="Cari nama/IC..." />
       <!-- Tapis Panel: dropdown + taip -->
-      <select id="filterPanelSelect" title="Tapis Jenis Panel">
-        <option value="">Semua Panel</option>
-      </select>
+      <select id="filterPanelSelect" title="Tapis Jenis Panel"><option value="">Semua Panel</option></select>
       <input id="filterPanelText" type="text" placeholder="Tulis nama panel..." />
       <!-- Sort -->
       <select id="sort">
@@ -63,9 +62,6 @@
       </select>
       <select id="pageSize" title="Rekod per halaman"><option>25</option><option selected>50</option><option>100</option></select>
       <button id="refresh" class="secondary" title="Muat semula">Refresh</button>
-      <span style="flex:1 1 auto"></span>
-      <input id="cutoff" type="date" title="Tarikh cutoff arkib" />
-      <button id="btn-archive" title="Arkibkan rekod Done/Rejected sebelum tarikh">Archive</button>
     </div>
   </header>
 
@@ -132,7 +128,7 @@
 
     <aside class="right">
       <h3>Panel Window</h3>
-      <p class="hint">Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Tetingkap kanan dibuka sekali & dikitar semula (URL sama → fokus, tiada duplikasi).</p>
+      <p class="hint">Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Hanya <b>1 popup</b> di kanan digunakan semula setiap kali (URL sama → fokus).</p>
       <div id="detail"></div>
     </aside>
   </div>
@@ -140,15 +136,15 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-  // ===== CONFIG =====
+  // ====== KONFIG ======
   const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
 
-  // ===== STATE =====
+  // ====== STATE ======
   let state = { tab:'inprocess', page:1, pageSize:50, q:'', sort:'tarikh_desc', filterPanelSelect:'', filterPanelText:'' };
-  let panelWin = null, lastOpenTs = 0;
   let regPanelMap = new Map(); // key lowercased panel_name -> {pic_name,pic_phone,panel_link}
+  let lastClickAt = 0; // debounce
 
-  // ===== HELPERS =====
+  // ====== UI HELPERS ======
   const el = s => document.querySelector(s);
   const tbody = el('#tbody');
   const pageInfo = el('#pageInfo');
@@ -167,62 +163,79 @@
       else d=new Date(s);
       if(isNaN(d.getTime())) return escapeHtml(s);
     }
-    const pad=n=>String(n).padStart(2,'0');
-    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const p=n=>String(n).padStart(2,'0');
+    return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
   }
 
-  const toPhoneDigits = s => String(s||'').replace(/[^\d]/g,'');
-  function buildWhatsAppUrl(phone, text){
-    const p = toPhoneDigits(phone); const q = encodeURIComponent(text||'');
+  // ====== SINGLE POPUP DI KANAN (REUSE SENTIASA) ======
+  // Nama popup kekal → pastikan hanya satu
+  const POPUP_NAME = 'panel_claim_popup_right';
+  function openOrReuseRight(url) {
+    const now = Date.now();
+    if (now - lastClickAt < 400) return; // anti double-click
+    lastClickAt = now;
+    url = String(url||'');
+
+    // 1) Cuba attach pada popup sedia ada
+    let w = null;
+    try{
+      w = window.open('', POPUP_NAME);
+      if (w && !w.closed) {
+        try {
+          const current = w.location && String(w.location.href);
+          if (current === url) { w.focus(); return; }
+        } catch(e) {}
+        w.location.href = url; w.focus(); return;
+      }
+    }catch(e){}
+
+    // 2) Cipta popup baru di kanan jika belum ada
+    const sw = window.screen.availWidth, sh = window.screen.availHeight;
+    const width  = Math.max(520, Math.round(sw * 0.34)); // ~34% lebar kanan
+    const height = Math.max(650, sh);
+    const left   = Math.max(0, sw - width);
+    const top    = 0;
+    const features = [
+      'popup=yes','toolbar=no','location=no','status=no','menubar=no',
+      'scrollbars=yes','resizable=yes',
+      `width=${width}`, `height=${height}`, `left=${left}`, `top=${top}`
+    ].join(',');
+    const created = window.open(url, POPUP_NAME, features);
+    if (!created) {
+      alert('Sila benarkan pop-up untuk domain ini.');
+      window.open(url, POPUP_NAME); // fallback tab (masih nama sama → reuse)
+      return;
+    }
+    created.focus();
+  }
+
+  // ====== DATA HELPERS ======
+  const toDigits = s => String(s||'').replace(/[^\d]/g,'');
+  function buildWAUrl(phone, text){
+    const p = toDigits(phone); const q = encodeURIComponent(text||'');
     if(!p) return '';
     return `https://web.whatsapp.com/send?phone=${p}${q?`&text=${q}`:''}`;
   }
 
-  // SVG WhatsApp rasmi (bulat hijau + ikon putih)
+  // SVG WhatsApp rasmi
   const waSVG = `
   <svg class="icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
     <circle cx="16" cy="16" r="16" fill="#25D366"/>
     <path fill="#fff" d="M21.6 17.4c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.6-.6.7-.2.2-.4.1c-.2-.1-.8-.3-1.5-1-.6-.5-1-.9-1.1-1.1-.1-.2 0-.3.1-.4.1-.1.2-.3.3-.4.1-.1.1-.2.2-.3.1-.1 0-.3 0-.4s-.5-1.3-.7-1.8c-.2-.5-.4-.4-.5-.4h-.4c-.1 0-.4.1-.6.3-.2.2-.8.7-.8 1.8s.9 2 1 2.2c.1.2 1.7 2.3 3.9 3.3.6.2 1 .4 1.3.5.5.2 1.1.2 1.5.1.4-.1 1.3-.6 1.5-1.1.2-.5.2-1 .1-1.1s-.2-.1-.4-.2zM16 6.1c-4.5 0-8.1 3.5-8.1 7.9 0 1.6.5 3.1 1.4 4.3l-1 3.6 3.7-1c1.2.7 2.7 1.1 4.3 1.1 4.5 0 8.1-3.5 8.1-7.9S20.5 6.1 16 6.1z"/>
   </svg>`;
 
-  // ===== Single Window Reuse (untuk Open & WhatsApp) =====
-  function openOrReusePanel(url){
-    if(!url) return;
-    const now=Date.now(); if(now-lastOpenTs<250) return; lastOpenTs=now;
-
-    // Jika tetingkap sedia ada → guna semula
-    try{
-      if(panelWin && !panelWin.closed){
-        try{
-          const current = panelWin.location && String(panelWin.location.href);
-          if(current === String(url)){ panelWin.focus(); return; }
-        }catch(e){}
-        panelWin.location.href = url; panelWin.focus(); return;
-      }
-    }catch(e){}
-
-    // Jika belum ada → cipta satu (nama sama memastikan reuse seterusnya)
-    const sw=window.screen.availWidth, sh=window.screen.availHeight;
-    const w=Math.max(520, Math.round(sw*0.34));
-    const h=Math.max(650, sh);
-    const left=Math.max(0, sw-w), top=0;
-    const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
-    panelWin = window.open(url, 'panel_claim_window', features);
-    if(!panelWin){ alert('Sila benarkan pop-up untuk domain ini.'); window.open(url, 'panel_claim_window'); return; }
-    panelWin.focus();
-  }
-
+  // ====== TABS ======
   function setActiveTab(tab){
     state.tab = tab;
     document.querySelectorAll('.tab').forEach(t=> t.classList.toggle('active', t.dataset.tab===tab));
     const isReg = tab==='regpanel';
     el('#recordsView').style.display = isReg ? 'none' : '';
     el('#regPanelView').style.display = isReg ? '' : 'none';
-    el('#searchBar').style.display = isReg ? 'none' : '';
+    el('#searchBar').style.display   = isReg ? 'none' : '';
     if(isReg){ loadRegPanel(); } else { state.page=1; load(); }
   }
 
-  // ===== RECORDS =====
+  // ====== LOAD RECORDS ======
   async function load(){
     if(regPanelMap.size===0){ await buildRegPanelMap(); await populatePanelDropdown(); }
     const url = `${API_BASE}?action=listrecords&statusTab=${encodeURIComponent(state.tab)}&page=${state.page}&pageSize=${state.pageSize}&q=${encodeURIComponent(state.q)}`;
@@ -230,9 +243,8 @@
       const res = await fetch(url); const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat data');
       const {total, items} = json.data;
-      state.total = total;
 
-      // Filter panel: dropdown (exact, case-insensitive) + teks (contains). Jika kedua-dua diisi → AND.
+      // Tapis panel: dropdown exact + teks contains (AND jika kedua-dua ada)
       let filtered = items.slice();
       if(state.filterPanelSelect){
         const key = state.filterPanelSelect.toLowerCase();
@@ -243,13 +255,8 @@
         filtered = filtered.filter(r => String(r.jenis_panel||'').toLowerCase().includes(t));
       }
 
-      // Sorting paparan halaman semasa
       const sorted = sortItems(filtered);
-
-      const pages = Math.max(1, Math.ceil(total / state.pageSize));
-      pageInfo.textContent = `Halaman ${state.page}/${pages} • ${sorted.length} rekod`;
-      tbody.innerHTML = sorted.map(r => renderRow(r)).join('');
-      sorted.forEach(r => wireRow(r));
+      renderTable(sorted, total);
       updateBadgesApprox(sorted);
     }catch(e){ console.error(e); toast('Ralat memuat data'); }
   }
@@ -261,19 +268,17 @@
     if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00');
     const d=new Date(s); return isNaN(d.getTime())?null:d;
   }
+
   function sortItems(items){
     const m = state.sort;
     if(m==='panel_az' || m==='panel_za'){
-      items.sort((a,b)=> String(a.jenis_panel||'').localeCompare(String(b.jenis_panel||''), 'ms', {sensitivity:'base'}));
-      if(m==='panel_za') items.reverse();
-      return items;
+      items.sort((a,b)=> String(a.jenis_panel||'').localeCompare(String(b.jenis_panel||''),'ms',{sensitivity:'base'}));
+      if(m==='panel_za') items.reverse(); return items;
     }
     if(m==='nama_az' || m==='nama_za'){
-      items.sort((a,b)=> String(a.nama_pesakit||'').localeCompare(String(b.nama_pesakit||''), 'ms', {sensitivity:'base'}));
-      if(m==='nama_za') items.reverse();
-      return items;
+      items.sort((a,b)=> String(a.nama_pesakit||'').localeCompare(String(b.nama_pesakit||''),'ms',{sensitivity:'base'}));
+      if(m==='nama_za') items.reverse(); return items;
     }
-    // default: tarikh
     items.sort((a,b)=>{
       const da=parseDate(a.tarikh_hadir), db=parseDate(b.tarikh_hadir);
       const ta=da?da.getTime():0, tb=db?db.getTime():0;
@@ -281,6 +286,12 @@
     });
     if(m==='tarikh_asc') items.reverse();
     return items;
+  }
+
+  function renderTable(items, total){
+    pageInfo.textContent = `Halaman ${state.page} • ${items.length} rekod`;
+    tbody.innerHTML = items.map(r => renderRow(r)).join('');
+    items.forEach(r => wireRow(r));
   }
 
   function num(x){ const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; return n.toFixed(2); }
@@ -293,18 +304,18 @@
     const reg = regPanelMap.get(panelKey);
 
     // WhatsApp Pesakit (kolom Telefon)
-    const waPatientURL = r.no_telefon ? buildWhatsAppUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
+    const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
     const waPatientIcon = waPatientURL ? `
       <a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit"
-         onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">
+         onclick="openOrReuseRight('${waPatientURL.replace(/'/g,"%27")}')">
          ${waSVG}
       </a>` : '';
 
-    // WhatsApp PIC (kolom Panel/PIC – sebelah no. PIC)
-    const waPICURL = (reg && reg.pic_phone) ? buildWhatsAppUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
+    // WhatsApp PIC (kolom Panel/PIC)
+    const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
     const waPICIcon = waPICURL ? `
       <a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel"
-         onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">
+         onclick="openOrReuseRight('${waPICURL.replace(/'/g,"%27")}')">
          ${waSVG}
       </a>` : '';
 
@@ -345,11 +356,15 @@
 
   function wireRow(r){
     const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
-    tr.querySelector('.btn-open').addEventListener('click', ()=>{
+    const openBtn = tr.querySelector('.btn-open');
+    openBtn.addEventListener('click', ()=>{
+      openBtn.disabled = true;
       const url = r.panel_claim_url || '';
-      if(!url){ toast('URL panel tiada'); return; }
-      openOrReusePanel(url);
+      if(!url){ toast('URL panel tiada'); openBtn.disabled=false; return; }
+      openOrReuseRight(url);
+      setTimeout(()=> openBtn.disabled=false, 500);
     });
+
     const submitBtn = tr.querySelector('.btn-submit');
     if(submitBtn){
       submitBtn.addEventListener('click', async ()=>{
@@ -359,7 +374,7 @@
     }
   }
 
-  // ===== POST util — x-www-form-urlencoded (elak preflight) =====
+  // ====== POST util — x-www-form-urlencoded (min preflight) ======
   async function postForm(action, obj){
     const body = new URLSearchParams();
     body.set('payload', JSON.stringify(obj||{}));
@@ -381,12 +396,12 @@
   function updateBadgesApprox(items){
     const count={inprocess:0, done:0, rejected:0};
     items.forEach(r=>{ const s=(r.status_claim||'Not Started'); if(s==='Done'||s==='Submitted') count.done++; else if(s==='Rejected') count.rejected++; else count.inprocess++; });
-    el('#badge-inprocess').textContent=String(count.inprocess);
-    el('#badge-done').textContent=String(count.done);
-    el('#badge-rejected').textContent=String(count.rejected);
+    document.getElementById('badge-inprocess').textContent=String(count.inprocess);
+    document.getElementById('badge-done').textContent=String(count.done);
+    document.getElementById('badge-rejected').textContent=String(count.rejected);
   }
 
-  // ===== REG PANEL =====
+  // ====== REG PANEL ======
   async function buildRegPanelMap(){
     regPanelMap.clear();
     try{
@@ -418,9 +433,9 @@
       const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat Reg Panel');
       const items = json.data.items || [];
-      el('#rp_tbody').innerHTML = items.map(p => {
-        const href = p.pic_phone ? buildWhatsAppUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
-        const waBtn = href ? `<a class="wa" href="javascript:void(0)" onclick="openOrReusePanel('${href.replace(/'/g,"%27")}')" title="WhatsApp PIC">${waSVG}</a>` : '';
+      document.getElementById('rp_tbody').innerHTML = items.map(p => {
+        const href = p.pic_phone ? buildWAUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
+        const waBtn = href ? `<a class="wa" href="javascript:void(0)" onclick="openOrReuseRight('${href.replace(/'/g,"%27")}')" title="WhatsApp PIC">${waSVG}</a>` : '';
         return `<tr>
           <td>${escapeHtml(p.panel_name||'')}</td>
           <td><a href="${escapeHtml(p.panel_link||'#')}" target="_blank" rel="noopener">Buka</a></td>
@@ -434,19 +449,19 @@
     }catch(e){ console.error(e); toast('Ralat memuat Reg Panel'); }
   }
 
-  // ===== EVENTS =====
+  // ====== EVENTS ======
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
-  el('#search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
-  el('#filterPanelSelect').addEventListener('change', e => { state.filterPanelSelect = e.target.value; state.page=1; load(); });
-  el('#filterPanelText').addEventListener('input', e => { state.filterPanelText = e.target.value.trim(); state.page=1; load(); });
-  el('#sort').addEventListener('change', e => { state.sort = e.target.value; state.page=1; load(); });
-  el('#pageSize').addEventListener('change', e => { state.pageSize = parseInt(e.target.value,10)||50; state.page=1; load(); });
-  el('#refresh').addEventListener('click', load);
-  el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
-  el('#next').addEventListener('click', ()=>{ const pages=Math.max(1,Math.ceil(state.total/state.pageSize)); if(state.page<pages){ state.page++; load(); }});
+  document.getElementById('search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
+  document.getElementById('filterPanelSelect').addEventListener('change', e => { state.filterPanelSelect = e.target.value; state.page=1; load(); });
+  document.getElementById('filterPanelText').addEventListener('input', e => { state.filterPanelText = e.target.value.trim(); state.page=1; load(); });
+  document.getElementById('sort').addEventListener('change', e => { state.sort = e.target.value; state.page=1; load(); });
+  document.getElementById('pageSize').addEventListener('change', e => { state.pageSize = parseInt(e.target.value,10)||50; state.page=1; load(); });
+  document.getElementById('refresh').addEventListener('click', load);
+  document.getElementById('prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
+  document.getElementById('next').addEventListener('click', ()=>{ state.page++; load(); });
 
   // INIT
-  setActiveTab('inprocess'); // load() akan dipanggil
+  setActiveTab('inprocess'); // memanggil load()
   </script>
 </body>
 </html>
