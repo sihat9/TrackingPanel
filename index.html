@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel Claims Portal</title>
   <style>
-    :root{--bg:#f8f9fb;--fg:#111;--border:#e5e7eb;--soft:#f1f3f5;--brand:#111;--ok:#22c55e;--warn:#facc15;--bad:#ef4444;--wa:#25D366;}
+    :root{--bg:#f8f9fb;--fg:#111;--muted:#555;--border:#e5e7eb;--soft:#f1f3f5;--brand:#111;--ok:#22c55e;--warn:#facc15;--bad:#ef4444;--wa:#25D366;}
     *{box-sizing:border-box}
     body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--fg)}
     header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:10}
@@ -16,7 +16,7 @@
     .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     input[type="text"], input[type="url"], input[type="tel"], select, input[type="date"], textarea{padding:8px 10px;border:1px solid #d1d5db;border-radius:10px;min-width:170px;background:#fff}
     button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
-    button.secondary{background:#fff;color:var(--brand)} button[disabled]{opacity:.6;cursor:not-allowed}
+    button.secondary{background:#fff;color:var(--brand)} button[disabled]{opacity:.5;cursor:not-allowed}
     .container{display:grid;grid-template-columns:1fr}
     @media(min-width:1000px){.container{grid-template-columns:62% 38%}}
     .left{padding:16px} .right{padding:16px;border-left:1px solid var(--border);background:#fff;min-height:60vh}
@@ -24,17 +24,17 @@
     th,td{border-bottom:1px solid var(--soft);padding:10px;text-align:left;font-size:14px;vertical-align:top}
     th{background:#fafafa;font-weight:600}
     .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
-    .chip.inprocess{background:#fffbe6;border-color:var(--warn)}
-    .chip.done{background:#e6ffed;border-color:var(--ok)}
-    .chip.rejected{background:#ffe6e6;border-color:var(--bad)}
+    .chip.inprocess{background:#fffbe6;border-color:var(--warn)} .chip.done{background:#e6ffed;border-color:var(--ok)} .chip.rejected{background:#ffe6e6;border-color:var(--bad)}
     .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.2s}
     .toast.show{opacity:1;transform:translateY(0)}
     .price{font-size:12px;color:#333;line-height:1.3}
     .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
-    /* Ikon WhatsApp rasmi */
-    .wa{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:999px;background:#fff;text-decoration:none}
+    /* Butang ikon WhatsApp (rasmi hijau) */
+    .wa{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--wa);text-decoration:none}
+    .wa:hover{background:#f4fff8}
     .wa .icon{width:18px;height:18px;display:block}
+    .label-mini{font-size:11px;color:#333;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 6px;margin-left:6px}
   </style>
 </head>
 <body>
@@ -47,8 +47,12 @@
     </div>
     <div class="search" id="searchBar">
       <input id="search" type="text" placeholder="Cari nama/IC..." />
-      <select id="filterPanelSelect" title="Tapis Jenis Panel"><option value="">Semua Panel</option></select>
+      <!-- Tapis Panel: dropdown + taip -->
+      <select id="filterPanelSelect" title="Tapis Jenis Panel">
+        <option value="">Semua Panel</option>
+      </select>
       <input id="filterPanelText" type="text" placeholder="Tulis nama panel..." />
+      <!-- Sort -->
       <select id="sort">
         <option value="tarikh_desc">Tarikh Hadir: Terbaru</option>
         <option value="tarikh_asc">Tarikh Hadir: Terdahulu</option>
@@ -59,6 +63,9 @@
       </select>
       <select id="pageSize" title="Rekod per halaman"><option>25</option><option selected>50</option><option>100</option></select>
       <button id="refresh" class="secondary" title="Muat semula">Refresh</button>
+      <span style="flex:1 1 auto"></span>
+      <input id="cutoff" type="date" title="Tarikh cutoff arkib" />
+      <button id="btn-archive" title="Arkibkan rekod Done/Rejected sebelum tarikh">Archive</button>
     </div>
   </header>
 
@@ -125,7 +132,7 @@
 
     <aside class="right">
       <h3>Panel Window</h3>
-      <p class="hint">Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Satu popup di kanan akan digunakan semula (URL sama → fokus).</p>
+      <p class="hint">Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Tetingkap kanan dibuka sekali & dikitar semula (URL sama → fokus, tiada duplikasi).</p>
       <div id="detail"></div>
     </aside>
   </div>
@@ -133,13 +140,13 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-  // ===== KONFIG =====
+  // ===== CONFIG =====
   const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
 
   // ===== STATE =====
   let state = { tab:'inprocess', page:1, pageSize:50, q:'', sort:'tarikh_desc', filterPanelSelect:'', filterPanelText:'' };
-  let regPanelMap = new Map();
-  let lastClickAt = 0;
+  let panelWin = null, lastOpenTs = 0;
+  let regPanelMap = new Map(); // key lowercased panel_name -> {pic_name,pic_phone,panel_link}
 
   // ===== HELPERS =====
   const el = s => document.querySelector(s);
@@ -149,93 +156,83 @@
   const escapeHtml = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function toast(m){ toastEl.textContent=m; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),2200); }
 
+  // Tarikh → DD/MM/YYYY HH:mm (24 jam)
   function formatDateDDMMYYYY_HHMM(v){
     if(!v) return '';
     let d;
-    if(v instanceof Date) d=v; else {
+    if(v instanceof Date) d=v;
+    else {
       const s=String(v);
-      if(/^\d{4}-\d{2}-\d{2}$/.test(s)) d=new Date(s+'T00:00:00'); else d=new Date(s);
+      if(/^\d{4}-\d{2}-\d{2}$/.test(s)) d=new Date(s+'T00:00:00');
+      else d=new Date(s);
       if(isNaN(d.getTime())) return escapeHtml(s);
     }
-    const p=n=>String(n).padStart(2,'0');
-    return `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    const pad=n=>String(n).padStart(2,'0');
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  // ===== SATU POPUP DI KANAN (REUSE) =====
-  const POPUP_NAME = 'panel_claim_popup_right';
-  function openOrReuseRight(url) {
-    const now = Date.now();
-    if (now - lastClickAt < 400) return; // debounce
-    lastClickAt = now;
-    url = String(url||'');
-
-    // Cuba attach pada popup sedia ada
-    let w = null;
-    try{
-      w = window.open('', POPUP_NAME);
-      if (w && !w.closed) {
-        try {
-          const current = w.location && String(w.location.href);
-          if (current === url) { w.focus(); return; }
-        } catch(e) {}
-        w.location.href = url; w.focus(); return;
-      }
-    }catch(e){}
-
-    // Cipta popup baru di kanan
-    const sw = window.screen.availWidth, sh = window.screen.availHeight;
-    const width  = Math.max(520, Math.round(sw*0.34));
-    const height = Math.max(650, sh);
-    const left   = Math.max(0, sw - width);
-    const top    = 0;
-    const features = [
-      'popup=yes','toolbar=no','location=no','status=no','menubar=no',
-      'scrollbars=yes','resizable=yes',
-      `width=${width}`, `height=${height}`, `left=${left}`, `top=${top}`
-    ].join(',');
-    const created = window.open(url, POPUP_NAME, features);
-    if (!created) {
-      alert('Sila benarkan pop-up untuk domain ini.');
-      window.open(url, POPUP_NAME); // fallback (tab) masih reuse nama sama
-      return;
-    }
-    created.focus();
-  }
-
-  // ===== DATA HELPERS =====
-  const toDigits = s => String(s||'').replace(/[^\d]/g,'');
-  function buildWAUrl(phone, text){
-    const p = toDigits(phone); const q = encodeURIComponent(text||'');
+  const toPhoneDigits = s => String(s||'').replace(/[^\d]/g,'');
+  function buildWhatsAppUrl(phone, text){
+    const p = toPhoneDigits(phone); const q = encodeURIComponent(text||'');
     if(!p) return '';
     return `https://web.whatsapp.com/send?phone=${p}${q?`&text=${q}`:''}`;
   }
+
+  // SVG WhatsApp rasmi (bulat hijau + ikon putih)
   const waSVG = `
   <svg class="icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
     <circle cx="16" cy="16" r="16" fill="#25D366"/>
     <path fill="#fff" d="M21.6 17.4c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.6-.6.7-.2.2-.4.1c-.2-.1-.8-.3-1.5-1-.6-.5-1-.9-1.1-1.1-.1-.2 0-.3.1-.4.1-.1.2-.3.3-.4.1-.1.1-.2.2-.3.1-.1 0-.3 0-.4s-.5-1.3-.7-1.8c-.2-.5-.4-.4-.5-.4h-.4c-.1 0-.4.1-.6.3-.2.2-.8.7-.8 1.8s.9 2 1 2.2c.1.2 1.7 2.3 3.9 3.3.6.2 1 .4 1.3.5.5.2 1.1.2 1.5.1.4-.1 1.3-.6 1.5-1.1.2-.5.2-1 .1-1.1s-.2-.1-.4-.2zM16 6.1c-4.5 0-8.1 3.5-8.1 7.9 0 1.6.5 3.1 1.4 4.3l-1 3.6 3.7-1c1.2.7 2.7 1.1 4.3 1.1 4.5 0 8.1-3.5 8.1-7.9S20.5 6.1 16 6.1z"/>
   </svg>`;
 
-  // ===== TABS =====
+  // ===== Single Window Reuse (untuk Open & WhatsApp) =====
+  function openOrReusePanel(url){
+    if(!url) return;
+    const now=Date.now(); if(now-lastOpenTs<250) return; lastOpenTs=now;
+
+    // Jika tetingkap sedia ada → guna semula
+    try{
+      if(panelWin && !panelWin.closed){
+        try{
+          const current = panelWin.location && String(panelWin.location.href);
+          if(current === String(url)){ panelWin.focus(); return; }
+        }catch(e){}
+        panelWin.location.href = url; panelWin.focus(); return;
+      }
+    }catch(e){}
+
+    // Jika belum ada → cipta satu (nama sama memastikan reuse seterusnya)
+    const sw=window.screen.availWidth, sh=window.screen.availHeight;
+    const w=Math.max(520, Math.round(sw*0.34));
+    const h=Math.max(650, sh);
+    const left=Math.max(0, sw-w), top=0;
+    const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
+    panelWin = window.open(url, 'panel_claim_window', features);
+    if(!panelWin){ alert('Sila benarkan pop-up untuk domain ini.'); window.open(url, 'panel_claim_window'); return; }
+    panelWin.focus();
+  }
+
   function setActiveTab(tab){
     state.tab = tab;
     document.querySelectorAll('.tab').forEach(t=> t.classList.toggle('active', t.dataset.tab===tab));
     const isReg = tab==='regpanel';
     el('#recordsView').style.display = isReg ? 'none' : '';
     el('#regPanelView').style.display = isReg ? '' : 'none';
-    el('#searchBar').style.display   = isReg ? 'none' : '';
+    el('#searchBar').style.display = isReg ? 'none' : '';
     if(isReg){ loadRegPanel(); } else { state.page=1; load(); }
   }
 
-  // ===== LOAD RECORDS =====
+  // ===== RECORDS =====
   async function load(){
     if(regPanelMap.size===0){ await buildRegPanelMap(); await populatePanelDropdown(); }
     const url = `${API_BASE}?action=listrecords&statusTab=${encodeURIComponent(state.tab)}&page=${state.page}&pageSize=${state.pageSize}&q=${encodeURIComponent(state.q)}`;
     try{
       const res = await fetch(url); const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat data');
-      const {items} = json.data;
+      const {total, items} = json.data;
+      state.total = total;
 
-      // Filter panel: dropdown exact + teks contains (AND jika dua-dua ada)
+      // Filter panel: dropdown (exact, case-insensitive) + teks (contains). Jika kedua-dua diisi → AND.
       let filtered = items.slice();
       if(state.filterPanelSelect){
         const key = state.filterPanelSelect.toLowerCase();
@@ -246,56 +243,70 @@
         filtered = filtered.filter(r => String(r.jenis_panel||'').toLowerCase().includes(t));
       }
 
+      // Sorting paparan halaman semasa
       const sorted = sortItems(filtered);
-      renderTable(sorted);
+
+      const pages = Math.max(1, Math.ceil(total / state.pageSize));
+      pageInfo.textContent = `Halaman ${state.page}/${pages} • ${sorted.length} rekod`;
+      tbody.innerHTML = sorted.map(r => renderRow(r)).join('');
+      sorted.forEach(r => wireRow(r));
       updateBadgesApprox(sorted);
     }catch(e){ console.error(e); toast('Ralat memuat data'); }
   }
 
-  function parseDate(v){ if(!v) return null; const s=String(v); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00'); const d=new Date(s); return isNaN(d)?null:d; }
+  function parseDate(value){
+    if(!value) return null;
+    if(value instanceof Date) return value;
+    const s=String(value);
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00');
+    const d=new Date(s); return isNaN(d.getTime())?null:d;
+  }
   function sortItems(items){
     const m = state.sort;
     if(m==='panel_az' || m==='panel_za'){
-      items.sort((a,b)=> String(a.jenis_panel||'').localeCompare(String(b.jenis_panel||''),'ms',{sensitivity:'base'}));
-      if(m==='panel_za') items.reverse(); return items;
+      items.sort((a,b)=> String(a.jenis_panel||'').localeCompare(String(b.jenis_panel||''), 'ms', {sensitivity:'base'}));
+      if(m==='panel_za') items.reverse();
+      return items;
     }
     if(m==='nama_az' || m==='nama_za'){
-      items.sort((a,b)=> String(a.nama_pesakit||'').localeCompare(String(b.nama_pesakit||''),'ms',{sensitivity:'base'}));
-      if(m==='nama_za') items.reverse(); return items;
+      items.sort((a,b)=> String(a.nama_pesakit||'').localeCompare(String(b.nama_pesakit||''), 'ms', {sensitivity:'base'}));
+      if(m==='nama_za') items.reverse();
+      return items;
     }
+    // default: tarikh
     items.sort((a,b)=>{
-      const ta=(parseDate(a.tarikh_hadir)||0).getTime?.()||0;
-      const tb=(parseDate(b.tarikh_hadir)||0).getTime?.()||0;
-      return tb - ta; // terbaru dulu
+      const da=parseDate(a.tarikh_hadir), db=parseDate(b.tarikh_hadir);
+      const ta=da?da.getTime():0, tb=db?db.getTime():0;
+      return tb - ta; // terbaru dahulu
     });
     if(m==='tarikh_asc') items.reverse();
     return items;
-  }
-
-  function renderTable(items){
-    pageInfo.textContent = `Halaman ${state.page} • ${items.length} rekod`;
-    tbody.innerHTML = items.map(r => renderRow(r)).join('');
-    items.forEach(r => wireRow(r));
   }
 
   function num(x){ const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; return n.toFixed(2); }
 
   function renderRow(r){
     const status = (r.status_claim||'Not Started');
-    const cls = status==='Done'||status==='Submitted' ? 'done' : (status==='Rejected' ? 'rejected' : 'inprocess');
+    const chipClass = status==='Done'||status==='Submitted' ? 'done' : (status==='Rejected' ? 'rejected' : 'inprocess');
 
-    const key = String(r.jenis_panel||'').toLowerCase().trim();
-    const reg = regPanelMap.get(key);
+    const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
+    const reg = regPanelMap.get(panelKey);
 
-    const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
+    // WhatsApp Pesakit (kolom Telefon)
+    const waPatientURL = r.no_telefon ? buildWhatsAppUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
     const waPatientIcon = waPatientURL ? `
       <a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit"
-         onclick="openOrReuseRight('${waPatientURL.replace(/'/g,'%27')}')">${waSVG}</a>` : '';
+         onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">
+         ${waSVG}
+      </a>` : '';
 
-    const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
+    // WhatsApp PIC (kolom Panel/PIC – sebelah no. PIC)
+    const waPICURL = (reg && reg.pic_phone) ? buildWhatsAppUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
     const waPICIcon = waPICURL ? `
       <a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel"
-         onclick="openOrReuseRight('${waPICURL.replace(/'/g,'%27')}')">${waSVG}</a>` : '';
+         onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">
+         ${waSVG}
+      </a>` : '';
 
     const price = `<div class="price">
       Consult RM${num(r.harga_consultation)} · Ubat RM${num(r.harga_ubat)} · Prosedur RM${num(r.harga_prosedur)}<br>
@@ -305,20 +316,26 @@
     return `<tr data-id="${escapeHtml(r.record_id)}">
       <td>${escapeHtml(r.nama_pesakit||'')}</td>
       <td>${escapeHtml(r.no_ic||'')}</td>
-      <td><div style="display:flex;align-items:center;gap:8px"><span>${escapeHtml(r.no_telefon||'')}</span>${waPatientIcon||''}</div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>${escapeHtml(r.no_telefon||'')}</span>
+          ${waPatientIcon || ''}
+        </div>
+      </td>
       <td>${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
       <td>
         <div><b>${escapeHtml(r.jenis_panel||'')}</b></div>
         ${reg ? `<div class="price" style="margin-top:4px">
           ${escapeHtml(reg.pic_name||'-')}<br>
           <div style="display:flex;align-items:center;gap:8px">
-            <small>${escapeHtml(reg.pic_phone||'')}</small>${waPICIcon||''}
+            <small>${escapeHtml(reg.pic_phone||'')}</small>
+            ${waPICIcon || ''}
           </div>
         </div>` : ''}
       </td>
       <td>${price}</td>
       <td>${escapeHtml(r.jenis_ubat||'')}</td>
-      <td><span class="chip ${cls}">${escapeHtml(status)}</span></td>
+      <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
       <td class="actions">
         <button class="secondary btn-open" title="Buka laman panel">Open</button>
         <button class="btn-submit" title="Tanda Submitted">Submit</button>
@@ -328,15 +345,11 @@
 
   function wireRow(r){
     const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
-    const openBtn = tr.querySelector('.btn-open');
-    openBtn.addEventListener('click', ()=>{
-      openBtn.disabled = true;
+    tr.querySelector('.btn-open').addEventListener('click', ()=>{
       const url = r.panel_claim_url || '';
-      if(!url){ toast('URL panel tiada'); openBtn.disabled=false; return; }
-      openOrReuseRight(url);
-      setTimeout(()=> openBtn.disabled=false, 500);
+      if(!url){ toast('URL panel tiada'); return; }
+      openOrReusePanel(url);
     });
-
     const submitBtn = tr.querySelector('.btn-submit');
     if(submitBtn){
       submitBtn.addEventListener('click', async ()=>{
@@ -346,14 +359,16 @@
     }
   }
 
-  // ===== POST util (kurang preflight) =====
+  // ===== POST util — x-www-form-urlencoded (elak preflight) =====
   async function postForm(action, obj){
-    const body = new URLSearchParams(); body.set('payload', JSON.stringify(obj||{}));
+    const body = new URLSearchParams();
+    body.set('payload', JSON.stringify(obj||{}));
     const res = await fetch(`${API_BASE}?action=${encodeURIComponent(action)}`, { method:'POST', body });
     const json = await res.json().catch(()=>null);
     if(!json || json.status!=='ok') throw new Error((json && json.message) || 'Request gagal');
     return json;
   }
+
   async function updateStatus(record_id, payload){
     try{
       const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
@@ -366,9 +381,9 @@
   function updateBadgesApprox(items){
     const count={inprocess:0, done:0, rejected:0};
     items.forEach(r=>{ const s=(r.status_claim||'Not Started'); if(s==='Done'||s==='Submitted') count.done++; else if(s==='Rejected') count.rejected++; else count.inprocess++; });
-    document.getElementById('badge-inprocess').textContent=String(count.inprocess);
-    document.getElementById('badge-done').textContent=String(count.done);
-    document.getElementById('badge-rejected').textContent=String(count.rejected);
+    el('#badge-inprocess').textContent=String(count.inprocess);
+    el('#badge-done').textContent=String(count.done);
+    el('#badge-rejected').textContent=String(count.rejected);
   }
 
   // ===== REG PANEL =====
@@ -385,6 +400,7 @@
       }
     }catch(e){ console.warn('Gagal muat Reg Panel map', e); }
   }
+
   async function populatePanelDropdown(){
     const select = el('#filterPanelSelect');
     select.innerHTML = '<option value="">Semua Panel</option>';
@@ -395,15 +411,16 @@
       select.appendChild(opt);
     }
   }
+
   async function loadRegPanel(){
     try{
       const res = await fetch(`${API_BASE}?action=listregpanel`);
       const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat Reg Panel');
       const items = json.data.items || [];
-      document.getElementById('rp_tbody').innerHTML = items.map(p => {
-        const href = p.pic_phone ? buildWAUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
-        const waBtn = href ? `<a class="wa" href="javascript:void(0)" onclick="openOrReuseRight('${href.replace(/'/g,"%27")}')" title="WhatsApp PIC">${waSVG}</a>` : '';
+      el('#rp_tbody').innerHTML = items.map(p => {
+        const href = p.pic_phone ? buildWhatsAppUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
+        const waBtn = href ? `<a class="wa" href="javascript:void(0)" onclick="openOrReusePanel('${href.replace(/'/g,"%27")}')" title="WhatsApp PIC">${waSVG}</a>` : '';
         return `<tr>
           <td>${escapeHtml(p.panel_name||'')}</td>
           <td><a href="${escapeHtml(p.panel_link||'#')}" target="_blank" rel="noopener">Buka</a></td>
@@ -419,17 +436,17 @@
 
   // ===== EVENTS =====
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
-  document.getElementById('search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
-  document.getElementById('filterPanelSelect').addEventListener('change', e => { state.filterPanelSelect = e.target.value; state.page=1; load(); });
-  document.getElementById('filterPanelText').addEventListener('input', e => { state.filterPanelText = e.target.value.trim(); state.page=1; load(); });
-  document.getElementById('sort').addEventListener('change', e => { state.sort = e.target.value; state.page=1; load(); });
-  document.getElementById('pageSize').addEventListener('change', e => { state.pageSize = parseInt(e.target.value,10)||50; state.page=1; load(); });
-  document.getElementById('refresh').addEventListener('click', load);
-  document.getElementById('prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
-  document.getElementById('next').addEventListener('click', ()=>{ state.page++; load(); });
+  el('#search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
+  el('#filterPanelSelect').addEventListener('change', e => { state.filterPanelSelect = e.target.value; state.page=1; load(); });
+  el('#filterPanelText').addEventListener('input', e => { state.filterPanelText = e.target.value.trim(); state.page=1; load(); });
+  el('#sort').addEventListener('change', e => { state.sort = e.target.value; state.page=1; load(); });
+  el('#pageSize').addEventListener('change', e => { state.pageSize = parseInt(e.target.value,10)||50; state.page=1; load(); });
+  el('#refresh').addEventListener('click', load);
+  el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
+  el('#next').addEventListener('click', ()=>{ const pages=Math.max(1,Math.ceil(state.total/state.pageSize)); if(state.page<pages){ state.page++; load(); }});
 
   // INIT
-  setActiveTab('inprocess'); // akan panggil load()
+  setActiveTab('inprocess'); // load() akan dipanggil
   </script>
 </body>
 </html>
