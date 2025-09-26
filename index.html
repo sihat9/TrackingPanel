@@ -4,61 +4,542 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel Claims Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root{--bg:#f8f9fb;--fg:#111;--muted:#555;--border:#e5e7eb;--soft:#f1f3f5;--brand:#111;--ok:#22c55e;--warn:#facc15;--bad:#ef4444;--wa:#25D366;}
-    *{box-sizing:border-box}
-    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--fg)}
-    header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:10}
-    .tabs{display:flex;gap:8px;align-items:center;padding:10px 16px;flex-wrap:wrap}
-    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer}
-    .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
-    .badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:999px;background:var(--brand);color:#fff;text-align:center;font-size:12px;margin-left:6px}
-    .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    input[type="text"], input[type="url"], input[type="tel"], select, input[type="date"], textarea{padding:8px 10px;border:1px solid #d1d5db;border-radius:10px;min-width:170px;background:#fff}
-    button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
-    button.secondary{background:#fff;color:var(--brand)} button[disabled]{opacity:.5;cursor:not-allowed}
-    .container{display:grid;grid-template-columns:1fr}
-    @media(min-width:1000px){.container{grid-template-columns:62% 38%}}
-    .left{padding:16px} .right{padding:16px;border-left:1px solid var(--border);background:#fff;min-height:60vh}
-    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border)}
-    th,td{border-bottom:1px solid var(--soft);padding:10px;text-align:left;font-size:14px;vertical-align:top}
-    th{background:#fafafa;font-weight:600}
-    .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
-    .chip.inprocess{background:#fffbe6;border-color:var(--warn)} .chip.done{background:#e6ffed;border-color:var(--ok)} .chip.rejected{background:#ffe6e6;border-color:var(--bad)}
-    .sla{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;border:1px solid var(--border);margin-left:6px}
-    .sla.on{background:#e6ffed;border-color:var(--ok)} .sla.today{background:#fffbe6;border-color:var(--warn)} .sla.over{background:#ffe6e6;border-color:var(--bad)}
-    .actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-    .toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.2s}
-    .toast.show{opacity:1;transform:translateY(0)}
-    .price{font-size:12px;color:#333;line-height:1.3}
-    .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
-    .wa{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--wa);text-decoration:none}
-    .wa:hover{background:#f4fff8}
-    .wa .icon{width:18px;height:18px;display:block}
-    .label-mini{font-size:11px;color:#333;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 6px;margin-left:6px}
-    .btn-danger{border-color:var(--bad);background:var(--bad)}
-    .btn-warning{border-color:var(--warn);background:var(--warn);color:#111}
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #6c757d;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --bg: #f8f9fb;
+      --fg: #212529;
+      --muted: #6c757d;
+      --border: #dee2e6;
+      --soft: #e9ecef;
+      --wa: #25D366;
+      --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      --hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+    }
+    
+    header {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 16px;
+      flex-wrap: wrap;
+      background: #fff;
+    }
+    
+    .tab {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .tab:hover {
+      background: var(--light);
+      border-color: var(--primary);
+    }
+    
+    .tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .search {
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: var(--light);
+      border-top: 1px solid var(--border);
+    }
+    
+    input[type="text"], input[type="url"], input[type="tel"], select, input[type="date"], textarea {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 170px;
+      background: #fff;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+    
+    button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    button:hover {
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    
+    button.secondary {
+      background: #fff;
+      color: var(--primary);
+    }
+    
+    button.secondary:hover {
+      background: var(--light);
+    }
+    
+    button[disabled] {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    @media(min-width: 1200px) {
+      .container {
+        grid-template-columns: 65% 35%;
+      }
+    }
+    
+    .left {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+    
+    .right {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    
+    th, td {
+      border-bottom: 1px solid var(--soft);
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+    
+    th {
+      background: var(--light);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    
+    tr:hover {
+      background: rgba(67, 97, 238, 0.03);
+    }
+    
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+    }
+    
+    .chip.inprocess {
+      background: #fff9e6;
+      border-color: var(--warning);
+      color: #856404;
+    }
+    
+    .chip.done {
+      background: #e6ffed;
+      border-color: var(--success);
+      color: #155724;
+    }
+    
+    .chip.submitted {
+      background: #e6f3ff;
+      border-color: var(--primary);
+      color: #004085;
+    }
+    
+    .chip.rejected {
+      background: #ffe6e6;
+      border-color: var(--danger);
+      color: #721c24;
+    }
+    
+    .sla {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+      margin-left: 6px;
+    }
+    
+    .sla.on {
+      background: #e6ffed;
+      border-color: var(--success);
+      color: #155724;
+    }
+    
+    .sla.today {
+      background: #fffbe6;
+      border-color: var(--warning);
+      color: #856404;
+    }
+    
+    .sla.over {
+      background: #ffe6e6;
+      border-color: var(--danger);
+      color: #721c24;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: var(--dark);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: .3s;
+      z-index: 1000;
+      box-shadow: var(--hover-shadow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .price {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--card-shadow);
+    }
+    
+    /* Ikon WhatsApp yang lebih realistik */
+    .wa {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--wa);
+      color: white;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border: none;
+    }
+    
+    .wa:hover {
+      background: #128C7E;
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .wa i {
+      font-size: 18px;
+    }
+    
+    .label-mini {
+      font-size: 11px;
+      color: #333;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 6px;
+      margin-left: 6px;
+    }
+    
+    .btn-danger {
+      border-color: var(--danger);
+      background: var(--danger);
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+      border-color: #bd2130;
+    }
+    
+    .btn-warning {
+      border-color: var(--warning);
+      background: var(--warning);
+      color: #212529;
+    }
+    
+    .btn-warning:hover {
+      background: #e0a800;
+      border-color: #d39e00;
+    }
+    
     /* Loading overlay */
-    .loading{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.6);backdrop-filter:saturate(1.2) blur(2px);z-index:9999}
-    .loading.show{display:flex}
-    .spinner{width:58px;height:58px;border-radius:50%;border:6px solid #ddd;border-top-color:#111;animation:spin 0.8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .muted{color:#666;font-size:12px}
-    .inline-input{width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:8px}
+    .loading {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+    }
+    
+    .loading.show {
+      display: flex;
+    }
+    
+    .spinner {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 6px solid #ddd;
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    
+    .inline-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      background: var(--light);
+    }
+    
+    .page-info {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .section-title {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--light);
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .hint {
+      padding: 12px 16px;
+      background: #e6f3ff;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: #004085;
+    }
+    
+    .detail-content {
+      padding: 16px;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    
+    @media(min-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .form-group label {
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .form-group full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .stat-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    .tab-icon {
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="tabs">
-      <div class="tab active" data-tab="inprocess">Panel (In Process) <span id="badge-inprocess" class="badge">0</span></div>
-      <div class="tab" data-tab="submitted">Panel (Submitted) <span id="badge-submitted" class="badge">0</span></div>
-      <div class="tab" data-tab="done">Panel (Done) <span id="badge-done" class="badge">0</span></div>
-      <div class="tab" data-tab="rejected">Panel (Rejected) <span id="badge-rejected" class="badge">0</span></div>
-      <div class="tab" data-tab="regpanel">Reg Panel</div>
+      <div class="tab active" data-tab="inprocess">
+        <i class="fas fa-spinner tab-icon"></i> Panel (In Process) <span id="badge-inprocess" class="badge">0</span>
+      </div>
+      <div class="tab" data-tab="submitted">
+        <i class="fas fa-paper-plane tab-icon"></i> Panel (Submitted) <span id="badge-submitted" class="badge">0</span>
+      </div>
+      <div class="tab" data-tab="done">
+        <i class="fas fa-check-circle tab-icon"></i> Panel (Done) <span id="badge-done" class="badge">0</span>
+      </div>
+      <div class="tab" data-tab="rejected">
+        <i class="fas fa-times-circle tab-icon"></i> Panel (Rejected) <span id="badge-rejected" class="badge">0</span>
+      </div>
+      <div class="tab" data-tab="regpanel">
+        <i class="fas fa-cog tab-icon"></i> Reg Panel
+      </div>
     </div>
     <div class="search" id="searchBar">
       <input id="search" type="text" placeholder="Cari nama/IC..." />
-      <select id="filterPanelSelect" title="Tapis Jenis Panel"><option value="">Semua Panel</option></select>
+      <select id="filterPanelSelect" title="Tapis Jenis Panel">
+        <option value="">Semua Panel</option>
+      </select>
       <input id="filterPanelText" type="text" placeholder="Tulis nama panel..." />
       <select id="sort">
         <option value="tarikh_desc">Tarikh Hadir: Terbaru</option>
@@ -74,14 +555,21 @@
         <option value="today">SLA: Due Today</option>
         <option value="on">SLA: On Track</option>
       </select>
-      <select id="pageSize" title="Rekod per halaman"><option>25</option><option selected>50</option><option>100</option></select>
-      <button id="refresh" class="secondary" title="Muat semula">Refresh</button>
+      <select id="pageSize" title="Rekod per halaman">
+        <option>25</option>
+        <option selected>50</option>
+        <option>100</option>
+      </select>
+      <button id="refresh" class="secondary" title="Muat semula">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
     </div>
   </header>
 
   <div class="container">
     <section class="left">
       <div id="recordsView">
+        <div class="section-title">Senarai Tuntutan Panel</div>
         <table>
           <thead>
             <tr>
@@ -98,32 +586,64 @@
           </thead>
           <tbody id="tbody"></tbody>
         </table>
-        <div class="actions" style="margin-top:12px">
-          <button id="prev" class="secondary">Prev</button>
-          <span id="pageInfo"></span>
-          <button id="next" class="secondary">Next</button>
+        <div class="pagination">
+          <button id="prev" class="secondary">
+            <i class="fas fa-chevron-left"></i> Prev
+          </button>
+          <span id="pageInfo" class="page-info"></span>
+          <button id="next" class="secondary">
+            Next <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
       </div>
 
       <div id="regPanelView" style="display:none">
-        <div class="card" style="margin-bottom:12px">
-          <h3 style="margin:0 0 8px 0">Daftar Panel Baharu</h3>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div><label>Nama Panel *</label><input id="rp_name" type="text" placeholder="Contoh: AIA" required /></div>
-            <div><label>Link Panel (URL) *</label><input id="rp_link" type="url" placeholder="https://..." required /></div>
-            <div><label>Nama PIC</label><input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" /></div>
-            <div><label>No. Telefon PIC</label><input id="rp_pic_phone" type="tel" placeholder="0123456789" /></div>
-            <div><label>Tempoh (hari) *</label><input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" /></div>
-            <div style="grid-column:1 / -1"><label>Catatan</label><textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%"></textarea></div>
+        <div class="section-title">Pendaftaran Panel</div>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="margin:0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-plus-circle"></i> Daftar Panel Baharu
+          </h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="rp_name">Nama Panel *</label>
+              <input id="rp_name" type="text" placeholder="Contoh: AIA" required />
+            </div>
+            <div class="form-group">
+              <label for="rp_link">Link Panel (URL) *</label>
+              <input id="rp_link" type="url" placeholder="https://..." required />
+            </div>
+            <div class="form-group">
+              <label for="rp_pic_name">Nama PIC</label>
+              <input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" />
+            </div>
+            <div class="form-group">
+              <label for="rp_pic_phone">No. Telefon PIC</label>
+              <input id="rp_pic_phone" type="tel" placeholder="0123456789" />
+            </div>
+            <div class="form-group">
+              <label for="rp_terms_days">Tempoh (hari) *</label>
+              <input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" />
+            </div>
+            <div class="form-group full-width">
+              <label for="rp_notes">Catatan</label>
+              <textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%; min-height: 80px;"></textarea>
+            </div>
           </div>
-          <div style="margin-top:10px;display:flex;gap:8px">
-            <button id="rp_save">Simpan Panel</button>
-            <button id="rp_clear" class="secondary">Clear</button>
+          <div style="margin-top:16px;display:flex;gap:8px">
+            <button id="rp_save">
+              <i class="fas fa-save"></i> Simpan Panel
+            </button>
+            <button id="rp_clear" class="secondary">
+              <i class="fas fa-eraser"></i> Clear
+            </button>
           </div>
         </div>
 
         <div class="card">
-          <h3 style="margin:0 0 8px 0">Senarai Panel Berdaftar <span class="muted">(klik Edit untuk ubah terus dalam baris)</span></h3>
+          <h3 style="margin:0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-list"></i> Senarai Panel Berdaftar
+          </h3>
+          <p class="muted" style="margin-bottom: 12px;">Klik Edit untuk ubah terus dalam baris</p>
           <table>
             <thead>
               <tr>
@@ -144,14 +664,25 @@
     </section>
 
     <aside class="right">
-      <h3>Panel Window</h3>
-      <p class="hint">Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Tetingkap kanan dibuka sekali & dikitar semula.</p>
-      <div id="detail"></div>
+      <div class="section-title">Panel Window</div>
+      <div class="hint">
+        <i class="fas fa-info-circle"></i> Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Tetingkap kanan dibuka sekali & dikitar semula.
+      </div>
+      <div class="detail-content" id="detail">
+        <p style="text-align: center; color: var(--muted); padding: 40px 20px;">
+          Pilih rekod untuk melihat butiran
+        </p>
+      </div>
     </aside>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <div id="loading" class="loading" aria-live="polite"><div class="spinner" title="Loading..."></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <i class="fas fa-check-circle"></i>
+    <span class="toast-message"></span>
+  </div>
+  <div id="loading" class="loading" aria-live="polite">
+    <div class="spinner" title="Loading..."></div>
+  </div>
 
   <script>
   // ===== CONFIG =====
@@ -167,9 +698,24 @@
   const tbody = el('#tbody');
   const pageInfo = el('#pageInfo');
   const toastEl = el('#toast');
+  const toastMsg = el('.toast-message');
   const loader = el('#loading');
   const escapeHtml = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  function toast(m){ toastEl.textContent=m; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),2200); }
+  
+  function toast(m, type = 'info') {
+    const iconMap = {
+      'info': 'fas fa-info-circle',
+      'success': 'fas fa-check-circle',
+      'warning': 'fas fa-exclamation-triangle',
+      'error': 'fas fa-exclamation-circle'
+    };
+    
+    toastMsg.textContent = m;
+    toastEl.innerHTML = `<i class="${iconMap[type] || iconMap.info}"></i><span class="toast-message">${m}</span>`;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 3000);
+  }
+  
   function showLoading(){ loader.classList.add('show'); }
   function hideLoading(){ loader.classList.remove('show'); }
 
@@ -186,10 +732,14 @@
     const pad=n=>String(n).padStart(2,'0');
     return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
+  
   const toDigits = s => String(s||'').replace(/[^\d]/g,'');
-  function buildWAUrl(phone, text){ const p=toDigits(phone); const q=encodeURIComponent(text||''); if(!p) return ''; return `https://web.whatsapp.com/send?phone=${p}${q?`&text=${q}`:''}`; }
-
-  const waSVG = `<svg class="icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path fill="#25D366" d="M16 0C7.164 0 0 7.164 0 16c0 2.968.86 5.732 2.344 8.06L.5 31.5l7.672-1.781C11.276 31.352 13.568 32 16 32c8.836 0 16-7.164 16-16S24.836 0 16 0z"/><path fill="#FFF" d="M23.656 22.344c-1.172 1.172-2.707 1.812-4.344 1.812-1.637 0-3.172-.64-4.344-1.812l-6.656-6.656c-1.172-1.172-1.812-2.707-1.812-4.344s.64-3.172 1.812-4.344 2.707-1.812 4.344-1.812 3.172.64 4.344 1.812l6.656 6.656c1.172 1.172 1.812 2.707 1.812 4.344s-.64 3.172-1.812 4.344zM16 7c-2.209 0-4 1.791-4 4s1.791 4 4 4 4-1.791 4-4-1.791-4-4-4z"/></svg>`;
+  function buildWAUrl(phone, text){ 
+    const p=toDigits(phone); 
+    const q=encodeURIComponent(text||''); 
+    if(!p) return ''; 
+    return `https://web.whatsapp.com/send?phone=${p}${q?`&text=${q}`:''}`; 
+  }
 
   // ===== Single Window (kanan) Reuse =====
   function openOrReusePanel(url){
@@ -197,8 +747,16 @@
     const now=Date.now(); if(now-lastOpenTs<250) return; lastOpenTs=now;
     try{
       if(panelWin && !panelWin.closed){
-        try{ const current=panelWin.location && String(panelWin.location.href); if(current===String(url)){ panelWin.focus(); return; } }catch(e){}
-        panelWin.location.href=url; panelWin.focus(); return;
+        try{ 
+          const current=panelWin.location && String(panelWin.location.href); 
+          if(current===String(url)){ 
+            panelWin.focus(); 
+            return; 
+          } 
+        } catch(e){}
+        panelWin.location.href=url; 
+        panelWin.focus(); 
+        return;
       }
     }catch(e){}
     const sw=window.screen.availWidth, sh=window.screen.availHeight;
@@ -206,7 +764,11 @@
     const left=Math.max(0, sw-w), top=0;
     const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
     panelWin = window.open(url, 'panel_claim_window', features);
-    if(!panelWin){ alert('Sila benarkan pop-up untuk domain ini.'); window.open(url, 'panel_claim_window'); return; }
+    if(!panelWin){ 
+      toast('Sila benarkan pop-up untuk domain ini.', 'warning');
+      window.open(url, 'panel_claim_window'); 
+      return; 
+    }
     panelWin.focus();
   }
 
@@ -231,12 +793,16 @@
       }
     }catch(e){ console.warn('Gagal muat Reg Panel map', e); }
   }
+  
   async function populatePanelDropdown(){
     const select = el('#filterPanelSelect');
     select.innerHTML = '<option value="">Semua Panel</option>';
     const names = Array.from(regPanelMap.keys()).sort((a,b)=> a.localeCompare(b,'ms',{sensitivity:'base'}));
     for(const name of names){
-      const opt = document.createElement('option'); opt.value = name; opt.textContent = name.replace(/\b\w/g, c=>c.toUpperCase()); select.appendChild(opt);
+      const opt = document.createElement('option'); 
+      opt.value = name; 
+      opt.textContent = name.replace(/\b\w/g, c=>c.toUpperCase()); 
+      select.appendChild(opt);
     }
   }
 
@@ -274,7 +840,10 @@
 
   // ===== LOAD RECORDS =====
   async function load(){
-    if(regPanelMap.size===0){ await buildRegPanelMap(); await populatePanelDropdown(); }
+    if(regPanelMap.size===0){ 
+      await buildRegPanelMap(); 
+      await populatePanelDropdown(); 
+    }
     const url = `${API_BASE}?action=listrecords&statusTab=${encodeURIComponent(state.tab)}&page=${state.page}&pageSize=${state.pageSize}&q=${encodeURIComponent(state.q)}`;
     try{
       showLoading();
@@ -299,8 +868,13 @@
       const sorted = sortItems(filtered);
       renderTable(sorted);
       updateBadgesApprox(sorted);
-    }catch(e){ console.error(e); toast('Ralat memuat data'); }
-    finally{ hideLoading(); }
+    }catch(e){ 
+      console.error(e); 
+      toast('Ralat memuat data', 'error'); 
+    }
+    finally{ 
+      hideLoading(); 
+    }
   }
 
   function parseDate(value){
@@ -310,6 +884,7 @@
     if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00');
     const d=new Date(s); return isNaN(d.getTime())?null:d;
   }
+  
   function sortItems(items){
     const m = state.sort;
     if(m==='panel_az' || m==='panel_za'){
@@ -329,7 +904,10 @@
     return items;
   }
 
-  function num(x){ const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; return n.toFixed(2); }
+  function num(x){ 
+    const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; 
+    return n.toFixed(2); 
+  }
 
   function renderTable(items){
     if(pageInfo) pageInfo.textContent = `Halaman ${state.page} • ${items.length} rekod`;
@@ -337,20 +915,28 @@
     items.forEach(r => wireRow(r));
   }
 
-  const waSVGEl = waSVG; // reuse string
-
   function renderRow(r){
     const status = (r.status_claim||'Not Started');
-    const chipClass = status==='Done'||status==='Submitted' ? 'done' : (status==='Rejected' ? 'rejected' : 'inprocess');
+    const chipClass = 
+      status==='Done' ? 'done' : 
+      status==='Rejected' ? 'rejected' : 
+      status==='Submitted' ? 'submitted' : 
+      'inprocess';
 
     const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
     const reg = regPanelMap.get(panelKey);
 
     const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
-    const waPatientIcon = waPatientURL ? `<a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit" onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">${waSVGEl}</a>` : '';
+    const waPatientIcon = waPatientURL ? 
+      `<a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit" onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">
+        <i class="fab fa-whatsapp"></i>
+      </a>` : '';
 
     const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
-    const waPICIcon = waPICURL ? `<a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel" onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">${waSVGEl}</a>` : '';
+    const waPICIcon = waPICURL ? 
+      `<a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel" onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">
+        <i class="fab fa-whatsapp"></i>
+      </a>` : '';
 
     const price = `<div class="price">
       Consult RM${num(r.harga_consultation)} · Ubat RM${num(r.harga_ubat)} · Prosedur RM${num(r.harga_prosedur)}<br>
@@ -361,9 +947,9 @@
     const slaBadge = sla.cls ? `<span class="sla ${sla.cls}" title="Due: ${sla.dueText}">${sla.label}</span>` : '';
 
     const submittedActions = state.tab==='submitted'
-      ? `<button class="secondary btn-pending" title="Masih menunggu">Pending</button>
-         <button class="btn-done" title="Tanda Done">Done</button>
-         <button class="btn-rejected" title="Tanda Rejected">Rejected</button>`
+      ? `<button class="secondary btn-pending" title="Masih menunggu"><i class="fas fa-clock"></i></button>
+         <button class="btn-done" title="Tanda Done"><i class="fas fa-check"></i></button>
+         <button class="btn-rejected" title="Tanda Rejected"><i class="fas fa-times"></i></button>`
       : '';
 
     return `<tr data-id="${escapeHtml(r.record_id)}">
@@ -390,9 +976,9 @@
       <td>${escapeHtml(r.jenis_ubat||'')}</td>
       <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
       <td class="actions">
-        <button class="secondary btn-open" title="Buka laman panel">Open</button>
+        <button class="secondary btn-open" title="Buka laman panel"><i class="fas fa-external-link-alt"></i></button>
         ${state.tab==='inprocess'
-          ? `<button class="btn-submit" title="Hantar ke Submitted">Submit</button>`
+          ? `<button class="btn-submit" title="Hantar ke Submitted"><i class="fas fa-paper-plane"></i></button>`
           : submittedActions
         }
       </td>
@@ -407,26 +993,28 @@
         const reg = regPanelMap.get(key);
         return reg && reg.panel_link ? reg.panel_link : '';
       })();
-      if(!url){ toast('URL panel tiada'); return; }
+      if(!url){ toast('URL panel tiada', 'warning'); return; }
       openOrReusePanel(url);
     });
 
     if (state.tab==='inprocess') {
       tr.querySelector('.btn-submit')?.addEventListener('click', async ()=>{
         const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
-        if (ref === null) { toast('Dibatalkan.'); return; }
+        if (ref === null) { toast('Dibatalkan.', 'info'); return; }
         await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
       });
     } else if (state.tab==='submitted') {
-      tr.querySelector('.btn-pending')?.addEventListener('click', async ()=>{ await updateStatus(r.record_id, { status_claim: 'Submitted' }); });
+      tr.querySelector('.btn-pending')?.addEventListener('click', async ()=>{ 
+        await updateStatus(r.record_id, { status_claim: 'Submitted' }); 
+      });
       tr.querySelector('.btn-done')?.addEventListener('click', async ()=>{
         const ref = prompt('Masukkan Claim Ref/ID (jika belum diisi):', r.claim_ref_id||'');
-        if (ref === null) { toast('Dibatalkan.'); return; }
+        if (ref === null) { toast('Dibatalkan.', 'info'); return; }
         await updateStatus(r.record_id, { status_claim: 'Done', claim_ref_id: ref });
       });
       tr.querySelector('.btn-rejected')?.addEventListener('click', async ()=>{
         const reason = prompt('Sebab Rejected (optional):','');
-        if (reason === null) { toast('Dibatalkan.'); return; }
+        if (reason === null) { toast('Dibatalkan.', 'info'); return; }
         await updateStatus(r.record_id, { status_claim: 'Rejected', notes: reason||'' });
       });
     }
@@ -446,19 +1034,27 @@
       hideLoading();
     }
   }
+  
   async function updateStatus(record_id, payload){
     try{
       const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
       if(tr && payload.status_claim){
         const chip=tr.querySelector('.chip');
         chip.textContent = payload.status_claim;
-        chip.className = 'chip ' + (payload.status_claim==='Rejected' ? 'rejected' : (payload.status_claim==='Done'||payload.status_claim==='Submitted' ? 'done' : 'inprocess'));
+        chip.className = 'chip ' + 
+          (payload.status_claim==='Rejected' ? 'rejected' : 
+           (payload.status_claim==='Done' ? 'done' : 
+            (payload.status_claim==='Submitted' ? 'submitted' : 'inprocess')));
       }
       await postForm('updateclaimstatus', { record_id, ...payload });
-      toast('Status dikemas kini');
+      toast('Status dikemas kini', 'success');
       await load();
-    }catch(e){ toast(e.message||'Gagal kemas status'); await load(); }
+    }catch(e){ 
+      toast(e.message||'Gagal kemas status', 'error'); 
+      await load(); 
+    }
   }
+  
   function updateBadgesApprox(items){
     const count={inprocess:0, submitted:0, done:0, rejected:0};
     items.forEach(r=>{
@@ -487,14 +1083,22 @@
       tbodyRP.querySelectorAll('tr').forEach(tr => wireRegRow(tr));
       await buildRegPanelMap();
       await populatePanelDropdown();
-    }catch(e){ console.error(e); toast('Ralat memuat Reg Panel'); }
-    finally{ hideLoading(); }
+    }catch(e){ 
+      console.error(e); 
+      toast('Ralat memuat Reg Panel', 'error'); 
+    }
+    finally{ 
+      hideLoading(); 
+    }
   }
 
   function renderRegRow(p){
     const link = escapeHtml(p.panel_link || p.login_url || p.claim_url_template || '');
     const waHref = p.pic_phone ? buildWAUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
-    const waBtn = waHref ? `<a class="wa" href="javascript:void(0)" onclick="openOrReusePanel('${waHref.replace(/'/g,"%27")}')" title="WhatsApp PIC">${waSVG}</a>` : '';
+    const waBtn = waHref ? 
+      `<a class="wa" href="javascript:void(0)" onclick="openOrReusePanel('${waHref.replace(/'/g,"%27")}')" title="WhatsApp PIC">
+        <i class="fab fa-whatsapp"></i>
+      </a>` : '';
     const terms = parseInt(p.payment_terms_days,10) || '';
 
     return `<tr data-panel="${escapeHtml(p.panel_name||'')}">
@@ -506,10 +1110,10 @@
       <td class="cell-notes"><span class="view">${escapeHtml(p.notes||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
       <td>${waBtn}</td>
       <td class="actions">
-        <button class="btn-warning btn-rp-edit">Edit</button>
-        <button class="btn-danger btn-rp-del">Padam</button>
-        <button class="btn-save" style="display:none">Save</button>
-        <button class="secondary btn-cancel" style="display:none">Cancel</button>
+        <button class="btn-warning btn-rp-edit"><i class="fas fa-edit"></i></button>
+        <button class="btn-danger btn-rp-del"><i class="fas fa-trash"></i></button>
+        <button class="btn-save" style="display:none"><i class="fas fa-save"></i></button>
+        <button class="secondary btn-cancel" style="display:none"><i class="fas fa-times"></i></button>
       </td>
     </tr>`;
   }
@@ -539,19 +1143,32 @@
       const picp = tr.querySelector('.cell-picphone .edit').value.trim();
       const terms= parseInt(tr.querySelector('.cell-terms .edit').value,10);
       const notes= tr.querySelector('.cell-notes .edit').value.trim();
-      if(!name || !link || !Number.isFinite(terms) || terms<=0){ toast('Isi Nama, Link & Tempoh hari'); return; }
+      if(!name || !link || !Number.isFinite(terms) || terms<=0){ 
+        toast('Isi Nama, Link & Tempoh hari', 'warning'); 
+        return; 
+      }
       try{
         await postForm('updateregpanel', { panel_name:name, panel_link:link, pic_name:picn, pic_phone:picp, payment_terms_days:terms, notes });
-        toast('Panel dikemas kini');
+        toast('Panel dikemas kini', 'success');
         await loadRegPanel();
-      }catch(e){ console.error(e); toast('Gagal kemas panel'); }
+      }catch(e){ 
+        console.error(e); 
+        toast('Gagal kemas panel', 'error'); 
+      }
     });
 
     btnDel.addEventListener('click', async ()=>{
       const name = tr.getAttribute('data-panel');
       if(!confirm(`Padam panel "${name}"?`)) return;
-      try{ await postForm('deleteregpanel', { panel_name:name }); toast('Panel dipadam'); await loadRegPanel(); }
-      catch(e){ console.error(e); toast('Gagal padam panel'); }
+      try{ 
+        await postForm('deleteregpanel', { panel_name:name }); 
+        toast('Panel dipadam', 'success'); 
+        await loadRegPanel(); 
+      }
+      catch(e){ 
+        console.error(e); 
+        toast('Gagal padam panel', 'error'); 
+      }
     });
   }
 
@@ -563,15 +1180,24 @@
     const termsDays = parseInt(el('#rp_terms_days').value,10);
     const notes = el('#rp_notes').value.trim();
 
-    if(!name || !link || !Number.isFinite(termsDays) || termsDays<=0){ toast('Sila isi Nama Panel, Link dan Tempoh (hari).'); return; }
+    if(!name || !link || !Number.isFinite(termsDays) || termsDays<=0){ 
+      toast('Sila isi Nama Panel, Link dan Tempoh (hari).', 'warning'); 
+      return; 
+    }
     try{
       await postForm('updateregpanel', { panel_name: name, panel_link: link, pic_name: picName||'', pic_phone: picPhone||'', payment_terms_days: termsDays, notes: notes||'' });
-      toast('Panel disimpan.');
+      toast('Panel disimpan.', 'success');
       clearRegPanelForm();
       await loadRegPanel();
-    }catch(e){ console.error(e); toast('Gagal simpan panel'); }
+    }catch(e){ 
+      console.error(e); 
+      toast('Gagal simpan panel', 'error'); 
+    }
   }
-  function clearRegPanelForm(){ ['#rp_name','#rp_link','#rp_pic_name','#rp_pic_phone','#rp_terms_days','#rp_notes'].forEach(id=> el(id).value=''); }
+  
+  function clearRegPanelForm(){ 
+    ['#rp_name','#rp_link','#rp_pic_name','#rp_pic_phone','#rp_terms_days','#rp_notes'].forEach(id=> el(id).value=''); 
+  }
 
   // ===== Events =====
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
@@ -588,7 +1214,7 @@
   // Reg Panel buttons
   document.addEventListener('click', (ev)=>{
     if(ev.target && ev.target.id==='rp_save'){ saveRegPanel(); }
-    if(ev.target && ev.target.id==='rp_clear'){ clearRegPanelForm(); toast('Bersih.'); }
+    if(ev.target && ev.target.id==='rp_clear'){ clearRegPanelForm(); toast('Bersih.', 'info'); }
   });
 
   // INIT
