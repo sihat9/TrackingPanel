@@ -32,7 +32,6 @@
     .toast.show{opacity:1;transform:translateY(0)}
     .price{font-size:12px;color:#333;line-height:1.3}
     .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
-    /* Butang ikon WhatsApp (rasmi hijau) */
     .wa{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--wa);text-decoration:none}
     .wa:hover{background:#f4fff8}
     .wa .icon{width:18px;height:18px;display:block}
@@ -60,7 +59,6 @@
         <option value="nama_az">Nama Pesakit: A → Z</option>
         <option value="nama_za">Nama Pesakit: Z → A</option>
       </select>
-      <!-- Penapis SLA (tab Submitted sahaja) -->
       <select id="filterSLA" title="Status SLA">
         <option value="">SLA: Semua</option>
         <option value="over">SLA: Overdue</option>
@@ -292,7 +290,7 @@
       }
 
       const sorted = sortItems(filtered);
-      renderTable(sorted);              // <-- fungsi yang dulu hilang
+      renderTable(sorted);
       updateBadgesApprox(sorted);
     }catch(e){ console.error(e); toast('Ralat memuat data'); }
   }
@@ -325,15 +323,10 @@
 
   function num(x){ const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; return n.toFixed(2); }
 
-  // ====== RENDER TABLE (DITAMBAH) ======
+  // ====== RENDER TABLE ======
   function renderTable(items){
-    // Info halaman ringkas (berdasarkan bilangan items selepas filter di client)
     if(pageInfo) pageInfo.textContent = `Halaman ${state.page} • ${items.length} rekod`;
-
-    // Isi jadual
     tbody.innerHTML = items.map(r => renderRow(r)).join('');
-
-    // Wire setiap baris
     items.forEach(r => wireRow(r));
   }
 
@@ -407,8 +400,11 @@
     </tr>`;
   }
 
+  // ===== wireRow DENGAN SEMAK CANCEL =====
   function wireRow(r){
     const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
+
+    // OPEN
     tr.querySelector('.btn-open').addEventListener('click', ()=>{
       const url = r.panel_claim_url || (()=>{
         const key = String(r.jenis_panel||'').toLowerCase().trim();
@@ -420,23 +416,29 @@
     });
 
     if (state.tab==='inprocess') {
-      const submitBtn = tr.querySelector('.btn-submit');
-      if(submitBtn){
-        submitBtn.addEventListener('click', async ()=>{
-          const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
-          await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
-        });
-      }
-    } else if (state.tab==='submitted') {
-      tr.querySelector('.btn-pending')?.addEventListener('click', async ()=>{
-        await updateStatus(r.record_id, { status_claim: 'Submitted' }); // kekal submitted
+      // SUBMIT — hanya proceed jika pengguna TIDAK tekan Cancel
+      tr.querySelector('.btn-submit')?.addEventListener('click', async ()=>{
+        const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
+        if (ref === null) { toast('Dibatalkan.'); return; } // ← penting
+        await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
       });
+    } else if (state.tab==='submitted') {
+      // PENDING — kekal Submitted (tiada prompt)
+      tr.querySelector('.btn-pending')?.addEventListener('click', async ()=>{
+        await updateStatus(r.record_id, { status_claim: 'Submitted' });
+      });
+
+      // DONE — hanya proceed jika TIDAK Cancel
       tr.querySelector('.btn-done')?.addEventListener('click', async ()=>{
         const ref = prompt('Masukkan Claim Ref/ID (jika belum diisi):', r.claim_ref_id||'');
+        if (ref === null) { toast('Dibatalkan.'); return; } // ← penting
         await updateStatus(r.record_id, { status_claim: 'Done', claim_ref_id: ref });
       });
+
+      // REJECTED — hanya proceed jika TIDAK Cancel
       tr.querySelector('.btn-rejected')?.addEventListener('click', async ()=>{
         const reason = prompt('Sebab Rejected (optional):','');
+        if (reason === null) { toast('Dibatalkan.'); return; } // ← penting
         await updateStatus(r.record_id, { status_claim: 'Rejected', notes: reason||'' });
       });
     }
@@ -453,6 +455,7 @@
   }
   async function updateStatus(record_id, payload){
     try{
+      // UI optimistik
       const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
       if(tr && payload.status_claim){
         const chip=tr.querySelector('.chip');
