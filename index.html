@@ -30,9 +30,9 @@
     .toast.show{opacity:1;transform:translateY(0)}
     .price{font-size:12px;color:#333;line-height:1.3}
     .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
-    /* Butang ikon WhatsApp (warna hijau) */
+    /* Butang ikon WhatsApp (rasmi hijau) */
     .wa{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--wa);text-decoration:none}
-    .wa:hover{background:#f7fff4}
+    .wa:hover{background:#f4fff8}
     .wa .icon{width:18px;height:18px;display:block}
     .label-mini{font-size:11px;color:#333;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 6px;margin-left:6px}
   </style>
@@ -47,10 +47,11 @@
     </div>
     <div class="search" id="searchBar">
       <input id="search" type="text" placeholder="Cari nama/IC..." />
-      <!-- Dropdown Panel auto dari REG_PANEL -->
+      <!-- Tapis Panel: dropdown + taip -->
       <select id="filterPanelSelect" title="Tapis Jenis Panel">
         <option value="">Semua Panel</option>
       </select>
+      <input id="filterPanelText" type="text" placeholder="Tulis nama panel..." />
       <!-- Sort -->
       <select id="sort">
         <option value="tarikh_desc">Tarikh Hadir: Terbaru</option>
@@ -143,9 +144,9 @@
   const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
 
   // ===== STATE =====
-  let state = { tab:'inprocess', page:1, pageSize:50, q:'', sort:'tarikh_desc', filterPanel:'' };
+  let state = { tab:'inprocess', page:1, pageSize:50, q:'', sort:'tarikh_desc', filterPanelSelect:'', filterPanelText:'' };
   let panelWin = null, lastOpenTs = 0;
-  let regPanelMap = new Map(); // key: panel_name (lower) -> {pic_name,pic_phone,panel_link}
+  let regPanelMap = new Map(); // key lowercased panel_name -> {pic_name,pic_phone,panel_link}
 
   // ===== HELPERS =====
   const el = s => document.querySelector(s);
@@ -177,7 +178,7 @@
     return `https://web.whatsapp.com/send?phone=${p}${q?`&text=${q}`:''}`;
   }
 
-  // SVG WhatsApp (hijau asal)
+  // SVG WhatsApp rasmi (bulat hijau + ikon putih)
   const waSVG = `
   <svg class="icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
     <circle cx="16" cy="16" r="16" fill="#25D366"/>
@@ -189,31 +190,25 @@
     if(!url) return;
     const now=Date.now(); if(now-lastOpenTs<250) return; lastOpenTs=now;
 
+    // Jika tetingkap sedia ada → guna semula
     try{
       if(panelWin && !panelWin.closed){
-        // Jika URL sama → fokus, jika berbeza → tukar lokasi
         try{
           const current = panelWin.location && String(panelWin.location.href);
           if(current === String(url)){ panelWin.focus(); return; }
         }catch(e){}
-        panelWin.location.href = url;
-        panelWin.focus();
-        return;
+        panelWin.location.href = url; panelWin.focus(); return;
       }
-    }catch(e){/* ignore cross-origin */ }
+    }catch(e){}
 
-    // Cipta tetingkap kanan sekali sahaja (nama window sama)
+    // Jika belum ada → cipta satu (nama sama memastikan reuse seterusnya)
     const sw=window.screen.availWidth, sh=window.screen.availHeight;
-    const w=Math.max(520, Math.round(sw*0.34));  // lebih kecil di kanan
+    const w=Math.max(520, Math.round(sw*0.34));
     const h=Math.max(650, sh);
     const left=Math.max(0, sw-w), top=0;
     const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
     panelWin = window.open(url, 'panel_claim_window', features);
-    if(!panelWin){
-      alert('Sila benarkan pop-up untuk domain ini.');
-      window.open(url, 'panel_claim_window'); // fallback tab dengan nama sama (masih reuse)
-      return;
-    }
+    if(!panelWin){ alert('Sila benarkan pop-up untuk domain ini.'); window.open(url, 'panel_claim_window'); return; }
     panelWin.focus();
   }
 
@@ -237,14 +232,18 @@
       const {total, items} = json.data;
       state.total = total;
 
-      // Filter panel via dropdown (exact match, case-insensitive)
+      // Filter panel: dropdown (exact, case-insensitive) + teks (contains). Jika kedua-dua diisi → AND.
       let filtered = items.slice();
-      if(state.filterPanel){
-        const key = state.filterPanel.toLowerCase();
+      if(state.filterPanelSelect){
+        const key = state.filterPanelSelect.toLowerCase();
         filtered = filtered.filter(r => String(r.jenis_panel||'').toLowerCase() === key);
       }
+      if(state.filterPanelText){
+        const t = state.filterPanelText.toLowerCase();
+        filtered = filtered.filter(r => String(r.jenis_panel||'').toLowerCase().includes(t));
+      }
 
-      // Sorting
+      // Sorting paparan halaman semasa
       const sorted = sortItems(filtered);
 
       const pages = Math.max(1, Math.ceil(total / state.pageSize));
@@ -297,13 +296,17 @@
     const waPatientURL = r.no_telefon ? buildWhatsAppUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
     const waPatientIcon = waPatientURL ? `
       <a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit"
-         onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">${waSVG}</a>` : '';
+         onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">
+         ${waSVG}
+      </a>` : '';
 
     // WhatsApp PIC (kolom Panel/PIC – sebelah no. PIC)
     const waPICURL = (reg && reg.pic_phone) ? buildWhatsAppUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
     const waPICIcon = waPICURL ? `
       <a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel"
-         onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">${waSVG}</a>` : '';
+         onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">
+         ${waSVG}
+      </a>` : '';
 
     const price = `<div class="price">
       Consult RM${num(r.harga_consultation)} · Ubat RM${num(r.harga_ubat)} · Prosedur RM${num(r.harga_prosedur)}<br>
@@ -317,7 +320,6 @@
         <div style="display:flex;align-items:center;gap:8px">
           <span>${escapeHtml(r.no_telefon||'')}</span>
           ${waPatientIcon || ''}
-          ${waPatientIcon ? '<span class="label-mini">Pesakit</span>' : ''}
         </div>
       </td>
       <td>${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
@@ -328,7 +330,6 @@
           <div style="display:flex;align-items:center;gap:8px">
             <small>${escapeHtml(reg.pic_phone||'')}</small>
             ${waPICIcon || ''}
-            ${waPICIcon ? '<span class="label-mini">PIC</span>' : ''}
           </div>
         </div>` : ''}
       </td>
@@ -402,7 +403,6 @@
 
   async function populatePanelDropdown(){
     const select = el('#filterPanelSelect');
-    // reset
     select.innerHTML = '<option value="">Semua Panel</option>';
     const names = Array.from(regPanelMap.keys()).sort((a,b)=> a.localeCompare(b,'ms',{sensitivity:'base'}));
     for(const name of names){
@@ -437,7 +437,8 @@
   // ===== EVENTS =====
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
   el('#search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
-  el('#filterPanelSelect').addEventListener('change', e => { state.filterPanel = e.target.value; state.page=1; load(); });
+  el('#filterPanelSelect').addEventListener('change', e => { state.filterPanelSelect = e.target.value; state.page=1; load(); });
+  el('#filterPanelText').addEventListener('input', e => { state.filterPanelText = e.target.value.trim(); state.page=1; load(); });
   el('#sort').addEventListener('change', e => { state.sort = e.target.value; state.page=1; load(); });
   el('#pageSize').addEventListener('change', e => { state.pageSize = parseInt(e.target.value,10)||50; state.page=1; load(); });
   el('#refresh').addEventListener('click', load);
@@ -445,7 +446,7 @@
   el('#next').addEventListener('click', ()=>{ const pages=Math.max(1,Math.ceil(state.total/state.pageSize)); if(state.page<pages){ state.page++; load(); }});
 
   // INIT
-  setActiveTab('inprocess'); // ini akan panggil load()
+  setActiveTab('inprocess'); // load() akan dipanggil
   </script>
 </body>
 </html>
