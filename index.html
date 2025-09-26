@@ -12,7 +12,7 @@
     .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer}
     .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
     .badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:999px;background:var(--brand);color:#fff;text-align:center;font-size:12px;margin-left:6px}
-    .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap}
+    .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     input[type="text"], input[type="url"], input[type="tel"], select, input[type="date"], textarea{padding:8px 10px;border:1px solid #d1d5db;border-radius:10px;min-width:220px;background:#fff}
     textarea{min-height:60px;width:100%}
     button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
@@ -138,7 +138,7 @@
 
   <script>
   // ===== CONFIG =====
-  const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
+  const API_BASE = 'PASTE_YOUR_GAS_WEB_APP_URL_HERE';
 
   // ===== STATE =====
   let state = { tab:'inprocess', page:1, pageSize:50, q:'', total:0 };
@@ -149,15 +149,15 @@
   const tbody = el('#tbody');
   const pageInfo = el('#pageInfo');
   const toastEl = el('#toast');
-  const priceStr = n => 'RM' + (typeof n==='number'? n : parseFloat(String(n||'').replace(/[^\d.]/g,''))||0).toFixed(2);
+  const priceStr = n => 'RM' + ((typeof n==='number')? n : parseFloat(String(n||'').replace(/[^\d.]/g,''))||0).toFixed(2);
   const escapeHtml = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
   function toast(m){ toastEl.textContent=m; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),2200); }
 
   function openOrReusePanel(url){
+    // anti double-click (300ms)
     const now=Date.now(); if(now-lastOpenTs<300) return; lastOpenTs=now;
     const sw=window.screen.availWidth, sh=window.screen.availHeight;
-    const w=Math.max(600, Math.round(sw*0.38)), h=Math.max(600, sh);
+    const w=Math.max(560, Math.round(sw*0.36)), h=Math.max(600, sh);
     const left=Math.max(0, sw-w), top=0;
     const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
     try{
@@ -171,12 +171,11 @@
   function setActiveTab(tab){
     state.tab = tab;
     document.querySelectorAll('.tab').forEach(t=> t.classList.toggle('active', t.dataset.tab===tab));
-    // tukar view + bar carian ikut tab
     const isReg = tab==='regpanel';
     el('#recordsView').style.display = isReg ? 'none' : '';
     el('#regPanelView').style.display = isReg ? '' : 'none';
     el('#searchBar').style.display = isReg ? 'none' : '';
-    if(isReg) { loadRegPanel(); } else { state.page=1; load(); }
+    if(isReg){ loadRegPanel(); } else { state.page=1; load(); }
   }
 
   // ===== RECORDS =====
@@ -215,6 +214,7 @@
       updateBadgesApprox(items);
     }catch(e){ console.error(e); toast('Ralat memuat data'); }
   }
+
   function wireRow(r){
     const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
     tr.querySelector('.btn-open').addEventListener('click', ()=>{
@@ -227,22 +227,47 @@
       await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
     });
   }
+
+  // ===== POST util — x-www-form-urlencoded tanpa headers (elak preflight) =====
+  async function postForm(action, obj){
+    const body = new URLSearchParams();
+    body.set('payload', JSON.stringify(obj||{}));
+    const res = await fetch(`${API_BASE}?action=${encodeURIComponent(action)}`, { method:'POST', body });
+    const json = await res.json().catch(()=>null);
+    if(!json || json.status!=='ok') throw new Error((json && json.message) || 'Request gagal');
+    return json;
+  }
+
   async function updateStatus(record_id, payload){
     try{
+      // Optimistic
       const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
-      if(tr){ const chip = tr.querySelector('.chip'); chip.textContent='Submitted'; chip.className='chip done'; }
-      const res = await fetch(`${API_BASE}?action=updateclaimstatus`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ record_id, ...payload })});
-      const json = await res.json(); if(json.status!=='ok') throw new Error(json.message||'Gagal kemas status');
+      if(tr){ const chip=tr.querySelector('.chip'); chip.textContent='Submitted'; chip.className='chip done'; }
+      await postForm('updateclaimstatus', { record_id, ...payload });
       toast('Status dikemas kini');
-    }catch(e){ toast('Gagal kemas status'); await load(); }
+    }catch(e){ toast(e.message||'Gagal kemas status'); await load(); }
   }
+
   function updateBadgesApprox(items){
-    const count={inprocess:0,done:0,rejected:0};
+    const count={inprocess:0, done:0, rejected:0};
     items.forEach(r=>{ const s=(r.status_claim||'Not Started'); if(s==='Done'||s==='Submitted') count.done++; else if(s==='Rejected') count.rejected++; else count.inprocess++; });
     el('#badge-inprocess').textContent=String(count.inprocess);
     el('#badge-done').textContent=String(count.done);
     el('#badge-rejected').textContent=String(count.rejected);
   }
+
+  // ===== ARCHIVE =====
+  el('#btn-archive').addEventListener('click', async ()=>{
+    const cutoff = el('#cutoff').value;
+    if(!cutoff){ alert('Sila pilih tarikh cutoff'); return; }
+    const year = cutoff.slice(0,4);
+    if(!confirm(`Arkibkan rekod Done/Rejected sebelum ${cutoff} ke ARCHIVE_${year}?`)) return;
+    try{
+      await postForm('archiverecords', { cutoffDate: cutoff, statuses:['Done','Rejected'] });
+      toast('Diarkibkan');
+      await load();
+    }catch(e){ alert(e.message||'Gagal arkib.'); }
+  });
 
   // ===== REG PANEL =====
   async function loadRegPanel(){
@@ -269,16 +294,11 @@
     const notes= el('#rp_notes').value.trim();
     if(!name || !link){ alert('Nama Panel dan Link Panel adalah wajib.'); return; }
     try{
-      const res = await fetch(`${API_BASE}?action=addregpanel`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ panel_name:name, panel_link:link, pic_contact:pic, payment_terms:terms, notes })
-      });
-      const json = await res.json();
-      if(json.status!=='ok') throw new Error(json.message||'Gagal simpan panel');
+      await postForm('addregpanel', { panel_name:name, panel_link:link, pic_contact:pic, payment_terms:terms, notes });
       toast('Panel disimpan');
       el('#rp_name').value=''; el('#rp_link').value=''; el('#rp_pic').value=''; el('#rp_terms').value=''; el('#rp_notes').value='';
       await loadRegPanel();
-    }catch(e){ alert(e.message); }
+    }catch(e){ alert(e.message || 'Failed to fetch.'); }
   }
 
   // ===== EVENTS =====
@@ -288,16 +308,6 @@
   el('#refresh').addEventListener('click', load);
   el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
   el('#next').addEventListener('click', ()=>{ const pages=Math.max(1,Math.ceil(state.total/state.pageSize)); if(state.page<pages){ state.page++; load(); }});
-  el('#btn-archive')?.addEventListener('click', async ()=>{
-    const cutoff = el('#cutoff').value; if(!cutoff){ alert('Sila pilih tarikh cutoff'); return; }
-    const year = cutoff.slice(0,4);
-    if(!confirm(`Arkibkan rekod Done/Rejected sebelum ${cutoff} ke ARCHIVE_${year}?`)) return;
-    try{
-      const res = await fetch(`${API_BASE}?action=archiverecords`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ cutoffDate: cutoff, statuses:['Done','Rejected'] })});
-      const json = await res.json(); if(json.status!=='ok') throw new Error(json.message||'Gagal arkib');
-      toast(`Diarkib: ${json.data.moved} ➜ ${json.data.archiveSheet}`); await load();
-    }catch(e){ alert('Gagal arkib.'); }
-  });
 
   el('#rp_save').addEventListener('click', saveRegPanel);
   el('#rp_clear').addEventListener('click', ()=>{ el('#rp_name').value=''; el('#rp_link').value=''; el('#rp_pic').value=''; el('#rp_terms').value=''; el('#rp_notes').value=''; });
