@@ -181,7 +181,7 @@
   const waSVG = `
   <svg class="icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
     <circle cx="16" cy="16" r="16" fill="#25D366"/>
-    <path fill="#fff" d="M21.6 17.4c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.6-.6.7-.2.2-.4.1c-.2-.1-.8-.3-1.5-1-.6-.5-1-.9-1.1-1.1-.1-.2 0-.3.1-.4.1-.1.2-.3.3-.4.1-.1.1-.2.2-.3.1-.1 0-.3 0-.4s-.5-1.3-.7-1.8c-.2-.5-.4-.4-.5-.4h-.4c-.1 0-.4.1-.6.3-.2.2-.8.7-.8 1.8s.9 2 1 2.2c.1.2 1.7 2.3 3.9 3.3.6.2 1 .4 1.3.5.5.2 1.1.2 1.5.1.4-.1 1.3-.6 1.5-1.1.2-.5.2-1 .1-1.1s-.2-.1-.4-.2zM16 6.1c-4.5 0-8.1 3.5-8.1 7.9 0 1.6.5 3.1 1.4 4.3l-1 3.6 3.7-1c1.2.7 2.7 1.1 4.3 1.1 4.5 0 8.1-3.5 8.1-7.9S20.5 6.1 16 6.1z"/>
+    <path fill="#fff" d="M21.6 17.4c-.2-.1-1.2-.6-1.4-.7s-.3-.1-.5.1-.5.6-.6.7-.2.2-.4.1c-.2-.1-.8-.3-1.5-1-.6-.5-1-.9-1.1-1.1-.1-.2 0-.3.1-.4.1-.1.2-.3.3-.4.1-.1.1-.2.2-.3.1-.1 0-.3 0-.4s-.5-1.3-.7-1.8c-.2-.5-.4-.4-.5-.4h-.4c-.1 0 -.4.1 -.6.3 -.2.2 -.8.7 -.8 1.8s.9 2 1 2.2c.1.2 1.7 2.3 3.9 3.3.6.2 1 .4 1.3.5.5.2 1.1.2 1.5.1.4-.1 1.3-.6 1.5-1.1.2-.5.2-1 .1-1.1s-.2-.1-.4-.2zM16 6.1c-4.5 0-8.1 3.5-8.1 7.9 0 1.6.5 3.1 1.4 4.3l-1 3.6 3.7-1c1.2.7 2.7 1.1 4.3 1.1 4.5 0 8.1-3.5 8.1-7.9S20.5 6.1 16 6.1z"/>
   </svg>`;
 
   // ===== Single Window (kanan) Reuse =====
@@ -213,7 +213,7 @@
       const res = await fetch(`${API_BASE}?action=listregpanel`);
       const json = await res.json();
       if(json.status!=='ok') return;
-      const items = json.data.items || [];
+      const items = (json.data && (json.data.items || json.data)) || [];
       for(const p of items){
         const key = String(p.panel_name||'').toLowerCase().trim();
         regPanelMap.set(key, {
@@ -299,7 +299,7 @@
     if(!value) return null;
     if(value instanceof Date) return value;
     const s=String(value);
-    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00');
+    if(/^\d{4}-\d{2}-\d2$/.test(s)) return new Date(s+'T00:00:00');
     const d=new Date(s); return isNaN(d.getTime())?null:d;
   }
   function sortItems(items){
@@ -337,7 +337,7 @@
     const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
     const reg = regPanelMap.get(panelKey);
 
-    // WhatsApp Pesakit (kolom Telefon)
+    // WhatsApp Pesakit
     const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
     const waPatientIcon = waPatientURL ? `
       <a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit"
@@ -345,7 +345,7 @@
          ${waSVG}
       </a>` : '';
 
-    // WhatsApp PIC (kolom Panel/PIC – sebelah no. PIC)
+    // WhatsApp PIC
     const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
     const waPICIcon = waPICURL ? `
       <a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel"
@@ -400,11 +400,9 @@
     </tr>`;
   }
 
-  // ===== wireRow DENGAN SEMAK CANCEL =====
+  // ===== wireRow (dengan semakan Cancel prompt) =====
   function wireRow(r){
     const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
-
-    // OPEN
     tr.querySelector('.btn-open').addEventListener('click', ()=>{
       const url = r.panel_claim_url || (()=>{
         const key = String(r.jenis_panel||'').toLowerCase().trim();
@@ -416,29 +414,23 @@
     });
 
     if (state.tab==='inprocess') {
-      // SUBMIT — hanya proceed jika pengguna TIDAK tekan Cancel
       tr.querySelector('.btn-submit')?.addEventListener('click', async ()=>{
         const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
-        if (ref === null) { toast('Dibatalkan.'); return; } // ← penting
+        if (ref === null) { toast('Dibatalkan.'); return; }
         await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
       });
     } else if (state.tab==='submitted') {
-      // PENDING — kekal Submitted (tiada prompt)
       tr.querySelector('.btn-pending')?.addEventListener('click', async ()=>{
         await updateStatus(r.record_id, { status_claim: 'Submitted' });
       });
-
-      // DONE — hanya proceed jika TIDAK Cancel
       tr.querySelector('.btn-done')?.addEventListener('click', async ()=>{
         const ref = prompt('Masukkan Claim Ref/ID (jika belum diisi):', r.claim_ref_id||'');
-        if (ref === null) { toast('Dibatalkan.'); return; } // ← penting
+        if (ref === null) { toast('Dibatalkan.'); return; }
         await updateStatus(r.record_id, { status_claim: 'Done', claim_ref_id: ref });
       });
-
-      // REJECTED — hanya proceed jika TIDAK Cancel
       tr.querySelector('.btn-rejected')?.addEventListener('click', async ()=>{
         const reason = prompt('Sebab Rejected (optional):','');
-        if (reason === null) { toast('Dibatalkan.'); return; } // ← penting
+        if (reason === null) { toast('Dibatalkan.'); return; }
         await updateStatus(r.record_id, { status_claim: 'Rejected', notes: reason||'' });
       });
     }
@@ -455,7 +447,6 @@
   }
   async function updateStatus(record_id, payload){
     try{
-      // UI optimistik
       const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
       if(tr && payload.status_claim){
         const chip=tr.querySelector('.chip');
@@ -464,7 +455,7 @@
       }
       await postForm('updateclaimstatus', { record_id, ...payload });
       toast('Status dikemas kini');
-      await load(); // pastikan berpindah tab jika perlu
+      await load();
     }catch(e){ toast(e.message||'Gagal kemas status'); await load(); }
   }
 
@@ -483,13 +474,13 @@
     el('#badge-rejected').textContent=String(count.rejected);
   }
 
-  // ===== REG PANEL VIEW =====
+  // ====== REG PANEL VIEW (LIST + SAVE/CLEAR) ======
   async function loadRegPanel(){
     try{
       const res = await fetch(`${API_BASE}?action=listregpanel`);
       const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat Reg Panel');
-      const items = json.data.items || [];
+      const items = (json.data && (json.data.items || json.data)) || [];
       document.getElementById('rp_tbody').innerHTML = items.map(p => {
         const href = p.pic_phone ? buildWAUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
         const waBtn = href ? `<a class="wa" href="javascript:void(0)" onclick="openOrReusePanel('${href.replace(/'/g,"%27")}')" title="WhatsApp PIC">${waSVG}</a>` : '';
@@ -508,6 +499,44 @@
     }catch(e){ console.error(e); toast('Ralat memuat Reg Panel'); }
   }
 
+  async function saveRegPanel(){
+    const name = el('#rp_name').value.trim();
+    const link = el('#rp_link').value.trim();
+    const picName = el('#rp_pic_name').value.trim();
+    const picPhone = el('#rp_pic_phone').value.trim();
+    const termsDays = parseInt(el('#rp_terms_days').value,10);
+    const notes = el('#rp_notes').value.trim();
+
+    if(!name || !link || !Number.isFinite(termsDays) || termsDays<=0){
+      toast('Sila isi Nama Panel, Link, dan Tempoh (hari) dengan betul.'); return;
+    }
+    try{
+      await postForm('addregpanel', {
+        panel_name: name,
+        panel_link: link,
+        pic_name: picName || '',
+        pic_phone: picPhone || '',
+        payment_terms_days: termsDays,
+        notes: notes || ''
+      });
+      toast('Panel disimpan.');
+      // clear form
+      clearRegPanelForm();
+      // reload senarai + dropdown
+      await loadRegPanel();
+    }catch(e){
+      console.error(e); toast('Gagal simpan panel');
+    }
+  }
+  function clearRegPanelForm(){
+    el('#rp_name').value='';
+    el('#rp_link').value='';
+    el('#rp_pic_name').value='';
+    el('#rp_pic_phone').value='';
+    el('#rp_terms_days').value='';
+    el('#rp_notes').value='';
+  }
+
   // ===== EVENTS =====
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
   el('#search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
@@ -520,8 +549,14 @@
   el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
   el('#next').addEventListener('click', ()=>{ state.page++; load(); });
 
+  // NEW: wire Reg Panel buttons
+  document.addEventListener('click', (ev)=>{
+    if(ev.target && ev.target.id==='rp_save'){ saveRegPanel(); }
+    if(ev.target && ev.target.id==='rp_clear'){ clearRegPanelForm(); toast('Bersih.'); }
+  });
+
   // INIT
-  setActiveTab('inprocess'); // load() dipanggil melalui setActiveTab
+  setActiveTab('inprocess');
   </script>
 </body>
 </html>
