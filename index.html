@@ -17,7 +17,8 @@
     textarea{min-height:60px;width:100%}
     button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
     button.secondary{background:#fff;color:var(--brand)} button[disabled]{opacity:.5;cursor:not-allowed}
-    .container{display:grid;grid-template-columns:1fr} @media(min-width:1000px){.container{grid-template-columns:48% 52%}}
+    .container{display:grid;grid-template-columns:1fr}
+    @media(min-width:1000px){.container{grid-template-columns:44% 56%}}
     .left{padding:16px} .right{padding:16px;border-left:1px solid var(--border);background:#fff;min-height:60vh}
     table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border)}
     th,td{border-bottom:1px solid var(--soft);padding:10px;text-align:left;font-size:14px;vertical-align:top}
@@ -28,9 +29,8 @@
     .toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.2s}
     .toast.show{opacity:1;transform:translateY(0)}
     .price{font-size:12px;color:#333;line-height:1.3}
-    .formgrid{display:grid;grid-template-columns:1fr;gap:10px}
-    @media(min-width:800px){.formgrid{grid-template-columns:1fr 1fr}}
     .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
+    a.btnlink{display:inline-block;padding:6px 10px;border:1px solid var(--border);border-radius:999px;text-decoration:none}
   </style>
 </head>
 <body>
@@ -62,7 +62,7 @@
               <th>IC</th>
               <th>Telefon</th>
               <th>Tarikh Hadir</th>
-              <th>Jenis Panel</th>
+              <th>Panel / PIC</th>
               <th>Harga</th>
               <th>Ubat</th>
               <th>Status</th>
@@ -82,27 +82,13 @@
       <div id="regPanelView" style="display:none">
         <div class="card" style="margin-bottom:12px">
           <h3 style="margin:0 0 8px 0">Daftar Panel Baharu</h3>
-          <div class="formgrid">
-            <div>
-              <label>Nama Panel *</label>
-              <input id="rp_name" type="text" placeholder="Contoh: Panel Contoso" required />
-            </div>
-            <div>
-              <label>Link Panel (URL) *</label>
-              <input id="rp_link" type="url" placeholder="https://..." required />
-            </div>
-            <div>
-              <label>No. PIC (opsyenal)</label>
-              <input id="rp_pic" type="tel" placeholder="012-xxxxxxx" />
-            </div>
-            <div>
-              <label>Term Pembayaran</label>
-              <input id="rp_terms" type="text" placeholder="Contoh: 30 hari" />
-            </div>
-            <div style="grid-column:1 / -1">
-              <label>Catatan (opsyenal)</label>
-              <textarea id="rp_notes" placeholder="Nota tambahan jika perlu"></textarea>
-            </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><label>Nama Panel *</label><input id="rp_name" type="text" placeholder="Contoh: Panel Contoso" required /></div>
+            <div><label>Link Panel (URL) *</label><input id="rp_link" type="url" placeholder="https://..." required /></div>
+            <div><label>Nama PIC</label><input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" /></div>
+            <div><label>No. Telefon PIC</label><input id="rp_pic_phone" type="tel" placeholder="0123456789" /></div>
+            <div><label>Term Pembayaran</label><input id="rp_terms" type="text" placeholder="Contoh: 30 hari" /></div>
+            <div style="grid-column:1 / -1"><label>Catatan</label><textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%"></textarea></div>
           </div>
           <div style="margin-top:10px;display:flex;gap:8px">
             <button id="rp_save">Simpan Panel</button>
@@ -119,6 +105,7 @@
                 <th>Link</th>
                 <th>PIC</th>
                 <th>Term</th>
+                <th>WhatsApp</th>
               </tr>
             </thead>
             <tbody id="rp_tbody"></tbody>
@@ -128,8 +115,8 @@
     </section>
 
     <aside class="right">
-      <h3>Panduan "Side-by-Side"</h3>
-      <p class="hint">Klik <b>Open</b>. Tetingkap kanan dibuka sekali dan kekal sehingga anda tutup sendiri (tiada auto-reopen).</p>
+      <h3>Panel Window</h3>
+      <p class="hint">Klik <b>Open</b>. Tetingkap kanan dibuka sekali dan dikitar semula (tiada duplikasi). Jika URL sama, hanya fokus semula.</p>
       <div id="detail"></div>
     </aside>
   </div>
@@ -138,11 +125,12 @@
 
   <script>
   // ===== CONFIG =====
-  const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
+  const API_BASE = 'PASTE_YOUR_GAS_WEB_APP_URL_HERE';
 
   // ===== STATE =====
   let state = { tab:'inprocess', page:1, pageSize:50, q:'', total:0 };
   let panelWin = null, lastOpenTs = 0;
+  let regPanelMap = new Map(); // key: panel_name (lower) -> {pic_name,pic_phone,panel_link}
 
   // ===== HELPERS =====
   const el = s => document.querySelector(s);
@@ -152,12 +140,27 @@
   const priceStr = n => 'RM' + ((typeof n==='number')? n : parseFloat(String(n||'').replace(/[^\d.]/g,''))||0).toFixed(2);
   const escapeHtml = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function toast(m){ toastEl.textContent=m; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),2200); }
+  const toPhoneDigits = s => String(s||'').replace(/[^\d]/g,'');
+  const waLink = (phone, text) => {
+    const p = toPhoneDigits(phone);
+    const q = encodeURIComponent(text||'');
+    return p ? `https://wa.me/${p}${q?`?text=${q}`:''}` : '';
+  };
 
   function openOrReusePanel(url){
+    if(!url) return;
     // anti double-click (300ms)
     const now=Date.now(); if(now-lastOpenTs<300) return; lastOpenTs=now;
+
+    // jika tetingkap sudah buka dengan URL yang sama → fokus sahaja
+    try{
+      if(panelWin && !panelWin.closed){
+        if(panelWin.location && String(panelWin.location.href)===String(url)){ panelWin.focus(); return; }
+      }
+    }catch(e){} // cross-origin check
+
     const sw=window.screen.availWidth, sh=window.screen.availHeight;
-    const w=Math.max(560, Math.round(sw*0.36)), h=Math.max(600, sh);
+    const w=Math.max(700, Math.round(sw*0.46)), h=Math.max(650, sh);
     const left=Math.max(0, sw-w), top=0;
     const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
     try{
@@ -180,6 +183,9 @@
 
   // ===== RECORDS =====
   async function load(){
+    // Pastikan kita ada peta REG_PANEL dahulu (untuk PIC/WhatsApp)
+    if(regPanelMap.size===0){ await buildRegPanelMap(); }
+
     const url = `${API_BASE}?action=listrecords&statusTab=${encodeURIComponent(state.tab)}&page=${state.page}&pageSize=${state.pageSize}&q=${encodeURIComponent(state.q)}`;
     try{
       const res = await fetch(url); const json = await res.json();
@@ -195,17 +201,25 @@
           Consult ${priceStr(r.harga_consultation||0)} · Ubat ${priceStr(r.harga_ubat||0)} · Prosedur ${priceStr(r.harga_prosedur||0)}<br>
           <b>Jumlah ${priceStr(r.harga_jumlah||0)}</b>
         </div>`;
+
+        const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
+        const reg = regPanelMap.get(panelKey);
+        const picLine = reg ? `${escapeHtml(reg.pic_name||'-')}<br><small>${escapeHtml(reg.pic_phone||'')}</small>` : '-';
+        const waPatient = r.no_telefon ? `<a class="btnlink" href="${waLink(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`)}" target="_blank" rel="noopener">WA Pesakit</a>` : '';
+        const waPIC = (reg && reg.pic_phone) ? `<a class="btnlink" href="${waLink(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`)}" target="_blank" rel="noopener">WA PIC</a>` : '';
+
         return `<tr data-id="${escapeHtml(r.record_id)}">
-          <td>${escapeHtml(r.nama_pesakit||'')}</td>
+          <td>${escapeHtml(r.nama_pesakit||'')}<br>${waPatient}</td>
           <td>${escapeHtml(r.no_ic||'')}</td>
           <td>${escapeHtml(r.no_telefon||'')}</td>
           <td>${escapeHtml(r.tarikh_hadir||'')}</td>
-          <td>${escapeHtml(r.jenis_panel||'')}</td>
+          <td>${escapeHtml(r.jenis_panel||'')}${reg? `<div class="price" style="margin-top:4px">${picLine}</div>`:''}</td>
           <td>${price}</td>
           <td>${escapeHtml(r.jenis_ubat||'')}</td>
           <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
           <td class="actions">
             <button class="secondary btn-open">Open</button>
+            ${waPIC}
             <button class="btn-submit">Submit claim</button>
           </td>
         </tr>`;
@@ -222,10 +236,13 @@
       if(!url){ toast('URL panel tiada'); return; }
       openOrReusePanel(url);
     });
-    tr.querySelector('.btn-submit').addEventListener('click', async ()=>{
-      const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
-      await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
-    });
+    const submitBtn = tr.querySelector('.btn-submit');
+    if(submitBtn){
+      submitBtn.addEventListener('click', async ()=>{
+        const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
+        await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
+      });
+    }
   }
 
   // ===== POST util — x-www-form-urlencoded tanpa headers (elak preflight) =====
@@ -270,33 +287,53 @@
   });
 
   // ===== REG PANEL =====
+  async function buildRegPanelMap(){
+    regPanelMap.clear();
+    try{
+      const res = await fetch(`${API_BASE}?action=listregpanel`);
+      const json = await res.json();
+      if(json.status!=='ok') return;
+      const items = json.data.items || [];
+      for(const p of items){
+        const key = String(p.panel_name||'').toLowerCase().trim();
+        regPanelMap.set(key, { pic_name: p.pic_name||'', pic_phone: p.pic_phone||'', panel_link: p.panel_link||'', payment_terms: p.payment_terms||'' });
+      }
+    }catch(e){ console.warn('Gagal muat Reg Panel map', e); }
+  }
+
   async function loadRegPanel(){
     try{
       const res = await fetch(`${API_BASE}?action=listregpanel`);
       const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat Reg Panel');
       const items = json.data.items || [];
-      el('#rp_tbody').innerHTML = items.map(p => `
-        <tr>
+      el('#rp_tbody').innerHTML = items.map(p => {
+        const wa = p.pic_phone ? `<a class="btnlink" href="${waLink(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`)}" target="_blank" rel="noopener">WhatsApp</a>` : '';
+        return `<tr>
           <td>${escapeHtml(p.panel_name||'')}</td>
           <td><a href="${escapeHtml(p.panel_link||'#')}" target="_blank" rel="noopener">Buka</a></td>
-          <td>${escapeHtml(p.pic_contact||'')}</td>
+          <td>${escapeHtml(p.pic_name||'')}<br><small>${escapeHtml(p.pic_phone||'')}</small></td>
           <td>${escapeHtml(p.payment_terms||'')}</td>
-        </tr>
-      `).join('');
+          <td>${wa}</td>
+        </tr>`;
+      }).join('');
+      // segarkan map untuk jadual rekod
+      await buildRegPanelMap();
     }catch(e){ console.error(e); toast('Ralat memuat Reg Panel'); }
   }
+
   async function saveRegPanel(){
     const name = el('#rp_name').value.trim();
     const link = el('#rp_link').value.trim();
-    const pic  = el('#rp_pic').value.trim();
+    const picName  = el('#rp_pic_name').value.trim();
+    const picPhone = el('#rp_pic_phone').value.trim();
     const terms= el('#rp_terms').value.trim();
     const notes= el('#rp_notes').value.trim();
     if(!name || !link){ alert('Nama Panel dan Link Panel adalah wajib.'); return; }
     try{
-      await postForm('addregpanel', { panel_name:name, panel_link:link, pic_contact:pic, payment_terms:terms, notes });
+      await postForm('addregpanel', { panel_name:name, panel_link:link, pic_name:picName, pic_phone:picPhone, payment_terms:terms, notes });
       toast('Panel disimpan');
-      el('#rp_name').value=''; el('#rp_link').value=''; el('#rp_pic').value=''; el('#rp_terms').value=''; el('#rp_notes').value='';
+      el('#rp_name').value=''; el('#rp_link').value=''; el('#rp_pic_name').value=''; el('#rp_pic_phone').value=''; el('#rp_terms').value=''; el('#rp_notes').value='';
       await loadRegPanel();
     }catch(e){ alert(e.message || 'Failed to fetch.'); }
   }
@@ -310,7 +347,7 @@
   el('#next').addEventListener('click', ()=>{ const pages=Math.max(1,Math.ceil(state.total/state.pageSize)); if(state.page<pages){ state.page++; load(); }});
 
   el('#rp_save').addEventListener('click', saveRegPanel);
-  el('#rp_clear').addEventListener('click', ()=>{ el('#rp_name').value=''; el('#rp_link').value=''; el('#rp_pic').value=''; el('#rp_terms').value=''; el('#rp_notes').value=''; });
+  el('#rp_clear').addEventListener('click', ()=>{ el('#rp_name').value=''; el('#rp_link').value=''; el('#rp_pic_name').value=''; el('#rp_pic_phone').value=''; el('#rp_terms').value=''; el('#rp_notes').value=''; });
 
   // INIT
   setActiveTab('inprocess'); // akan panggil load()
