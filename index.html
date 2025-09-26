@@ -13,7 +13,7 @@
     .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
     .badge{display:inline-block;min-width:18px;padding:0 6px;border-radius:999px;background:var(--brand);color:#fff;text-align:center;font-size:12px;margin-left:6px}
     .search{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    input[type="text"], input[type="url"], input[type="tel"], select, input[type="date"], textarea{padding:8px 10px;border:1px solid #d1d5db;border-radius:10px;min-width:180px;background:#fff}
+    input[type="text"], input[type="url"], input[type="tel"], select, input[type="date"], textarea{padding:8px 10px;border:1px solid #d1d5db;border-radius:10px;min-width:170px;background:#fff}
     textarea{min-height:60px;width:100%}
     button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
     button.secondary{background:#fff;color:var(--brand)} button[disabled]{opacity:.5;cursor:not-allowed}
@@ -26,14 +26,18 @@
     th{background:#fafafa;font-weight:600}
     .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
     .chip.inprocess{background:#fffbe6;border-color:var(--warn)} .chip.done{background:#e6ffed;border-color:var(--ok)} .chip.rejected{background:#ffe6e6;border-color:var(--bad)}
-    .actions{display:flex;gap:8px;flex-wrap:wrap} .hint{font-size:13px;color:var(--muted)}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .toast{position:fixed;right:16px;bottom:16px;background:#111;color:#fff;padding:10px 12px;border-radius:10px;opacity:0;transform:translateY(10px);transition:.2s}
     .toast.show{opacity:1;transform:translateY(0)}
     .price{font-size:12px;color:#333;line-height:1.3}
     .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px}
-    a.iconbtn,button.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:999px;background:#fff;color:#111;text-decoration:none}
-    a.iconbtn:hover,button.iconbtn:hover{background:#f7f7f7}
-    .icon{width:18px;height:18px;display:block}
+    /* Ikon WhatsApp (hitam putih) */
+    .iconbtn{display:inline-flex;align-items:center;gap:6px}
+    .wa{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);border-radius:999px;background:#fff;color:#000;text-decoration:none}
+    .wa:hover{background:#f7f7f7}
+    .wa .icon{width:18px;height:18px;display:block}
+    .wa-tag{font-size:11px;color:#333;border:1px solid var(--border);border-radius:6px;padding:2px 6px;background:#fff}
+    .toolbar{display:flex;gap:8px;align-items:center;margin-top:12px}
   </style>
 </head>
 <body>
@@ -46,11 +50,14 @@
     </div>
     <div class="search" id="searchBar">
       <input id="search" type="text" placeholder="Cari nama/IC..." />
+      <input id="filterPanel" type="text" placeholder="Filter Jenis Panel..." />
       <select id="sort">
         <option value="tarikh_desc">Tarikh Hadir: Terbaru</option>
         <option value="tarikh_asc">Tarikh Hadir: Terdahulu</option>
         <option value="panel_az">Jenis Panel: A → Z</option>
         <option value="panel_za">Jenis Panel: Z → A</option>
+        <option value="nama_az">Nama Pesakit: A → Z</option>
+        <option value="nama_za">Nama Pesakit: Z → A</option>
       </select>
       <select id="pageSize" title="Rekod per halaman"><option>25</option><option selected>50</option><option>100</option></select>
       <button id="refresh" class="secondary" title="Muat semula">Refresh</button>
@@ -80,7 +87,7 @@
           </thead>
           <tbody id="tbody"></tbody>
         </table>
-        <div class="toolbar" style="display:flex;gap:8px;align-items:center;margin-top:12px">
+        <div class="toolbar">
           <button id="prev" class="secondary">Prev</button>
           <span id="pageInfo"></span>
           <button id="next" class="secondary">Next</button>
@@ -125,7 +132,7 @@
 
     <aside class="right">
       <h3>Panel Window</h3>
-      <p class="hint">Klik <b>Open</b>. Tetingkap kanan dibuka sekali dan dikitar semula (tiada duplikasi). Jika URL sama, hanya fokus semula.</p>
+      <p class="hint">Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Tetingkap kanan dibuka sekali & dikitar semula (URL sama → fokus semula, tiada duplikasi).</p>
       <div id="detail"></div>
     </aside>
   </div>
@@ -137,7 +144,7 @@
   const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
 
   // ===== STATE =====
-  let state = { tab:'inprocess', page:1, pageSize:50, q:'', total:0, sort:'tarikh_desc' };
+  let state = { tab:'inprocess', page:1, pageSize:50, q:'', sort:'tarikh_desc', filterPanel:'' };
   let panelWin = null, lastOpenTs = 0;
   let regPanelMap = new Map(); // key: panel_name (lower) -> {pic_name,pic_phone,panel_link}
 
@@ -146,36 +153,37 @@
   const tbody = el('#tbody');
   const pageInfo = el('#pageInfo');
   const toastEl = el('#toast');
-  const priceStr = n => 'RM' + ((typeof n==='number')? n : parseFloat(String(n||'').replace(/[^\d.]/g,''))||0).toFixed(2);
-  const escapeHtml = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function toast(m){ toastEl.textContent=m; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),2200); }
 
-  // Tarikh → paparkan DD/MM/YYYY HH:mm (24 jam). Jika tiada masa, guna 00:00.
+  // Tarikh → DD/MM/YYYY HH:mm (24 jam)
   function formatDateDDMMYYYY_HHMM(v){
     if(!v) return '';
     let d;
-    if(v instanceof Date) d = v;
+    if(v instanceof Date) d=v;
     else {
-      // sokong "YYYY-MM-DD", "YYYY-MM-DDTHH:mm:ssZ", atau string lain
-      const s = String(v);
-      if(/^\d{4}-\d{2}-\d{2}$/.test(s)) d = new Date(s + 'T00:00:00');
-      else d = new Date(s);
+      const s=String(v);
+      if(/^\d{4}-\d{2}-\d{2}$/.test(s)) d=new Date(s+'T00:00:00');
+      else d=new Date(s);
       if(isNaN(d.getTime())) return escapeHtml(s);
     }
-    const pad = n => String(n).padStart(2,'0');
-    const dd=pad(d.getDate()), mm=pad(d.getMonth()+1), yyyy=d.getFullYear();
-    const HH=pad(d.getHours()), MM=pad(d.getMinutes());
-    return `${dd}/${mm}/${yyyy} ${HH}:${MM}`;
+    const pad=n=>String(n).padStart(2,'0');
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
+  const escapeHtml = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const toPhoneDigits = s => String(s||'').replace(/[^\d]/g,'');
-  const waLink = (phone, text) => {
-    const p = toPhoneDigits(phone);
-    const q = encodeURIComponent(text||'');
-    return p ? `https://wa.me/${p}${q?`?text=${q}`:''}` : '';
-  };
+  // WA URL → pastikan guna WhatsApp Web (desktop), fallback ke wa.me
+  function buildWhatsAppUrl(phone, text){
+    const p = toPhoneDigits(phone); const q = encodeURIComponent(text||'');
+    if(!p) return '';
+    // cuba WhatsApp Web
+    const web = `https://web.whatsapp.com/send?phone=${p}${q?`&text=${q}`:''}`;
+    return web;
+  }
+  // SVG ikon WhatsApp (hitam putih)
   const waSVG = '<svg class="icon" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M19.11 17.28c-.27-.14-1.6-.79-1.84-.88-.25-.09-.43-.14-.62.14-.18.27-.71.88-.87 1.06-.16.18-.32.2-.59.07-.27-.14-1.13-.42-2.15-1.35-.79-.7-1.32-1.56-1.48-1.82-.16-.27-.02-.41.12-.54.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.62-1.49-.85-2.05-.22-.53-.45-.46-.62-.46-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.96.94-.96 2.29 0 1.35.98 2.65 1.12 2.84.14.18 1.93 2.95 4.67 4.15.65.28 1.16.45 1.56.58.65.21 1.24.18 1.71.11.52-.08 1.6-.65 1.83-1.29.23-.64.23-1.19.16-1.29-.07-.11-.25-.18-.52-.32ZM16.02 4C9.39 4 4 9.37 4 15.98c0 2.53.82 4.88 2.21 6.78L4 28l5.4-2.16c1.84 1.13 4.02 1.79 6.35 1.79 6.63 0 12.02-5.37 12.02-11.98C27.77 9.37 22.38 4 15.76 4h.26Z"/></svg>';
 
+  // Buka / kitar semula tetingkap kanan (juga untuk WhatsApp Web)
   function openOrReusePanel(url){
     if(!url) return;
     const now=Date.now(); if(now-lastOpenTs<300) return; lastOpenTs=now;
@@ -219,52 +227,21 @@
       const {total, items} = json.data;
       state.total = total;
 
-      // sorting client-side untuk rekod pada halaman ini
-      const sorted = sortItems(items.slice());
+      // tapiskan mengikut Filter Jenis Panel (klien-side di halaman semasa)
+      const filtered = state.filterPanel
+        ? items.filter(r => String(r.jenis_panel||'').toLowerCase().includes(state.filterPanel.toLowerCase()))
+        : items.slice();
+
+      const sorted = sortItems(filtered);
 
       const pages = Math.max(1, Math.ceil(total / state.pageSize));
       pageInfo.textContent = `Halaman ${state.page}/${pages} • ${sorted.length} rekod`;
-      tbody.innerHTML = sorted.map(r => {
-        const status = (r.status_claim||'Not Started');
-        const chipClass = status==='Done'||status==='Submitted' ? 'done' : (status==='Rejected' ? 'rejected' : 'inprocess');
-        const price = `<div class="price">
-          Consult ${priceStr(r.harga_consultation||0)} · Ubat ${priceStr(r.harga_ubat||0)} · Prosedur ${priceStr(r.harga_prosedur||0)}<br>
-          <b>Jumlah ${priceStr(r.harga_jumlah||0)}</b>
-        </div>`;
-
-        const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
-        const reg = regPanelMap.get(panelKey);
-        const picLine = reg ? `${escapeHtml(reg.pic_name||'-')}<br><small>${escapeHtml(reg.pic_phone||'')}</small>` : '-';
-
-        // ikon WhatsApp
-        const waPatientHref = r.no_telefon ? waLink(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
-        const waPatient = waPatientHref ? `<a class="iconbtn" title="WhatsApp Pesakit" href="${waPatientHref}" target="_blank" rel="noopener">${waSVG}</a>` : '';
-        const waPICHref = (reg && reg.pic_phone) ? waLink(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
-        const waPIC = waPICHref ? `<a class="iconbtn" title="WhatsApp PIC Panel" href="${waPICHref}" target="_blank" rel="noopener">${waSVG}</a>` : '';
-
-        return `<tr data-id="${escapeHtml(r.record_id)}">
-          <td>${escapeHtml(r.nama_pesakit||'')}</td>
-          <td>${escapeHtml(r.no_ic||'')}</td>
-          <td>${escapeHtml(r.no_telefon||'')}</td>
-          <td>${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
-          <td>${escapeHtml(r.jenis_panel||'')}${reg? `<div class="price" style="margin-top:4px">${picLine}</div>`:''}</td>
-          <td>${price}</td>
-          <td>${escapeHtml(r.jenis_ubat||'')}</td>
-          <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
-          <td class="actions">
-            <button class="secondary btn-open" title="Buka panel">Open</button>
-            ${waPIC}
-            ${waPatient}
-            <button class="btn-submit" title="Tanda Submitted">Submit claim</button>
-          </td>
-        </tr>`;
-      }).join('');
+      tbody.innerHTML = sorted.map(r => renderRow(r)).join('');
       sorted.forEach(r => wireRow(r));
       updateBadgesApprox(sorted);
     }catch(e){ console.error(e); toast('Ralat memuat data'); }
   }
 
-  // function sorting
   function parseDate(value){
     if(!value) return null;
     if(value instanceof Date) return value;
@@ -273,24 +250,81 @@
     const d=new Date(s); return isNaN(d.getTime())?null:d;
   }
   function sortItems(items){
-    const mode = state.sort;
-    if(mode==='panel_az' || mode==='panel_za'){
+    const m = state.sort;
+    if(m==='panel_az' || m==='panel_za'){
       items.sort((a,b)=>{
         const A=(a.jenis_panel||'').toLowerCase(), B=(b.jenis_panel||'').toLowerCase();
-        if(A<B) return -1; if(A>B) return 1; return 0;
+        return A.localeCompare(B);
       });
-      if(mode==='panel_za') items.reverse();
+      if(m==='panel_za') items.reverse();
       return items;
     }
-    // tarikh
+    if(m==='nama_az' || m==='nama_za'){
+      items.sort((a,b)=>{
+        const A=(a.nama_pesakit||'').toLowerCase(), B=(b.nama_pesakit||'').toLowerCase();
+        return A.localeCompare(B);
+      });
+      if(m==='nama_za') items.reverse();
+      return items;
+    }
+    // default: tarikh
     items.sort((a,b)=>{
       const da=parseDate(a.tarikh_hadir), db=parseDate(b.tarikh_hadir);
       const ta=da?da.getTime():0, tb=db?db.getTime():0;
-      return tb - ta; // default: terbaru dahulu
+      return tb - ta; // terbaru → dahulu
     });
-    if(mode==='tarikh_asc') items.reverse();
+    if(m==='tarikh_asc') items.reverse();
     return items;
   }
+
+  function renderRow(r){
+    const status = (r.status_claim||'Not Started');
+    const chipClass = status==='Done'||status==='Submitted' ? 'done' : (status==='Rejected' ? 'rejected' : 'inprocess');
+
+    const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
+    const reg = regPanelMap.get(panelKey);
+    const picLine = reg ? `${escapeHtml(reg.pic_name||'-')}<br><small>${escapeHtml(reg.pic_phone||'')}</small>` : '-';
+
+    // Tindakan WhatsApp (ikon + label mini)
+    const waPatientURL = r.no_telefon ? buildWhatsAppUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
+    const waPICURL = (reg && reg.pic_phone) ? buildWhatsAppUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
+
+    const waPatient = waPatientURL ? `
+      <span class="iconbtn" title="WhatsApp Pesakit">
+        <a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">${waSVG}</a>
+        <span class="wa-tag">Pesakit</span>
+      </span>` : '';
+
+    const waPIC = waPICURL ? `
+      <span class="iconbtn" title="WhatsApp PIC Panel">
+        <a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">${waSVG}</a>
+        <span class="wa-tag">PIC</span>
+      </span>` : '';
+
+    const price = `<div class="price">
+      Consult RM${num(r.harga_consultation)} · Ubat RM${num(r.harga_ubat)} · Prosedur RM${num(r.harga_prosedur)}<br>
+      <b>Jumlah RM${num(r.harga_jumlah)}</b>
+    </div>`;
+
+    return `<tr data-id="${escapeHtml(r.record_id)}">
+      <td>${escapeHtml(r.nama_pesakit||'')}</td>
+      <td>${escapeHtml(r.no_ic||'')}</td>
+      <td>${escapeHtml(r.no_telefon||'')}</td>
+      <td>${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
+      <td>${escapeHtml(r.jenis_panel||'')}${reg? `<div class="price" style="margin-top:4px">${picLine}</div>`:''}</td>
+      <td>${price}</td>
+      <td>${escapeHtml(r.jenis_ubat||'')}</td>
+      <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
+      <td class="actions">
+        <button class="secondary btn-open" title="Buka laman panel">Open</button>
+        ${waPIC}
+        ${waPatient}
+        <button class="btn-submit" title="Tanda Submitted">Submit</button>
+      </td>
+    </tr>`;
+  }
+
+  function num(x){ const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; return n.toFixed(2); }
 
   function wireRow(r){
     const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
@@ -308,7 +342,7 @@
     }
   }
 
-  // ===== POST util — x-www-form-urlencoded tanpa headers (elak preflight) =====
+  // ===== POST util — x-www-form-urlencoded (elak preflight) =====
   async function postForm(action, obj){
     const body = new URLSearchParams();
     body.set('payload', JSON.stringify(obj||{}));
@@ -370,8 +404,13 @@
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat Reg Panel');
       const items = json.data.items || [];
       el('#rp_tbody').innerHTML = items.map(p => {
-        const href = p.pic_phone ? waLink(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
-        const wa = href ? `<a class="iconbtn" href="${href}" target="_blank" rel="noopener" title="WhatsApp PIC">${waSVG}</a>` : '';
+        const href = p.pic_phone ? buildWhatsAppUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
+        const wa = href ? `
+          <span class="iconbtn">
+            <a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel" onclick="openOrReusePanel('${href.replace(/'/g,"%27")}')">${waSVG}</a>
+            <span class="wa-tag">PIC</span>
+          </span>
+        ` : '';
         return `<tr>
           <td>${escapeHtml(p.panel_name||'')}</td>
           <td><a href="${escapeHtml(p.panel_link||'#')}" target="_blank" rel="noopener">Buka</a></td>
@@ -384,36 +423,15 @@
     }catch(e){ console.error(e); toast('Ralat memuat Reg Panel'); }
   }
 
-  async function saveRegPanel(){
-    const name = el('#rp_name').value.trim();
-    const link = el('#rp_link').value.trim();
-    const picName  = el('#rp_pic_name').value.trim();
-    const picPhone = el('#rp_pic_phone').value.trim();
-    const terms= el('#rp_terms').value.trim();
-    const notes= el('#rp_notes').value.trim();
-    if(!name || !link){ alert('Nama Panel dan Link Panel adalah wajib.'); return; }
-    try{
-      await postForm('addregpanel', { panel_name:name, panel_link:link, pic_name:picName, pic_phone:picPhone, payment_terms:terms, notes });
-      toast('Panel disimpan');
-      el('#rp_name').value=''; el('#rp_link').value=''; el('#rp_pic_name').value=''; el('#rp_pic_phone').value=''; el('#rp_terms').value=''; el('#rp_notes').value='';
-      await loadRegPanel();
-    }catch(e){ alert(e.message || 'Failed to fetch.'); }
-  }
-
   // ===== EVENTS =====
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
   el('#search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
+  el('#filterPanel').addEventListener('input', e => { state.filterPanel = e.target.value.trim(); state.page=1; load(); });
   el('#sort').addEventListener('change', e => { state.sort = e.target.value; state.page=1; load(); });
   el('#pageSize').addEventListener('change', e => { state.pageSize = parseInt(e.target.value,10)||50; state.page=1; load(); });
   el('#refresh').addEventListener('click', load);
   el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
   el('#next').addEventListener('click', ()=>{ const pages=Math.max(1,Math.ceil(state.total/state.pageSize)); if(state.page<pages){ state.page++; load(); }});
-
-  // Reg Panel form
-  document.addEventListener('click', (ev)=>{
-    if(ev.target && ev.target.id==='rp_save') saveRegPanel();
-    if(ev.target && ev.target.id==='rp_clear'){ el('#rp_name').value=''; el('#rp_link').value=''; el('#rp_pic_name').value=''; el('#rp_pic_phone').value=''; el('#rp_terms').value=''; el('#rp_notes').value=''; }
-  });
 
   // INIT
   setActiveTab('inprocess'); // akan panggil load()
