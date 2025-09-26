@@ -50,10 +50,8 @@
     </div>
     <div class="search" id="searchBar">
       <input id="search" type="text" placeholder="Cari nama/IC..." />
-      <!-- Tapis Panel: dropdown + taip -->
       <select id="filterPanelSelect" title="Tapis Jenis Panel"><option value="">Semua Panel</option></select>
       <input id="filterPanelText" type="text" placeholder="Tulis nama panel..." />
-      <!-- Sort -->
       <select id="sort">
         <option value="tarikh_desc">Tarikh Hadir: Terbaru</option>
         <option value="tarikh_asc">Tarikh Hadir: Terdahulu</option>
@@ -62,8 +60,8 @@
         <option value="nama_az">Nama Pesakit: A → Z</option>
         <option value="nama_za">Nama Pesakit: Z → A</option>
       </select>
-      <!-- Penapis SLA (hanya terpakai bila tab Submitted) -->
-      <select id="filterSLA" title="Status SLA (tab Submitted sahaja)">
+      <!-- Penapis SLA (tab Submitted sahaja) -->
+      <select id="filterSLA" title="Status SLA">
         <option value="">SLA: Semua</option>
         <option value="over">SLA: Overdue</option>
         <option value="today">SLA: Due Today</option>
@@ -240,7 +238,6 @@
 
   // ===== SLA util =====
   function deriveSLA(record){
-    // cuba baca sla_due_at dari sheet jika ada; jika tiada, kira di UI
     const terms = (()=>{
       const key = String(record.jenis_panel||'').toLowerCase().trim();
       const rp = regPanelMap.get(key);
@@ -248,7 +245,6 @@
     })();
     let due = record.sla_due_at ? new Date(record.sla_due_at) : null;
     if ((!due || isNaN(due)) && record.status_claim==='Submitted' && terms){
-      // jika tak ada dalam sheet, kira dari submitted_at
       const base = record.submitted_at ? new Date(record.submitted_at) : new Date();
       if(!isNaN(base)) { due = new Date(base); due.setDate(due.getDate()+terms); }
     }
@@ -282,7 +278,6 @@
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat data');
       const {total, items} = json.data;
 
-      // Filter panel: dropdown exact + teks contains (AND jika dua-dua ada)
       let filtered = items.slice();
       if(state.filterPanelSelect){
         const key = state.filterPanelSelect.toLowerCase();
@@ -292,17 +287,12 @@
         const t = state.filterPanelText.toLowerCase();
         filtered = filtered.filter(r => String(r.jenis_panel||'').toLowerCase().includes(t));
       }
-
-      // Penapis SLA (hanya untuk tab Submitted)
       if(state.tab==='submitted' && state.filterSLA){
-        filtered = filtered.filter(r => {
-          const s = deriveSLA(r);
-          return s.cls === state.filterSLA;
-        });
+        filtered = filtered.filter(r => deriveSLA(r).cls === state.filterSLA);
       }
 
       const sorted = sortItems(filtered);
-      renderTable(sorted, total);
+      renderTable(sorted);              // <-- fungsi yang dulu hilang
       updateBadgesApprox(sorted);
     }catch(e){ console.error(e); toast('Ralat memuat data'); }
   }
@@ -324,7 +314,6 @@
       items.sort((a,b)=> String(a.nama_pesakit||'').localeCompare(String(b.nama_pesakit||''),'ms',{sensitivity:'base'}));
       if(m==='nama_za') items.reverse(); return items;
     }
-    // default: tarikh hadir (terbaru dahulu)
     items.sort((a,b)=>{
       const da=parseDate(a.tarikh_hadir), db=parseDate(b.tarikh_hadir);
       const ta=da?da.getTime():0, tb=db?db.getTime():0;
@@ -335,6 +324,18 @@
   }
 
   function num(x){ const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; return n.toFixed(2); }
+
+  // ====== RENDER TABLE (DITAMBAH) ======
+  function renderTable(items){
+    // Info halaman ringkas (berdasarkan bilangan items selepas filter di client)
+    if(pageInfo) pageInfo.textContent = `Halaman ${state.page} • ${items.length} rekod`;
+
+    // Isi jadual
+    tbody.innerHTML = items.map(r => renderRow(r)).join('');
+
+    // Wire setiap baris
+    items.forEach(r => wireRow(r));
+  }
 
   function renderRow(r){
     const status = (r.status_claim||'Not Started');
@@ -364,11 +365,9 @@
       <b>Jumlah RM${num(r.harga_jumlah)}</b>
     </div>`;
 
-    // SLA (untuk tab Submitted sahaja — tetap dipapar di semua tab jika nilai wujud)
     const sla = deriveSLA(r);
     const slaBadge = sla.cls ? `<span class="sla ${sla.cls}" title="Due: ${sla.dueText}">${sla.label}</span>` : '';
 
-    // Tiga butang khas di tab Submitted
     const submittedActions = state.tab==='submitted'
       ? `<button class="secondary btn-pending" title="Masih menunggu">Pending</button>
          <button class="btn-done" title="Tanda Done">Done</button>
@@ -454,7 +453,6 @@
   }
   async function updateStatus(record_id, payload){
     try{
-      // UI optimistik: kemas chip segera
       const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
       if(tr && payload.status_claim){
         const chip=tr.querySelector('.chip');
@@ -463,8 +461,7 @@
       }
       await postForm('updateclaimstatus', { record_id, ...payload });
       toast('Status dikemas kini');
-      // jika berpindah tab (cth Submitted→Done/Rejected), reload supaya rekod berpindah
-      await load();
+      await load(); // pastikan berpindah tab jika perlu
     }catch(e){ toast(e.message||'Gagal kemas status'); await load(); }
   }
 
