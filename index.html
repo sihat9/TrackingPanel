@@ -18,7 +18,8 @@
     button{padding:8px 12px;border-radius:10px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
     button.secondary{background:#fff;color:var(--brand)} button[disabled]{opacity:.5;cursor:not-allowed}
     .container{display:grid;grid-template-columns:1fr}
-    @media(min-width:1000px){.container{grid-template-columns:44% 56%}}
+    /* >>> KECILKAN PANEL KANAN (kiri jadi lebih luas) <<< */
+    @media(min-width:1000px){.container{grid-template-columns:62% 38%}}
     .left{padding:16px} .right{padding:16px;border-left:1px solid var(--border);background:#fff;min-height:60vh}
     table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border)}
     th,td{border-bottom:1px solid var(--soft);padding:10px;text-align:left;font-size:14px;vertical-align:top}
@@ -147,20 +148,21 @@
     return p ? `https://wa.me/${p}${q?`?text=${q}`:''}` : '';
   };
 
+  // >>> kecilkan saiz tetingkap panel (kanan) & elakkan buka berganda <<<
   function openOrReusePanel(url){
     if(!url) return;
-    // anti double-click (300ms)
     const now=Date.now(); if(now-lastOpenTs<300) return; lastOpenTs=now;
 
-    // jika tetingkap sudah buka dengan URL yang sama → fokus sahaja
+    // kalau tetingkap sedia ada & URL sama → fokus sahaja
     try{
       if(panelWin && !panelWin.closed){
         if(panelWin.location && String(panelWin.location.href)===String(url)){ panelWin.focus(); return; }
       }
-    }catch(e){} // cross-origin check
+    }catch(e){} // cross-origin guard
 
     const sw=window.screen.availWidth, sh=window.screen.availHeight;
-    const w=Math.max(700, Math.round(sw*0.46)), h=Math.max(650, sh);
+    const w=Math.max(520, Math.round(sw*0.34));  // <<< lebih kecil dari sebelum ini
+    const h=Math.max(650, sh);
     const left=Math.max(0, sw-w), top=0;
     const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
     try{
@@ -183,9 +185,7 @@
 
   // ===== RECORDS =====
   async function load(){
-    // Pastikan kita ada peta REG_PANEL dahulu (untuk PIC/WhatsApp)
     if(regPanelMap.size===0){ await buildRegPanelMap(); }
-
     const url = `${API_BASE}?action=listrecords&statusTab=${encodeURIComponent(state.tab)}&page=${state.page}&pageSize=${state.pageSize}&q=${encodeURIComponent(state.q)}`;
     try{
       const res = await fetch(url); const json = await res.json();
@@ -317,7 +317,6 @@
           <td>${wa}</td>
         </tr>`;
       }).join('');
-      // segarkan map untuk jadual rekod
       await buildRegPanelMap();
     }catch(e){ console.error(e); toast('Ralat memuat Reg Panel'); }
   }
