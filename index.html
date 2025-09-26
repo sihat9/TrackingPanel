@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel Claims Portal</title>
-  <!-- Font Awesome untuk ikon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
@@ -14,77 +13,75 @@
       --success: #28a745;
       --warning: #ffc107;
       --danger: #dc3545;
+      --info: #17a2b8;
       --light: #f8f9fa;
-      --dark: #212529;
-      --bg: #f5f7fb;
-      --card-bg: #ffffff;
-      --border: #e1e5eb;
-      --text: #333333;
-      --text-muted: #6c757d;
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.1);
+      --dark: #343a40;
+      --bg: #f8f9fb;
+      --fg: #212529;
+      --muted: #6c757d;
+      --border: #dee2e6;
+      --soft: #e9ecef;
+      --wa: #25D366;
+      --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      --hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
     }
-
+    
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-
+    
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      margin: 0;
       background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
+      color: var(--fg);
+      line-height: 1.5;
     }
-
-    /* Header & Navigation */
+    
     header {
       position: sticky;
       top: 0;
-      background: var(--card-bg);
+      background: #fff;
       border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      z-index: 100;
+      z-index: 10;
+      box-shadow: var(--card-shadow);
     }
-
-    .header-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
+    
     .tabs {
       display: flex;
-      gap: 4px;
+      gap: 8px;
       align-items: center;
-      padding: 12px 0;
+      padding: 12px 16px;
       flex-wrap: wrap;
+      background: #fff;
     }
-
+    
     .tab {
       padding: 10px 16px;
       border-radius: 8px;
-      border: 1px solid transparent;
-      background: transparent;
+      border: 1px solid var(--border);
+      background: #fff;
       cursor: pointer;
-      font-weight: 500;
       transition: all 0.2s ease;
+      font-weight: 500;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-
+    
     .tab:hover {
-      background: rgba(67, 97, 238, 0.05);
+      background: var(--light);
+      border-color: var(--primary);
     }
-
+    
     .tab.active {
       background: var(--primary);
-      color: white;
-      box-shadow: var(--shadow);
+      color: #fff;
+      border-color: var(--primary);
     }
-
+    
     .badge {
       display: inline-flex;
       align-items: center;
@@ -94,184 +91,131 @@
       padding: 0 6px;
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.2);
-      color: inherit;
+      color: #fff;
       text-align: center;
       font-size: 12px;
       font-weight: 600;
     }
-
-    .tab.active .badge {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    /* Search & Filters */
+    
     .search {
-      padding: 16px 0;
+      padding: 16px;
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       align-items: center;
+      background: var(--light);
       border-top: 1px solid var(--border);
     }
-
+    
     input[type="text"], input[type="url"], input[type="tel"], select, input[type="date"], textarea {
       padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 8px;
       min-width: 170px;
-      background: var(--card-bg);
+      background: #fff;
+      transition: border-color 0.2s;
       font-family: inherit;
-      transition: border 0.2s;
     }
-
+    
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
     }
-
+    
     button {
       padding: 10px 16px;
       border-radius: 8px;
-      border: none;
+      border: 1px solid var(--primary);
       background: var(--primary);
-      color: white;
+      color: #fff;
       cursor: pointer;
-      font-weight: 500;
       transition: all 0.2s;
+      font-weight: 500;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
-
+    
     button:hover {
       background: var(--primary-dark);
+      border-color: var(--primary-dark);
       transform: translateY(-1px);
-      box-shadow: var(--shadow-hover);
     }
-
+    
     button.secondary {
-      background: white;
+      background: #fff;
       color: var(--primary);
-      border: 1px solid var(--primary);
     }
-
+    
     button.secondary:hover {
-      background: rgba(67, 97, 238, 0.05);
+      background: var(--light);
     }
-
+    
     button[disabled] {
-      opacity: 0.6;
+      opacity: .5;
       cursor: not-allowed;
       transform: none;
     }
-
-    button.btn-danger {
-      background: var(--danger);
-      border-color: var(--danger);
-    }
-
-    button.btn-danger:hover {
-      background: #c82333;
-    }
-
-    button.btn-warning {
-      background: var(--warning);
-      border-color: var(--warning);
-      color: var(--dark);
-    }
-
-    button.btn-warning:hover {
-      background: #e0a800;
-    }
-
-    button.btn-success {
-      background: var(--success);
-      border-color: var(--success);
-    }
-
-    button.btn-success:hover {
-      background: #218838;
-    }
-
-    /* Main Container */
+    
     .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 24px 16px;
       display: grid;
       grid-template-columns: 1fr;
-      gap: 24px;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
     }
-
-    @media (min-width: 1200px) {
+    
+    @media(min-width: 1200px) {
       .container {
         grid-template-columns: 65% 35%;
       }
     }
-
-    .left, .right {
-      background: var(--card-bg);
+    
+    .left {
+      background: #fff;
       border-radius: 12px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--card-shadow);
       overflow: hidden;
     }
-
+    
     .right {
-      border-left: none;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      height: fit-content;
+      position: sticky;
+      top: 100px;
     }
-
-    @media (min-width: 1200px) {
-      .right {
-        border-left: 1px solid var(--border);
-      }
-    }
-
-    .section-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: #fafbfc;
-    }
-
-    .section-header h3 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .section-content {
-      padding: 20px;
-    }
-
-    /* Table Styles */
+    
     table {
       width: 100%;
       border-collapse: collapse;
-      background: var(--card-bg);
-      font-size: 14px;
+      background: #fff;
     }
-
+    
     th, td {
-      border-bottom: 1px solid var(--border);
-      padding: 12px;
+      border-bottom: 1px solid var(--soft);
+      padding: 14px 12px;
       text-align: left;
+      font-size: 14px;
       vertical-align: top;
     }
-
+    
     th {
-      background: #f8f9fa;
+      background: var(--light);
       font-weight: 600;
-      color: var(--text-muted);
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
     }
-
+    
     tr:hover {
-      background: #f8f9fa;
+      background: rgba(67, 97, 238, 0.03);
     }
-
-    /* Chips & Status */
+    
     .chip {
       display: inline-flex;
       align-items: center;
@@ -279,190 +223,158 @@
       border-radius: 20px;
       font-size: 12px;
       font-weight: 500;
-      gap: 4px;
+      border: 1px solid;
     }
-
+    
     .chip.inprocess {
-      background: #fff3cd;
+      background: #fff9e6;
+      border-color: var(--warning);
       color: #856404;
-      border: 1px solid #ffeaa7;
     }
-
+    
     .chip.done {
-      background: #d1edff;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    .chip.submitted {
-      background: #d4edda;
+      background: #e6ffed;
+      border-color: var(--success);
       color: #155724;
-      border: 1px solid #c3e6cb;
     }
-
+    
+    .chip.submitted {
+      background: #e6f3ff;
+      border-color: var(--primary);
+      color: #004085;
+    }
+    
     .chip.rejected {
-      background: #f8d7da;
+      background: #ffe6e6;
+      border-color: var(--danger);
       color: #721c24;
-      border: 1px solid #f5c6cb;
     }
-
+    
     .sla {
       display: inline-flex;
       align-items: center;
       border-radius: 20px;
       padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 600;
-      gap: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
       margin-left: 6px;
     }
-
+    
     .sla.on {
-      background: #d4edda;
+      background: #e6ffed;
+      border-color: var(--success);
       color: #155724;
-      border: 1px solid #c3e6cb;
     }
-
+    
     .sla.today {
-      background: #fff3cd;
+      background: #fffbe6;
+      border-color: var(--warning);
       color: #856404;
-      border: 1px solid #ffeaa7;
     }
-
+    
     .sla.over {
-      background: #f8d7da;
+      background: #ffe6e6;
+      border-color: var(--danger);
       color: #721c24;
-      border: 1px solid #f5c6cb;
     }
-
-    /* Actions */
+    
     .actions {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
       align-items: center;
     }
-
-    .action-btn {
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    /* WhatsApp Button */
-    .wa-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #25D366;
-      color: white;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .wa-btn:hover {
-      background: #128C7E;
-      transform: scale(1.05);
-    }
-
-    /* Price */
-    .price {
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .price b {
-      color: var(--text);
-    }
-
-    /* Cards */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .card h3 {
-      margin: 0 0 12px 0;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    /* Form Grid */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-
-    @media (min-width: 768px) {
-      .form-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .form-grid.full {
-      grid-template-columns: 1fr;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group label {
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    /* Pagination */
-    .pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16px;
-      padding: 12px 0;
-    }
-
-    .page-info {
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    /* Toast */
+    
     .toast {
       position: fixed;
       right: 20px;
       bottom: 20px;
       background: var(--dark);
-      color: white;
+      color: #fff;
       padding: 12px 16px;
       border-radius: 8px;
-      box-shadow: var(--shadow-hover);
       opacity: 0;
       transform: translateY(10px);
-      transition: all 0.3s;
+      transition: .3s;
       z-index: 1000;
-      max-width: 300px;
+      box-shadow: var(--hover-shadow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-
+    
     .toast.show {
       opacity: 1;
       transform: translateY(0);
     }
-
-    /* Loading */
+    
+    .price {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .wa {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--wa);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    .wa:hover {
+      background: #f4fff8;
+      border-color: var(--wa);
+      transform: scale(1.05);
+    }
+    
+    .label-mini {
+      font-size: 11px;
+      color: #333;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 6px;
+      margin-left: 6px;
+    }
+    
+    .btn-danger {
+      border-color: var(--danger);
+      background: var(--danger);
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+      border-color: #bd2130;
+    }
+    
+    .btn-warning {
+      border-color: var(--warning);
+      background: var(--warning);
+      color: #212529;
+    }
+    
+    .btn-warning:hover {
+      background: #e0a800;
+      border-color: #d39e00;
+    }
+    
+    /* Loading overlay */
     .loading {
       position: fixed;
       inset: 0;
@@ -473,323 +385,834 @@
       backdrop-filter: blur(4px);
       z-index: 9999;
     }
-
+    
     .loading.show {
       display: flex;
     }
-
+    
     .spinner {
-      width: 50px;
-      height: 50px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid var(--primary);
-      animation: spin 1s linear infinite;
+      border: 6px solid #ddd;
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
     }
-
+    
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
-
-    /* Inline Edit */
+    
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    
     .inline-input {
       width: 100%;
-      padding: 6px 10px;
+      padding: 8px 10px;
       border: 1px solid var(--border);
       border-radius: 6px;
       font-size: 14px;
     }
-
-    .view-mode, .edit-mode {
+    
+    .pagination {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
-    }
-
-    .edit-mode {
-      display: none;
-    }
-
-    .editing .view-mode {
-      display: none;
-    }
-
-    .editing .edit-mode {
-      display: flex;
-    }
-
-    /* Dashboard Stats */
-    .stats-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .stat-card {
-      background: white;
-      border-radius: 10px;
       padding: 16px;
-      text-align: center;
-      box-shadow: var(--shadow);
-      border-left: 4px solid var(--primary);
+      border-top: 1px solid var(--border);
+      background: var(--light);
     }
-
-    .stat-card.inprocess { border-left-color: var(--warning); }
-    .stat-card.submitted { border-left-color: var(--primary); }
-    .stat-card.done { border-left-color: var(--success); }
-    .stat-card.rejected { border-left-color: var(--danger); }
-
+    
+    .page-info {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    .section-title {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--light);
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .hint {
+      padding: 12px 16px;
+      background: #e6f3ff;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: #004085;
+    }
+    
+    .detail-content {
+      padding: 16px;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    
+    @media(min-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .form-group label {
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .stat-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+    }
+    
     .stat-value {
       font-size: 24px;
       font-weight: 700;
-      margin: 8px 0;
+      margin-bottom: 4px;
     }
-
+    
     .stat-label {
-      font-size: 14px;
-      color: var(--text-muted);
+      font-size: 12px;
+      color: var(--muted);
     }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .tabs {
-        justify-content: center;
-      }
-      
-      .search {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      input, select {
-        min-width: auto;
-        width: 100%;
-      }
-      
-      .container {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      
-      table {
-        font-size: 12px;
-      }
-      
-      th, td {
-        padding: 8px;
-      }
+    
+    .tab-icon {
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <div class="tabs">
-        <div class="tab active" data-tab="inprocess">
-          <i class="fas fa-clock"></i> In Process <span id="badge-inprocess" class="badge">0</span>
-        </div>
-        <div class="tab" data-tab="submitted">
-          <i class="fas fa-paper-plane"></i> Submitted <span id="badge-submitted" class="badge">0</span>
-        </div>
-        <div class="tab" data-tab="done">
-          <i class="fas fa-check-circle"></i> Done <span id="badge-done" class="badge">0</span>
-        </div>
-        <div class="tab" data-tab="rejected">
-          <i class="fas fa-times-circle"></i> Rejected <span id="badge-rejected" class="badge">0</span>
-        </div>
-        <div class="tab" data-tab="regpanel">
-          <i class="fas fa-cog"></i> Panel Settings
-        </div>
+    <div class="tabs">
+      <div class="tab active" data-tab="inprocess">
+        <i class="fas fa-spinner tab-icon"></i> Panel (In Process) <span id="badge-inprocess" class="badge">0</span>
       </div>
-      
-      <div class="search" id="searchBar">
-        <input id="search" type="text" placeholder="Cari nama/IC..." />
-        <select id="filterPanelSelect" title="Tapis Jenis Panel">
-          <option value="">Semua Panel</option>
-        </select>
-        <input id="filterPanelText" type="text" placeholder="Tulis nama panel..." />
-        <select id="sort">
-          <option value="tarikh_desc">Tarikh Hadir: Terbaru</option>
-          <option value="tarikh_asc">Tarikh Hadir: Terdahulu</option>
-          <option value="panel_az">Jenis Panel: A → Z</option>
-          <option value="panel_za">Jenis Panel: Z → A</option>
-          <option value="nama_az">Nama Pesakit: A → Z</option>
-          <option value="nama_za">Nama Pesakit: Z → A</option>
-        </select>
-        <select id="filterSLA" title="Status SLA">
-          <option value="">SLA: Semua</option>
-          <option value="over">SLA: Overdue</option>
-          <option value="today">SLA: Due Today</option>
-          <option value="on">SLA: On Track</option>
-        </select>
-        <select id="pageSize" title="Rekod per halaman">
-          <option>25</option>
-          <option selected>50</option>
-          <option>100</option>
-        </select>
-        <button id="refresh" class="secondary">
-          <i class="fas fa-sync-alt"></i> Refresh
-        </button>
+      <div class="tab" data-tab="submitted">
+        <i class="fas fa-paper-plane tab-icon"></i> Panel (Submitted) <span id="badge-submitted" class="badge">0</span>
       </div>
+      <div class="tab" data-tab="done">
+        <i class="fas fa-check-circle tab-icon"></i> Panel (Done) <span id="badge-done" class="badge">0</span>
+      </div>
+      <div class="tab" data-tab="rejected">
+        <i class="fas fa-times-circle tab-icon"></i> Panel (Rejected) <span id="badge-rejected" class="badge">0</span>
+      </div>
+      <div class="tab" data-tab="regpanel">
+        <i class="fas fa-cog tab-icon"></i> Reg Panel
+      </div>
+    </div>
+    <div class="search" id="searchBar">
+      <input id="search" type="text" placeholder="Cari nama/IC..." />
+      <select id="filterPanelSelect" title="Tapis Jenis Panel">
+        <option value="">Semua Panel</option>
+      </select>
+      <input id="filterPanelText" type="text" placeholder="Tulis nama panel..." />
+      <select id="sort">
+        <option value="tarikh_desc">Tarikh Hadir: Terbaru</option>
+        <option value="tarikh_asc">Tarikh Hadir: Terdahulu</option>
+        <option value="panel_az">Jenis Panel: A → Z</option>
+        <option value="panel_za">Jenis Panel: Z → A</option>
+        <option value="nama_az">Nama Pesakit: A → Z</option>
+        <option value="nama_za">Nama Pesakit: Z → A</option>
+      </select>
+      <select id="filterSLA" title="Status SLA">
+        <option value="">SLA: Semua</option>
+        <option value="over">SLA: Overdue</option>
+        <option value="today">SLA: Due Today</option>
+        <option value="on">SLA: On Track</option>
+      </select>
+      <select id="pageSize" title="Rekod per halaman">
+        <option>25</option>
+        <option selected>50</option>
+        <option>100</option>
+      </select>
+      <button id="refresh" class="secondary" title="Muat semula">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </button>
     </div>
   </header>
 
   <div class="container">
     <section class="left">
-      <!-- Dashboard Stats (akan ditunjukkan hanya untuk tab utama) -->
-      <div id="dashboardStats" class="stats-container" style="display: none;">
-        <div class="stat-card inprocess">
-          <div class="stat-label">In Process</div>
-          <div class="stat-value" id="stat-inprocess">0</div>
-          <div class="stat-label">Claims</div>
-        </div>
-        <div class="stat-card submitted">
-          <div class="stat-label">Submitted</div>
-          <div class="stat-value" id="stat-submitted">0</div>
-          <div class="stat-label">Claims</div>
-        </div>
-        <div class="stat-card done">
-          <div class="stat-label">Done</div>
-          <div class="stat-value" id="stat-done">0</div>
-          <div class="stat-label">Claims</div>
-        </div>
-        <div class="stat-card rejected">
-          <div class="stat-label">Rejected</div>
-          <div class="stat-value" id="stat-rejected">0</div>
-          <div class="stat-label">Claims</div>
-        </div>
-      </div>
-      
       <div id="recordsView">
-        <div class="section-header">
-          <h3>Panel Claims</h3>
-        </div>
-        <div class="section-content">
-          <table>
-            <thead>
-              <tr>
-                <th>Nama</th>
-                <th>IC</th>
-                <th>Telefon</th>
-                <th>Tarikh Hadir</th>
-                <th>Panel / PIC</th>
-                <th>Harga</th>
-                <th>Ubat</th>
-                <th>Status</th>
-                <th>Tindakan</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-          <div class="pagination">
-            <button id="prev" class="secondary">
-              <i class="fas fa-chevron-left"></i> Previous
-            </button>
-            <span id="pageInfo" class="page-info"></span>
-            <button id="next" class="secondary">
-              Next <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
+        <div class="section-title">Senarai Tuntutan Panel</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>IC</th>
+              <th>Telefon</th>
+              <th>Tarikh Hadir</th>
+              <th>Panel / PIC</th>
+              <th>Harga</th>
+              <th>Ubat</th>
+              <th>Status</th>
+              <th>Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="pagination">
+          <button id="prev" class="secondary">
+            <i class="fas fa-chevron-left"></i> Prev
+          </button>
+          <span id="pageInfo" class="page-info"></span>
+          <button id="next" class="secondary">
+            Next <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
       </div>
 
       <div id="regPanelView" style="display:none">
-        <div class="section-header">
-          <h3>Panel Settings</h3>
+        <div class="section-title">Pendaftaran Panel</div>
+        <div class="card" style="margin-bottom:16px">
+          <h3 style="margin:0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-plus-circle"></i> Daftar Panel Baharu
+          </h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="rp_name">Nama Panel *</label>
+              <input id="rp_name" type="text" placeholder="Contoh: AIA" required />
+            </div>
+            <div class="form-group">
+              <label for="rp_link">Link Panel (URL) *</label>
+              <input id="rp_link" type="url" placeholder="https://..." required />
+            </div>
+            <div class="form-group">
+              <label for="rp_pic_name">Nama PIC</label>
+              <input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" />
+            </div>
+            <div class="form-group">
+              <label for="rp_pic_phone">No. Telefon PIC</label>
+              <input id="rp_pic_phone" type="tel" placeholder="0123456789" />
+            </div>
+            <div class="form-group">
+              <label for="rp_terms_days">Tempoh (hari) *</label>
+              <input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" />
+            </div>
+            <div class="form-group full-width">
+              <label for="rp_notes">Catatan</label>
+              <textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%; min-height: 80px;"></textarea>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px">
+            <button id="rp_save">
+              <i class="fas fa-save"></i> Simpan Panel
+            </button>
+            <button id="rp_clear" class="secondary">
+              <i class="fas fa-eraser"></i> Clear
+            </button>
+          </div>
         </div>
-        <div class="section-content">
-          <div class="card">
-            <h3><i class="fas fa-plus-circle"></i> Daftar Panel Baharu</h3>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Nama Panel *</label>
-                <input id="rp_name" type="text" placeholder="Contoh: AIA" required />
-              </div>
-              <div class="form-group">
-                <label>Link Panel (URL) *</label>
-                <input id="rp_link" type="url" placeholder="https://..." required />
-              </div>
-              <div class="form-group">
-                <label>Nama PIC</label>
-                <input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" />
-              </div>
-              <div class="form-group">
-                <label>No. Telefon PIC</label>
-                <input id="rp_pic_phone" type="tel" placeholder="0123456789" />
-              </div>
-              <div class="form-group">
-                <label>Tempoh (hari) *</label>
-                <input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" />
-              </div>
-              <div class="form-group full">
-                <label>Catatan</label>
-                <textarea id="rp_notes" placeholder="Nota tambahan jika perlu" rows="3"></textarea>
-              </div>
-            </div>
-            <div style="margin-top:16px; display:flex; gap:10px">
-              <button id="rp_save">
-                <i class="fas fa-save"></i> Simpan Panel
-              </button>
-              <button id="rp_clear" class="secondary">
-                <i class="fas fa-eraser"></i> Clear
-              </button>
-            </div>
-          </div>
 
-          <div class="card">
-            <h3><i class="fas fa-list"></i> Senarai Panel Berdaftar</h3>
-            <p class="muted">Klik Edit untuk ubah terus dalam baris</p>
-            <table>
-              <thead>
-                <tr>
-                  <th>Nama</th>
-                  <th>Link</th>
-                  <th>PIC</th>
-                  <th>Telefon PIC</th>
-                  <th>Tempoh (hari)</th>
-                  <th>Catatan</th>
-                  <th>WhatsApp</th>
-                  <th>Tindakan</th>
-                </tr>
-              </thead>
-              <tbody id="rp_tbody"></tbody>
-            </table>
-          </div>
+        <div class="card">
+          <h3 style="margin:0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-list"></i> Senarai Panel Berdaftar
+          </h3>
+          <p class="muted" style="margin-bottom: 12px;">Klik Edit untuk ubah terus dalam baris</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Link</th>
+                <th>PIC</th>
+                <th>Telefon PIC</th>
+                <th>Tempoh (hari)</th>
+                <th>Catatan</th>
+                <th>WhatsApp</th>
+                <th>Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="rp_tbody"></tbody>
+          </table>
         </div>
       </div>
     </section>
 
     <aside class="right">
-      <div class="section-header">
-        <h3>Panel Window</h3>
+      <div class="section-title">Panel Window</div>
+      <div class="hint">
+        <i class="fas fa-info-circle"></i> Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Tetingkap kanan dibuka sekali & dikitar semula.
       </div>
-      <div class="section-content">
-        <p class="hint">Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Tetingkap kanan dibuka sekali & dikitar semula.</p>
-        <div id="detail"></div>
+      <div class="detail-content" id="detail">
+        <p style="text-align: center; color: var(--muted); padding: 40px 20px;">
+          Pilih rekod untuk melihat butiran
+        </p>
       </div>
     </aside>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <i class="fas fa-check-circle"></i>
+    <span class="toast-message"></span>
+  </div>
   <div id="loading" class="loading" aria-live="polite">
     <div class="spinner" title="Loading..."></div>
   </div>
 
   <script>
-  // JavaScript code remains largely the same with minor adjustments for the new UI
-  // Only changes needed are to update the WhatsApp SVG with Font Awesome icons
-  // and adjust any class names that might have changed
+  // ===== CONFIG =====
+  const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
+
+  // ===== STATE =====
+  let state = { tab:'inprocess', page:1, pageSize:50, q:'', sort:'tarikh_desc', filterPanelSelect:'', filterPanelText:'', filterSLA:'' };
+  let panelWin = null, lastOpenTs = 0;
+  let regPanelMap = new Map();
+
+  // ===== HELPERS =====
+  const el = s => document.querySelector(s);
+  const tbody = el('#tbody');
+  const pageInfo = el('#pageInfo');
+  const toastEl = el('#toast');
+  const toastMsg = el('.toast-message');
+  const loader = el('#loading');
+  const escapeHtml = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   
-  // The rest of your JavaScript code would go here with minimal changes
-  // Since you requested not to change the structure, I'll keep the JS similar
+  function toast(m, type = 'info') {
+    const iconMap = {
+      'info': 'fas fa-info-circle',
+      'success': 'fas fa-check-circle',
+      'warning': 'fas fa-exclamation-triangle',
+      'error': 'fas fa-exclamation-circle'
+    };
+    
+    toastMsg.textContent = m;
+    toastEl.innerHTML = `<i class="${iconMap[type] || iconMap.info}"></i><span class="toast-message">${m}</span>`;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 3000);
+  }
   
-  // Example of minimal change needed for WhatsApp icons:
-  // Instead of: const waSVG = `<svg ...> ... </svg>`;
-  // Use: const waIcon = `<i class="fab fa-whatsapp"></i>`;
+  function showLoading(){ loader.classList.add('show'); }
+  function hideLoading(){ loader.classList.remove('show'); }
+
+  function formatDateDDMMYYYY_HHMM(v){
+    if(!v) return '';
+    let d;
+    if(v instanceof Date) d=v;
+    else {
+      const s=String(v);
+      if(/^\d{4}-\d{2}-\d{2}$/.test(s)) d=new Date(s+'T00:00:00');
+      else d=new Date(s);
+      if(isNaN(d.getTime())) return escapeHtml(s);
+    }
+    const pad=n=>String(n).padStart(2,'0');
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
   
-  // The rest of the functionality would remain the same
+  const toDigits = s => String(s||'').replace(/[^\d]/g,'');
+  function buildWAUrl(phone, text){ 
+    const p=toDigits(phone); 
+    const q=encodeURIComponent(text||''); 
+    if(!p) return ''; 
+    return `https://web.whatsapp.com/send?phone=${p}${q?`&text=${q}`:''}`; 
+  }
+
+  // ===== Single Window (kanan) Reuse =====
+  function openOrReusePanel(url){
+    if(!url) return;
+    const now=Date.now(); if(now-lastOpenTs<250) return; lastOpenTs=now;
+    try{
+      if(panelWin && !panelWin.closed){
+        try{ 
+          const current=panelWin.location && String(panelWin.location.href); 
+          if(current===String(url)){ 
+            panelWin.focus(); 
+            return; 
+          } 
+        } catch(e){}
+        panelWin.location.href=url; 
+        panelWin.focus(); 
+        return;
+      }
+    }catch(e){}
+    const sw=window.screen.availWidth, sh=window.screen.availHeight;
+    const w=Math.max(520, Math.round(sw*0.34)), h=Math.max(650, sh);
+    const left=Math.max(0, sw-w), top=0;
+    const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
+    panelWin = window.open(url, 'panel_claim_window', features);
+    if(!panelWin){ 
+      toast('Sila benarkan pop-up untuk domain ini.', 'warning');
+      window.open(url, 'panel_claim_window'); 
+      return; 
+    }
+    panelWin.focus();
+  }
+
+  // ===== DATA: REG PANEL =====
+  async function buildRegPanelMap(){
+    regPanelMap.clear();
+    try{
+      const res = await fetch(`${API_BASE}?action=listregpanel`);
+      const json = await res.json();
+      if(json.status!=='ok') return;
+      const items = (json.data && (json.data.items || json.data)) || [];
+      for(const p of items){
+        const key = String(p.panel_name||'').toLowerCase().trim();
+        regPanelMap.set(key, {
+          panel_name: p.panel_name||'',
+          pic_name: p.pic_name||'',
+          pic_phone: p.pic_phone||'',
+          panel_link: p.panel_link || p.login_url || p.claim_url_template || '',
+          payment_terms_days: parseInt(p.payment_terms_days,10) || parseInt(p.payment_terms,10) || '',
+          notes: p.notes || ''
+        });
+      }
+    }catch(e){ console.warn('Gagal muat Reg Panel map', e); }
+  }
+  
+  async function populatePanelDropdown(){
+    const select = el('#filterPanelSelect');
+    select.innerHTML = '<option value="">Semua Panel</option>';
+    const names = Array.from(regPanelMap.keys()).sort((a,b)=> a.localeCompare(b,'ms',{sensitivity:'base'}));
+    for(const name of names){
+      const opt = document.createElement('option'); 
+      opt.value = name; 
+      opt.textContent = name.replace(/\b\w/g, c=>c.toUpperCase()); 
+      select.appendChild(opt);
+    }
+  }
+
+  // ===== SLA util =====
+  function deriveSLA(record){
+    const terms = (()=>{
+      const key = String(record.jenis_panel||'').toLowerCase().trim();
+      const rp = regPanelMap.get(key);
+      return rp && rp.payment_terms_days ? rp.payment_terms_days : null;
+    })();
+    let due = record.sla_due_at ? new Date(record.sla_due_at) : null;
+    if ((!due || isNaN(due)) && record.status_claim==='Submitted' && terms){
+      const base = record.submitted_at ? new Date(record.submitted_at) : new Date();
+      if(!isNaN(base)) { due = new Date(base); due.setDate(due.getDate()+terms); }
+    }
+    if(!due || isNaN(due)) return { label:'', cls:'', dueText:'' };
+    const today = new Date(); today.setHours(0,0,0,0);
+    const dd = new Date(due); dd.setHours(0,0,0,0);
+    let cls='on', label='On Track';
+    if(dd.getTime() < today.getTime()){ cls='over'; label='Overdue'; }
+    else if(dd.getTime() === today.getTime()){ cls='today'; label='Due Today'; }
+    return { label, cls, dueText: formatDateDDMMYYYY_HHMM(due) };
+  }
+
+  // ===== TABS =====
+  function setActiveTab(tab){
+    state.tab = tab;
+    document.querySelectorAll('.tab').forEach(t=> t.classList.toggle('active', t.dataset.tab===tab));
+    const isReg = tab==='regpanel';
+    el('#recordsView').style.display = isReg ? 'none' : '';
+    el('#regPanelView').style.display = isReg ? '' : 'none';
+    el('#searchBar').style.display   = isReg ? 'none' : '';
+    if(isReg){ loadRegPanel(); } else { state.page=1; load(); }
+  }
+
+  // ===== LOAD RECORDS =====
+  async function load(){
+    if(regPanelMap.size===0){ 
+      await buildRegPanelMap(); 
+      await populatePanelDropdown(); 
+    }
+    const url = `${API_BASE}?action=listrecords&statusTab=${encodeURIComponent(state.tab)}&page=${state.page}&pageSize=${state.pageSize}&q=${encodeURIComponent(state.q)}`;
+    try{
+      showLoading();
+      const res = await fetch(url);
+      const json = await res.json();
+      if(json.status!=='ok') throw new Error(json.message||'Gagal memuat data');
+      const {total, items} = json.data;
+
+      let filtered = items.slice();
+      if(state.filterPanelSelect){
+        const key = state.filterPanelSelect.toLowerCase();
+        filtered = filtered.filter(r => String(r.jenis_panel||'').toLowerCase() === key);
+      }
+      if(state.filterPanelText){
+        const t = state.filterPanelText.toLowerCase();
+        filtered = filtered.filter(r => String(r.jenis_panel||'').toLowerCase().includes(t));
+      }
+      if(state.tab==='submitted' && state.filterSLA){
+        filtered = filtered.filter(r => deriveSLA(r).cls === state.filterSLA);
+      }
+
+      const sorted = sortItems(filtered);
+      renderTable(sorted);
+      updateBadgesApprox(sorted);
+    }catch(e){ 
+      console.error(e); 
+      toast('Ralat memuat data', 'error'); 
+    }
+    finally{ 
+      hideLoading(); 
+    }
+  }
+
+  function parseDate(value){
+    if(!value) return null;
+    if(value instanceof Date) return value;
+    const s=String(value);
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00');
+    const d=new Date(s); return isNaN(d.getTime())?null:d;
+  }
+  
+  function sortItems(items){
+    const m = state.sort;
+    if(m==='panel_az' || m==='panel_za'){
+      items.sort((a,b)=> String(a.jenis_panel||'').localeCompare(String(b.jenis_panel||''),'ms',{sensitivity:'base'}));
+      if(m==='panel_za') items.reverse(); return items;
+    }
+    if(m==='nama_az' || m==='nama_za'){
+      items.sort((a,b)=> String(a.nama_pesakit||'').localeCompare(String(b.nama_pesakit||''),'ms',{sensitivity:'base'}));
+      if(m==='nama_za') items.reverse(); return items;
+    }
+    items.sort((a,b)=>{
+      const da=parseDate(a.tarikh_hadir), db=parseDate(b.tarikh_hadir);
+      const ta=da?da.getTime():0, tb=db?db.getTime():0;
+      return tb - ta;
+    });
+    if(m==='tarikh_asc') items.reverse();
+    return items;
+  }
+
+  function num(x){ 
+    const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; 
+    return n.toFixed(2); 
+  }
+
+  function renderTable(items){
+    if(pageInfo) pageInfo.textContent = `Halaman ${state.page} • ${items.length} rekod`;
+    tbody.innerHTML = items.map(r => renderRow(r)).join('');
+    items.forEach(r => wireRow(r));
+  }
+
+  function renderRow(r){
+    const status = (r.status_claim||'Not Started');
+    const chipClass = 
+      status==='Done' ? 'done' : 
+      status==='Rejected' ? 'rejected' : 
+      status==='Submitted' ? 'submitted' : 
+      'inprocess';
+
+    const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
+    const reg = regPanelMap.get(panelKey);
+
+    const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
+    const waPatientIcon = waPatientURL ? 
+      `<a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit" onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">
+        <i class="fab fa-whatsapp"></i>
+      </a>` : '';
+
+    const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
+    const waPICIcon = waPICURL ? 
+      `<a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel" onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">
+        <i class="fab fa-whatsapp"></i>
+      </a>` : '';
+
+    const price = `<div class="price">
+      Consult RM${num(r.harga_consultation)} · Ubat RM${num(r.harga_ubat)} · Prosedur RM${num(r.harga_prosedur)}<br>
+      <b>Jumlah RM${num(r.harga_jumlah)}</b>
+    </div>`;
+
+    const sla = deriveSLA(r);
+    const slaBadge = sla.cls ? `<span class="sla ${sla.cls}" title="Due: ${sla.dueText}">${sla.label}</span>` : '';
+
+    const submittedActions = state.tab==='submitted'
+      ? `<button class="secondary btn-pending" title="Masih menunggu"><i class="fas fa-clock"></i></button>
+         <button class="btn-done" title="Tanda Done"><i class="fas fa-check"></i></button>
+         <button class="btn-rejected" title="Tanda Rejected"><i class="fas fa-times"></i></button>`
+      : '';
+
+    return `<tr data-id="${escapeHtml(r.record_id)}">
+      <td>${escapeHtml(r.nama_pesakit||'')}</td>
+      <td>${escapeHtml(r.no_ic||'')}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>${escapeHtml(r.no_telefon||'')}</span>
+          ${waPatientIcon || ''}
+        </div>
+      </td>
+      <td>${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
+      <td>
+        <div><b>${escapeHtml(r.jenis_panel||'')}</b>${slaBadge}</div>
+        ${reg ? `<div class="price" style="margin-top:4px">
+          ${escapeHtml(reg.pic_name||'-')}<br>
+          <div style="display:flex;align-items:center;gap:8px">
+            <small>${escapeHtml(reg.pic_phone||'')}</small>
+            ${waPICIcon || ''}
+          </div>
+        </div>` : ''}
+      </td>
+      <td>${price}</td>
+      <td>${escapeHtml(r.jenis_ubat||'')}</td>
+      <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
+      <td class="actions">
+        <button class="secondary btn-open" title="Buka laman panel"><i class="fas fa-external-link-alt"></i></button>
+        ${state.tab==='inprocess'
+          ? `<button class="btn-submit" title="Hantar ke Submitted"><i class="fas fa-paper-plane"></i></button>`
+          : submittedActions
+        }
+      </td>
+    </tr>`;
+  }
+
+  function wireRow(r){
+    const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
+    tr.querySelector('.btn-open').addEventListener('click', ()=>{
+      const url = r.panel_claim_url || (()=>{
+        const key = String(r.jenis_panel||'').toLowerCase().trim();
+        const reg = regPanelMap.get(key);
+        return reg && reg.panel_link ? reg.panel_link : '';
+      })();
+      if(!url){ toast('URL panel tiada', 'warning'); return; }
+      openOrReusePanel(url);
+    });
+
+    if (state.tab==='inprocess') {
+      tr.querySelector('.btn-submit')?.addEventListener('click', async ()=>{
+        const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
+        if (ref === null) { toast('Dibatalkan.', 'info'); return; }
+        await updateStatus(r.record_id, { status_claim: 'Submitted', claim_ref_id: ref });
+      });
+    } else if (state.tab==='submitted') {
+      tr.querySelector('.btn-pending')?.addEventListener('click', async ()=>{ 
+        await updateStatus(r.record_id, { status_claim: 'Submitted' }); 
+      });
+      tr.querySelector('.btn-done')?.addEventListener('click', async ()=>{
+        const ref = prompt('Masukkan Claim Ref/ID (jika belum diisi):', r.claim_ref_id||'');
+        if (ref === null) { toast('Dibatalkan.', 'info'); return; }
+        await updateStatus(r.record_id, { status_claim: 'Done', claim_ref_id: ref });
+      });
+      tr.querySelector('.btn-rejected')?.addEventListener('click', async ()=>{
+        const reason = prompt('Sebab Rejected (optional):','');
+        if (reason === null) { toast('Dibatalkan.', 'info'); return; }
+        await updateStatus(r.record_id, { status_claim: 'Rejected', notes: reason||'' });
+      });
+    }
+  }
+
+  // ===== POST util — x-www-form-urlencoded (elak preflight) =====
+  async function postForm(action, obj){
+    showLoading();
+    try{
+      const body = new URLSearchParams();
+      body.set('payload', JSON.stringify(obj||{}));
+      const res = await fetch(`${API_BASE}?action=${encodeURIComponent(action)}`, { method:'POST', body });
+      const json = await res.json().catch(()=>null);
+      if(!json || json.status!=='ok') throw new Error((json && json.message) || 'Request gagal');
+      return json;
+    }finally{
+      hideLoading();
+    }
+  }
+  
+  async function updateStatus(record_id, payload){
+    try{
+      const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
+      if(tr && payload.status_claim){
+        const chip=tr.querySelector('.chip');
+        chip.textContent = payload.status_claim;
+        chip.className = 'chip ' + 
+          (payload.status_claim==='Rejected' ? 'rejected' : 
+           (payload.status_claim==='Done' ? 'done' : 
+            (payload.status_claim==='Submitted' ? 'submitted' : 'inprocess')));
+      }
+      await postForm('updateclaimstatus', { record_id, ...payload });
+      toast('Status dikemas kini', 'success');
+      await load();
+    }catch(e){ 
+      toast(e.message||'Gagal kemas status', 'error'); 
+      await load(); 
+    }
+  }
+  
+  function updateBadgesApprox(items){
+    const count={inprocess:0, submitted:0, done:0, rejected:0};
+    items.forEach(r=>{
+      const s=(r.status_claim||'Not Started');
+      if(s==='Done') count.done++;
+      else if(s==='Rejected') count.rejected++;
+      else if(s==='Submitted') count.submitted++;
+      else count.inprocess++;
+    });
+    el('#badge-inprocess').textContent=String(count.inprocess);
+    el('#badge-submitted').textContent=String(count.submitted);
+    el('#badge-done').textContent=String(count.done);
+    el('#badge-rejected').textContent=String(count.rejected);
+  }
+
+  // ====== REG PANEL VIEW (LIST + SAVE/CLEAR + INLINE EDIT) ======
+  async function loadRegPanel(){
+    try{
+      showLoading();
+      const res = await fetch(`${API_BASE}?action=listregpanel`);
+      const json = await res.json();
+      if(json.status!=='ok') throw new Error(json.message||'Gagal memuat Reg Panel');
+      const items = (json.data && (json.data.items || json.data)) || [];
+      const tbodyRP = document.getElementById('rp_tbody');
+      tbodyRP.innerHTML = items.map(p => renderRegRow(p)).join('');
+      tbodyRP.querySelectorAll('tr').forEach(tr => wireRegRow(tr));
+      await buildRegPanelMap();
+      await populatePanelDropdown();
+    }catch(e){ 
+      console.error(e); 
+      toast('Ralat memuat Reg Panel', 'error'); 
+    }
+    finally{ 
+      hideLoading(); 
+    }
+  }
+
+  function renderRegRow(p){
+    const link = escapeHtml(p.panel_link || p.login_url || p.claim_url_template || '');
+    const waHref = p.pic_phone ? buildWAUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
+    const waBtn = waHref ? 
+      `<a class="wa" href="javascript:void(0)" onclick="openOrReusePanel('${waHref.replace(/'/g,"%27")}')" title="WhatsApp PIC">
+        <i class="fab fa-whatsapp"></i>
+      </a>` : '';
+    const terms = parseInt(p.payment_terms_days,10) || '';
+
+    return `<tr data-panel="${escapeHtml(p.panel_name||'')}">
+      <td class="cell-name"><span class="view">${escapeHtml(p.panel_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.panel_name||'')}" /></td>
+      <td class="cell-link"><span class="view"><a href="${link||'#'}" target="_blank" rel="noopener">Buka</a></span><input class="edit inline-input" style="display:none" value="${escapeHtml(link)}" /></td>
+      <td class="cell-picname"><span class="view">${escapeHtml(p.pic_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_name||'')}" /></td>
+      <td class="cell-picphone"><span class="view">${escapeHtml(p.pic_phone||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_phone||'')}" /></td>
+      <td class="cell-terms"><span class="view">${escapeHtml(String(terms))}</span><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="${escapeHtml(String(terms))}" /></td>
+      <td class="cell-notes"><span class="view">${escapeHtml(p.notes||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
+      <td>${waBtn}</td>
+      <td class="actions">
+        <button class="btn-warning btn-rp-edit"><i class="fas fa-edit"></i></button>
+        <button class="btn-danger btn-rp-del"><i class="fas fa-trash"></i></button>
+        <button class="btn-save" style="display:none"><i class="fas fa-save"></i></button>
+        <button class="secondary btn-cancel" style="display:none"><i class="fas fa-times"></i></button>
+      </td>
+    </tr>`;
+  }
+
+  function wireRegRow(tr){
+    const btnEdit = tr.querySelector('.btn-rp-edit');
+    const btnDel  = tr.querySelector('.btn-rp-del');
+    const btnSave = tr.querySelector('.btn-save');
+    const btnCancel=tr.querySelector('.btn-cancel');
+
+    function setEditMode(on){
+      tr.querySelectorAll('.view').forEach(e=> e.style.display = on ? 'none' : '');
+      tr.querySelectorAll('.edit').forEach(e=> e.style.display = on ? '' : 'none');
+      btnEdit.style.display = on ? 'none' : '';
+      btnDel.style.display  = on ? 'none' : '';
+      btnSave.style.display = on ? '' : 'none';
+      btnCancel.style.display= on ? '' : 'none';
+    }
+
+    btnEdit.addEventListener('click', ()=> setEditMode(true));
+    btnCancel.addEventListener('click', ()=> setEditMode(false));
+
+    btnSave.addEventListener('click', async ()=>{
+      const name = tr.querySelector('.cell-name .edit').value.trim();
+      const link = tr.querySelector('.cell-link .edit').value.trim();
+      const picn = tr.querySelector('.cell-picname .edit').value.trim();
+      const picp = tr.querySelector('.cell-picphone .edit').value.trim();
+      const terms= parseInt(tr.querySelector('.cell-terms .edit').value,10);
+      const notes= tr.querySelector('.cell-notes .edit').value.trim();
+      if(!name || !link || !Number.isFinite(terms) || terms<=0){ 
+        toast('Isi Nama, Link & Tempoh hari', 'warning'); 
+        return; 
+      }
+      try{
+        await postForm('updateregpanel', { panel_name:name, panel_link:link, pic_name:picn, pic_phone:picp, payment_terms_days:terms, notes });
+        toast('Panel dikemas kini', 'success');
+        await loadRegPanel();
+      }catch(e){ 
+        console.error(e); 
+        toast('Gagal kemas panel', 'error'); 
+      }
+    });
+
+    btnDel.addEventListener('click', async ()=>{
+      const name = tr.getAttribute('data-panel');
+      if(!confirm(`Padam panel "${name}"?`)) return;
+      try{ 
+        await postForm('deleteregpanel', { panel_name:name }); 
+        toast('Panel dipadam', 'success'); 
+        await loadRegPanel(); 
+      }
+      catch(e){ 
+        console.error(e); 
+        toast('Gagal padam panel', 'error'); 
+      }
+    });
+  }
+
+  async function saveRegPanel(){
+    const name = el('#rp_name').value.trim();
+    const link = el('#rp_link').value.trim();
+    const picName = el('#rp_pic_name').value.trim();
+    const picPhone = el('#rp_pic_phone').value.trim();
+    const termsDays = parseInt(el('#rp_terms_days').value,10);
+    const notes = el('#rp_notes').value.trim();
+
+    if(!name || !link || !Number.isFinite(termsDays) || termsDays<=0){ 
+      toast('Sila isi Nama Panel, Link dan Tempoh (hari).', 'warning'); 
+      return; 
+    }
+    try{
+      await postForm('updateregpanel', { panel_name: name, panel_link: link, pic_name: picName||'', pic_phone: picPhone||'', payment_terms_days: termsDays, notes: notes||'' });
+      toast('Panel disimpan.', 'success');
+      clearRegPanelForm();
+      await loadRegPanel();
+    }catch(e){ 
+      console.error(e); 
+      toast('Gagal simpan panel', 'error'); 
+    }
+  }
+  
+  function clearRegPanelForm(){ 
+    ['#rp_name','#rp_link','#rp_pic_name','#rp_pic_phone','#rp_terms_days','#rp_notes'].forEach(id=> el(id).value=''); 
+  }
+
+  // ===== Events =====
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
+  el('#search').addEventListener('input', e => { state.q = e.target.value.trim(); state.page=1; load(); });
+  el('#filterPanelSelect').addEventListener('change', e => { state.filterPanelSelect = e.target.value; state.page=1; load(); });
+  el('#filterPanelText').addEventListener('input', e => { state.filterPanelText = e.target.value.trim(); state.page=1; load(); });
+  el('#filterSLA').addEventListener('change', e => { state.filterSLA = e.target.value; state.page=1; load(); });
+  el('#sort').addEventListener('change', e => { state.sort = e.target.value; state.page=1; load(); });
+  el('#pageSize').addEventListener('change', e => { state.pageSize = parseInt(e.target.value,10)||50; state.page=1; load(); });
+  el('#refresh').addEventListener('click', load);
+  el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
+  el('#next').addEventListener('click', ()=>{ state.page++; load(); });
+
+  // Reg Panel buttons
+  document.addEventListener('click', (ev)=>{
+    if(ev.target && ev.target.id==='rp_save'){ saveRegPanel(); }
+    if(ev.target && ev.target.id==='rp_clear'){ clearRegPanelForm(); toast('Bersih.', 'info'); }
+  });
+
+  // INIT
+  setActiveTab('regpanel'); // buka Reg Panel dulu untuk uji edit inline dengan cepat
   </script>
 </body>
 </html>
