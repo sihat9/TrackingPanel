@@ -553,6 +553,37 @@
       width: 100%;
       table-layout: fixed;
     }
+    
+    /* Styling untuk zoom effect */
+    .zoom-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .zoom-content {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .zoom-content:hover {
+      transform: scale(1.05);
+      z-index: 20;
+      position: relative;
+      background-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+      padding: 8px;
+      max-width: 300px;
+      word-wrap: break-word;
+      white-space: normal;
+    }
+    
+    /* Untuk sel-sel jadual yang mempunyai kandungan panjang */
+    td .zoom-content:hover {
+      transform: scale(1.1);
+      max-height: 200px;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -992,28 +1023,28 @@
       : '';
 
     return `<tr data-id="${escapeHtml(r.record_id)}">
-      <td>${escapeHtml(r.nama_pesakit||'')}</td>
-      <td>${escapeHtml(r.no_ic||'')}</td>
+      <td><div class="zoom-container"><span class="zoom-content">${escapeHtml(r.nama_pesakit||'')}</span></div></td>
+      <td><div class="zoom-container"><span class="zoom-content">${escapeHtml(r.no_ic||'')}</span></div></td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
-          <span>${escapeHtml(r.no_telefon||'')}</span>
+          <span class="zoom-container"><span class="zoom-content">${escapeHtml(r.no_telefon||'')}</span></span>
           ${waPatientIcon || ''}
         </div>
       </td>
-      <td>${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
+      <td><div class="zoom-container"><span class="zoom-content">${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</span></div></td>
       <td>
-        <div><b>${escapeHtml(r.jenis_panel||'')}</b>${slaBadge}</div>
+        <div><b><div class="zoom-container"><span class="zoom-content">${escapeHtml(r.jenis_panel||'')}</span></div></b>${slaBadge}</div>
         ${reg ? `<div class="price" style="margin-top:4px">
-          ${escapeHtml(reg.pic_name||'-')}<br>
+          <div class="zoom-container"><span class="zoom-content">${escapeHtml(reg.pic_name||'-')}</span></div><br>
           <div style="display:flex;align-items:center;gap:8px">
-            <small>${escapeHtml(reg.pic_phone||'')}</small>
+            <small><div class="zoom-container"><span class="zoom-content">${escapeHtml(reg.pic_phone||'')}</span></div></small>
             ${waPICIcon || ''}
           </div>
         </div>` : ''}
       </td>
-      <td>${price}</td>
-      <td>${escapeHtml(r.jenis_ubat||'')}</td>
-      <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
+      <td><div class="zoom-container"><span class="zoom-content">${price}</span></div></td>
+      <td><div class="zoom-container"><span class="zoom-content">${escapeHtml(r.jenis_ubat||'')}</span></div></td>
+      <td><div class="zoom-container"><span class="zoom-content"><span class="chip ${chipClass}">${escapeHtml(status)}</span></span></div></td>
       <td class="actions">
         <button class="secondary btn-open" title="Buka laman panel"><i class="fas fa-external-link-alt"></i></button>
         ${state.tab==='inprocess'
@@ -1141,12 +1172,12 @@
     const terms = parseInt(p.payment_terms_days,10) || '';
 
     return `<tr data-panel="${escapeHtml(p.panel_name||'')}">
-      <td class="cell-name"><span class="view">${escapeHtml(p.panel_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.panel_name||'')}" /></td>
-      <td class="cell-link"><span class="view"><a href="${link||'#'}" target="_blank" rel="noopener">Buka</a></span><input class="edit inline-input" style="display:none" value="${escapeHtml(link)}" /></td>
-      <td class="cell-picname"><span class="view">${escapeHtml(p.pic_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_name||'')}" /></td>
-      <td class="cell-picphone"><span class="view">${escapeHtml(p.pic_phone||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_phone||'')}" /></td>
-      <td class="cell-terms"><span class="view">${escapeHtml(String(terms))}</span><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="${escapeHtml(String(terms))}" /></td>
-      <td class="cell-notes"><span class="view">${escapeHtml(p.notes||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
+      <td class="cell-name"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(p.panel_name||'')}</span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(p.panel_name||'')}" /></td>
+      <td class="cell-link"><div class="zoom-container"><span class="zoom-content view"><a href="${link||'#'}" target="_blank" rel="noopener">Buka</a></span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(link)}" /></td>
+      <td class="cell-picname"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(p.pic_name||'')}</span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_name||'')}" /></td>
+      <td class="cell-picphone"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(p.pic_phone||'')}</span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_phone||'')}" /></td>
+      <td class="cell-terms"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(String(terms))}</span></div><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="${escapeHtml(String(terms))}" /></td>
+      <td class="cell-notes"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(p.notes||'')}</span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
       <td>${waBtn}</td>
       <td class="actions">
         <button class="btn-warning btn-rp-edit"><i class="fas fa-edit"></i></button>
