@@ -209,6 +209,7 @@
       text-align: left;
       font-size: 13px;
       vertical-align: top;
+      position: relative;
     }
     
     th {
@@ -554,35 +555,62 @@
       table-layout: fixed;
     }
     
-    /* Styling untuk zoom effect */
-    .zoom-container {
-      position: relative;
-      display: inline-block;
+    /* STYLE UNTUK FUNGSI KANTA MIKROSKOP */
+    .magnifier-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
     }
     
-    .zoom-content {
-      transition: all 0.3s ease;
+    .magnifier-content {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 80%;
+      max-height: 80%;
+      overflow: auto;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      position: relative;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    
+    .magnifier-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 24px;
       cursor: pointer;
+      color: var(--muted);
     }
     
-    .zoom-content:hover {
-      transform: scale(1.05);
-      z-index: 20;
-      position: relative;
-      background-color: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      border-radius: 4px;
-      padding: 8px;
-      max-width: 300px;
-      word-wrap: break-word;
-      white-space: normal;
+    .magnifier-close:hover {
+      color: var(--danger);
     }
     
-    /* Untuk sel-sel jadual yang mempunyai kandungan panjang */
-    td .zoom-content:hover {
-      transform: scale(1.1);
-      max-height: 200px;
-      overflow-y: auto;
+    /* Highlight untuk sel yang boleh dibesarkan */
+    td.magnifiable, th.magnifiable {
+      cursor: zoom-in;
+      transition: background-color 0.2s;
+    }
+    
+    td.magnifiable:hover, th.magnifiable:hover {
+      background-color: rgba(44, 62, 80, 0.05);
+    }
+    
+    /* Untuk input dan elemen lain yang boleh dibesarkan */
+    .magnifiable {
+      cursor: zoom-in;
     }
   </style>
 </head>
@@ -643,14 +671,14 @@
         <table>
           <thead>
             <tr>
-              <th>Nama</th>
-              <th>IC</th>
-              <th>Telefon</th>
-              <th>Tarikh Hadir</th>
-              <th>Panel / PIC</th>
-              <th>Harga</th>
-              <th>Ubat</th>
-              <th>Status</th>
+              <th class="magnifiable">Nama</th>
+              <th class="magnifiable">IC</th>
+              <th class="magnifiable">Telefon</th>
+              <th class="magnifiable">Tarikh Hadir</th>
+              <th class="magnifiable">Panel / PIC</th>
+              <th class="magnifiable">Harga</th>
+              <th class="magnifiable">Ubat</th>
+              <th class="magnifiable">Status</th>
               <th>Tindakan</th>
             </tr>
           </thead>
@@ -676,27 +704,27 @@
           <div class="form-grid">
             <div class="form-group">
               <label for="rp_name">Nama Panel *</label>
-              <input id="rp_name" type="text" placeholder="Contoh: AIA" required />
+              <input id="rp_name" type="text" placeholder="Contoh: AIA" required class="magnifiable" />
             </div>
             <div class="form-group">
               <label for="rp_link">Link Panel (URL) *</label>
-              <input id="rp_link" type="url" placeholder="https://..." required />
+              <input id="rp_link" type="url" placeholder="https://..." required class="magnifiable" />
             </div>
             <div class="form-group">
               <label for="rp_pic_name">Nama PIC</label>
-              <input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" />
+              <input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" class="magnifiable" />
             </div>
             <div class="form-group">
               <label for="rp_pic_phone">No. Telefon PIC</label>
-              <input id="rp_pic_phone" type="tel" placeholder="0123456789" />
+              <input id="rp_pic_phone" type="tel" placeholder="0123456789" class="magnifiable" />
             </div>
             <div class="form-group">
               <label for="rp_terms_days">Tempoh (hari) *</label>
-              <input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" />
+              <input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" class="magnifiable" />
             </div>
             <div class="form-group full-width">
               <label for="rp_notes">Catatan</label>
-              <textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%; min-height: 80px;"></textarea>
+              <textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%; min-height: 80px;" class="magnifiable"></textarea>
             </div>
           </div>
           <div style="margin-top:16px;display:flex;gap:8px">
@@ -717,12 +745,12 @@
           <table>
             <thead>
               <tr>
-                <th>Nama</th>
-                <th>Link</th>
-                <th>PIC</th>
-                <th>Telefon PIC</th>
-                <th>Tempoh (hari)</th>
-                <th>Catatan</th>
+                <th class="magnifiable">Nama</th>
+                <th class="magnifiable">Link</th>
+                <th class="magnifiable">PIC</th>
+                <th class="magnifiable">Telefon PIC</th>
+                <th class="magnifiable">Tempoh (hari)</th>
+                <th class="magnifiable">Catatan</th>
                 <th>WhatsApp</th>
                 <th>Tindakan</th>
               </tr>
@@ -744,6 +772,16 @@
         </p>
       </div>
     </aside>
+  </div>
+
+  <!-- Overlay untuk kanta mikroskop -->
+  <div id="magnifierOverlay" class="magnifier-overlay">
+    <div class="magnifier-content">
+      <button class="magnifier-close" aria-label="Tutup kanta">
+        <i class="fas fa-times"></i>
+      </button>
+      <div id="magnifierText"></div>
+    </div>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite">
@@ -840,6 +878,75 @@
       return; 
     }
     panelWin.focus();
+  }
+
+  // ===== FUNGSI KANTA MIKROSKOP =====
+  function initMagnifier() {
+    const overlay = el('#magnifierOverlay');
+    const content = el('#magnifierText');
+    const closeBtn = overlay.querySelector('.magnifier-close');
+    
+    // Fungsi untuk menutup kanta
+    function closeMagnifier() {
+      overlay.style.display = 'none';
+    }
+    
+    // Fungsi untuk membuka kanta dengan kandungan
+    function openMagnifier(text) {
+      content.innerHTML = text || 'Tiada kandungan';
+      overlay.style.display = 'flex';
+    }
+    
+    // Event listener untuk menutup kanta
+    closeBtn.addEventListener('click', closeMagnifier);
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeMagnifier();
+    });
+    
+    // Event listener untuk menutup dengan Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeMagnifier();
+    });
+    
+    // Tambah event listener untuk semua elemen dengan kelas 'magnifiable'
+    document.addEventListener('click', function(e) {
+      const target = e.target;
+      
+      // Jika klik pada elemen yang boleh dibesarkan
+      if (target.classList.contains('magnifiable')) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        let textContent = '';
+        
+        // Dapatkan kandungan berdasarkan jenis elemen
+        if (target.tagName === 'TD' || target.tagName === 'TH') {
+          // Untuk sel jadual, ambil semua teks dalam sel
+          textContent = target.textContent || target.innerText;
+        } else if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+          // Untuk input, ambil nilai
+          textContent = target.value;
+        } else {
+          // Untuk elemen lain, ambil teks
+          textContent = target.textContent || target.innerText;
+        }
+        
+        // Jika tiada kandungan, beri mesej default
+        if (!textContent.trim()) {
+          textContent = 'Tiada kandungan untuk dipaparkan';
+        }
+        
+        // Buka kanta dengan kandungan
+        openMagnifier(textContent);
+      }
+    });
+    
+    // Tambah hover effect untuk menunjukkan elemen boleh dibesarkan
+    document.addEventListener('mouseover', function(e) {
+      if (e.target.classList.contains('magnifiable')) {
+        e.target.title = 'Klik untuk membesarkan';
+      }
+    });
   }
 
   // ===== DATA: REG PANEL =====
@@ -1023,28 +1130,28 @@
       : '';
 
     return `<tr data-id="${escapeHtml(r.record_id)}">
-      <td><div class="zoom-container"><span class="zoom-content">${escapeHtml(r.nama_pesakit||'')}</span></div></td>
-      <td><div class="zoom-container"><span class="zoom-content">${escapeHtml(r.no_ic||'')}</span></div></td>
-      <td>
+      <td class="magnifiable">${escapeHtml(r.nama_pesakit||'')}</td>
+      <td class="magnifiable">${escapeHtml(r.no_ic||'')}</td>
+      <td class="magnifiable">
         <div style="display:flex;align-items:center;gap:8px">
-          <span class="zoom-container"><span class="zoom-content">${escapeHtml(r.no_telefon||'')}</span></span>
+          <span>${escapeHtml(r.no_telefon||'')}</span>
           ${waPatientIcon || ''}
         </div>
       </td>
-      <td><div class="zoom-container"><span class="zoom-content">${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</span></div></td>
-      <td>
-        <div><b><div class="zoom-container"><span class="zoom-content">${escapeHtml(r.jenis_panel||'')}</span></div></b>${slaBadge}</div>
+      <td class="magnifiable">${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
+      <td class="magnifiable">
+        <div><b>${escapeHtml(r.jenis_panel||'')}</b>${slaBadge}</div>
         ${reg ? `<div class="price" style="margin-top:4px">
-          <div class="zoom-container"><span class="zoom-content">${escapeHtml(reg.pic_name||'-')}</span></div><br>
+          ${escapeHtml(reg.pic_name||'-')}<br>
           <div style="display:flex;align-items:center;gap:8px">
-            <small><div class="zoom-container"><span class="zoom-content">${escapeHtml(reg.pic_phone||'')}</span></div></small>
+            <small>${escapeHtml(reg.pic_phone||'')}</small>
             ${waPICIcon || ''}
           </div>
         </div>` : ''}
       </td>
-      <td><div class="zoom-container"><span class="zoom-content">${price}</span></div></td>
-      <td><div class="zoom-container"><span class="zoom-content">${escapeHtml(r.jenis_ubat||'')}</span></div></td>
-      <td><div class="zoom-container"><span class="zoom-content"><span class="chip ${chipClass}">${escapeHtml(status)}</span></span></div></td>
+      <td class="magnifiable">${price}</td>
+      <td class="magnifiable">${escapeHtml(r.jenis_ubat||'')}</td>
+      <td class="magnifiable"><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
       <td class="actions">
         <button class="secondary btn-open" title="Buka laman panel"><i class="fas fa-external-link-alt"></i></button>
         ${state.tab==='inprocess'
@@ -1172,12 +1279,12 @@
     const terms = parseInt(p.payment_terms_days,10) || '';
 
     return `<tr data-panel="${escapeHtml(p.panel_name||'')}">
-      <td class="cell-name"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(p.panel_name||'')}</span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(p.panel_name||'')}" /></td>
-      <td class="cell-link"><div class="zoom-container"><span class="zoom-content view"><a href="${link||'#'}" target="_blank" rel="noopener">Buka</a></span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(link)}" /></td>
-      <td class="cell-picname"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(p.pic_name||'')}</span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_name||'')}" /></td>
-      <td class="cell-picphone"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(p.pic_phone||'')}</span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_phone||'')}" /></td>
-      <td class="cell-terms"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(String(terms))}</span></div><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="${escapeHtml(String(terms))}" /></td>
-      <td class="cell-notes"><div class="zoom-container"><span class="zoom-content view">${escapeHtml(p.notes||'')}</span></div><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
+      <td class="cell-name magnifiable"><span class="view">${escapeHtml(p.panel_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.panel_name||'')}" /></td>
+      <td class="cell-link magnifiable"><span class="view"><a href="${link||'#'}" target="_blank" rel="noopener">Buka</a></span><input class="edit inline-input" style="display:none" value="${escapeHtml(link)}" /></td>
+      <td class="cell-picname magnifiable"><span class="view">${escapeHtml(p.pic_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_name||'')}" /></td>
+      <td class="cell-picphone magnifiable"><span class="view">${escapeHtml(p.pic_phone||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_phone||'')}" /></td>
+      <td class="cell-terms magnifiable"><span class="view">${escapeHtml(String(terms))}</span><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="${escapeHtml(String(terms))}" /></td>
+      <td class="cell-notes magnifiable"><span class="view">${escapeHtml(p.notes||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
       <td>${waBtn}</td>
       <td class="actions">
         <button class="btn-warning btn-rp-edit"><i class="fas fa-edit"></i></button>
@@ -1289,6 +1396,7 @@
 
   // INIT
   setActiveTab('regpanel'); // buka Reg Panel dulu untuk uji edit inline dengan cepat
+  initMagnifier(); // Inisialisasi fungsi kanta mikroskop
   </script>
 </body>
 </html>
