@@ -176,7 +176,7 @@
     @media(min-width: 1200px) {
       .container {
         grid-template-columns: 63% 37%;
-        align-items: stretch; /* Pastikan kedua-dua panel sama tinggi */
+        align-items: stretch;
       }
     }
     
@@ -185,7 +185,7 @@
       border-radius: 8px;
       box-shadow: var(--card-shadow);
       overflow: hidden;
-      min-height: 700px; /* Kedua-dua panel sama tinggi minimum */
+      min-height: 700px;
       display: flex;
       flex-direction: column;
     }
@@ -194,7 +194,7 @@
       position: sticky;
       top: 100px;
       overflow-y: auto;
-      max-height: calc(100vh - 140px); /* Panel kanan lebih panjang */
+      max-height: calc(100vh - 140px);
     }
     
     table {
@@ -332,31 +332,30 @@
       box-shadow: var(--card-shadow);
     }
     
-    /* Ikon WhatsApp yang lebih realistik */
     .wa {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: none;
-  background: #ffffff; /* Sesuai dengan tema primary anda */
-  color: #2c3e50;
-  text-decoration: none;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: none;
-}
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: none;
+      background: #ffffff;
+      color: #2c3e50;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: none;
+    }
 
-.wa:hover {
-  background: transparent; /* Sedikit lebih terang */
-  transform: scale(1.05);
-  box-shadow: none;
-}
+    .wa:hover {
+      background: transparent;
+      transform: scale(1.05);
+      box-shadow: none;
+    }
 
-.wa i {
-  font-size: 16px;
-}
+    .wa i {
+      font-size: 16px;
+    }
     
     .label-mini {
       font-size: 10px;
@@ -389,7 +388,6 @@
       border-color: #d39e00;
     }
     
-    /* Loading overlay */
     .loading {
       position: fixed;
       inset: 0;
@@ -440,7 +438,7 @@
       padding: 16px;
       border-top: 1px solid var(--border);
       background: var(--light);
-      margin-top: auto; /* Pastikan pagination sentiasa di bawah */
+      margin-top: auto;
     }
     
     .page-info {
@@ -467,7 +465,7 @@
     
     .detail-content {
       padding: 16px;
-      flex-grow: 1; /* Isi ruang yang ada dalam panel kanan */
+      flex-grow: 1;
     }
     
     .form-grid {
@@ -529,7 +527,6 @@
       font-size: 14px;
     }
     
-    /* Pastikan content memenuhi ruang dalam panel */
     #recordsView, #regPanelView {
       display: flex;
       flex-direction: column;
@@ -537,7 +534,6 @@
       flex-grow: 1;
     }
     
-    /* Table scrollable jika kandungan terlalu panjang */
     table {
       flex-grow: 1;
     }
@@ -554,92 +550,54 @@
       table-layout: fixed;
     }
     
-    /* Styling untuk kanta mikroskop */
-    .magnifier-overlay {
+    /* ===== STYLE UNTUK KANTA MIKROSKOP YANG DITAMBAH BAIK ===== */
+    .magnifier-tooltip {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease;
-    }
-    
-    .magnifier-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    .magnifier-content {
-      background: white;
+      background: #fff;
+      border: 1px solid var(--border);
       border-radius: 8px;
-      max-width: 90%;
-      max-height: 90%;
-      overflow: auto;
-      padding: 20px;
-      position: relative;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      z-index: 10000;
+      max-width: 400px;
+      font-size: 16px;
+      line-height: 1.5;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
     
-    .magnifier-close {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--muted);
-      z-index: 10;
-    }
-    
-    .magnifier-close:hover {
-      color: var(--danger);
+    .magnifier-tooltip.show {
+      opacity: 1;
+      transform: scale(1);
     }
     
     .magnifier-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 15px;
-      color: var(--darker);
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-size: 14px;
       border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
+      padding-bottom: 5px;
     }
     
-    .magnifier-body {
+    .magnifier-content {
       font-size: 16px;
-      line-height: 1.6;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
     
-    /* Styling untuk sel yang boleh dibesarkan */
-    td.magnifiable {
+    /* Style untuk elemen yang boleh dibesarkan */
+    .magnifiable {
       cursor: pointer;
       transition: background-color 0.2s;
       position: relative;
     }
     
-    td.magnifiable:hover {
+    .magnifiable:hover {
       background-color: rgba(44, 62, 80, 0.05);
-    }
-    
-    td.magnifiable::after {
-      content: "🔍";
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      font-size: 10px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    
-    td.magnifiable:hover::after {
-      opacity: 0.7;
     }
   </style>
 </head>
@@ -803,15 +761,10 @@
     </aside>
   </div>
 
-  <!-- Overlay untuk kanta mikroskop -->
-  <div id="magnifierOverlay" class="magnifier-overlay">
-    <div class="magnifier-content">
-      <button id="magnifierClose" class="magnifier-close">
-        <i class="fas fa-times"></i>
-      </button>
-      <div id="magnifierTitle" class="magnifier-title"></div>
-      <div id="magnifierBody" class="magnifier-body"></div>
-    </div>
+  <!-- Tooltip untuk kanta mikroskop yang ditambah baik -->
+  <div id="magnifierTooltip" class="magnifier-tooltip">
+    <div id="magnifierTitle" class="magnifier-title"></div>
+    <div id="magnifierContent" class="magnifier-content"></div>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite">
@@ -830,6 +783,8 @@
   let state = { tab:'inprocess', page:1, pageSize:50, q:'', sort:'tarikh_desc', filterPanelSelect:'', filterPanelText:'', filterSLA:'' };
   let panelWin = null, lastOpenTs = 0;
   let regPanelMap = new Map();
+  let magnifierTimeout = null;
+  let currentMagnifierElement = null;
 
   // ===== HELPERS =====
   const el = s => document.querySelector(s);
@@ -910,45 +865,86 @@
     panelWin.focus();
   }
 
-  // ===== KANTA MIKROSKOP =====
+  // ====== FUNGSI KANTA MIKROSKOP YANG DITAMBAH BAIK ======
   function initMagnifier() {
-    const overlay = el('#magnifierOverlay');
-    const closeBtn = el('#magnifierClose');
+    const tooltip = el('#magnifierTooltip');
     const titleEl = el('#magnifierTitle');
-    const bodyEl = el('#magnifierBody');
+    const contentEl = el('#magnifierContent');
     
-    // Fungsi untuk menutup kanta mikroskop
+    // Fungsi untuk menutup kanta
     function closeMagnifier() {
-      overlay.classList.remove('active');
+      tooltip.classList.remove('show');
+      currentMagnifierElement = null;
     }
     
-    // Fungsi untuk membuka kanta mikroskop
-    function openMagnifier(title, content) {
+    // Fungsi untuk membuka kanta
+    function openMagnifier(title, content, element) {
       titleEl.textContent = title;
-      bodyEl.innerHTML = content;
-      overlay.classList.add('active');
+      contentEl.textContent = content;
+      tooltip.classList.add('show');
+      
+      // Position the tooltip relative to the element
+      const rect = element.getBoundingClientRect();
+      const tooltipWidth = tooltip.offsetWidth;
+      const tooltipHeight = tooltip.offsetHeight;
+      
+      // Position above the element if possible, otherwise below
+      let top = rect.top - tooltipHeight - 10;
+      let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+      
+      // Adjust if tooltip would go off screen
+      if (top < 10) {
+        top = rect.bottom + 10;
+      }
+      
+      if (left < 10) {
+        left = 10;
+      } else if (left + tooltipWidth > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipWidth - 10;
+      }
+      
+      tooltip.style.top = `${top}px`;
+      tooltip.style.left = `${left}px`;
     }
-    
-    // Event listeners
-    closeBtn.addEventListener('click', closeMagnifier);
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        closeMagnifier();
-      }
-    });
-    
-    // Escape key untuk menutup
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && overlay.classList.contains('active')) {
-        closeMagnifier();
-      }
-    });
     
     return { openMagnifier, closeMagnifier };
   }
   
   // Inisialisasi kanta mikroskop
   const magnifier = initMagnifier();
+  
+  // Fungsi untuk menambah event listener magnifier pada elemen
+  function addMagnifierToElement(element, title, content) {
+    if (!element) return;
+    
+    // Tambah class untuk styling
+    element.classList.add('magnifiable');
+    
+    // Event listener untuk hover (akan dibuka selepas 500ms)
+    element.addEventListener('mouseenter', function() {
+      // Clear timeout sebelumnya jika ada
+      if (magnifierTimeout) {
+        clearTimeout(magnifierTimeout);
+      }
+      
+      // Set timeout untuk membuka magnifier
+      magnifierTimeout = setTimeout(() => {
+        currentMagnifierElement = element;
+        magnifier.openMagnifier(title, content, element);
+      }, 500);
+    });
+    
+    element.addEventListener('mouseleave', function() {
+      // Clear timeout jika kursor meninggalkan elemen sebelum 500ms
+      if (magnifierTimeout) {
+        clearTimeout(magnifierTimeout);
+        magnifierTimeout = null;
+      }
+      
+      // Tutup tooltip serta-merta
+      magnifier.closeMagnifier();
+    });
+  }
 
   // ===== DATA: REG PANEL =====
   async function buildRegPanelMap(){
@@ -1131,16 +1127,16 @@
       : '';
 
     return `<tr data-id="${escapeHtml(r.record_id)}">
-      <td class="magnifiable">${escapeHtml(r.nama_pesakit||'')}</td>
-      <td class="magnifiable">${escapeHtml(r.no_ic||'')}</td>
-      <td class="magnifiable">
+      <td class="cell-magnifiable" data-title="Nama Pesakit" data-content="${escapeHtml(r.nama_pesakit||'')}">${escapeHtml(r.nama_pesakit||'')}</td>
+      <td class="cell-magnifiable" data-title="No. IC" data-content="${escapeHtml(r.no_ic||'')}">${escapeHtml(r.no_ic||'')}</td>
+      <td class="cell-magnifiable" data-title="No. Telefon" data-content="${escapeHtml(r.no_telefon||'')}">
         <div style="display:flex;align-items:center;gap:8px">
           <span>${escapeHtml(r.no_telefon||'')}</span>
           ${waPatientIcon || ''}
         </div>
       </td>
-      <td class="magnifiable">${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
-      <td class="magnifiable">
+      <td class="cell-magnifiable" data-title="Tarikh Hadir" data-content="${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}">${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
+      <td class="cell-magnifiable" data-title="Panel / PIC" data-content="${escapeHtml(r.jenis_panel||'')}${reg ? `\nPIC: ${escapeHtml(reg.pic_name||'-')}\nTelefon: ${escapeHtml(reg.pic_phone||'')}` : ''}">
         <div><b>${escapeHtml(r.jenis_panel||'')}</b>${slaBadge}</div>
         ${reg ? `<div class="price" style="margin-top:4px">
           ${escapeHtml(reg.pic_name||'-')}<br>
@@ -1150,9 +1146,9 @@
           </div>
         </div>` : ''}
       </td>
-      <td class="magnifiable">${price}</td>
-      <td class="magnifiable">${escapeHtml(r.jenis_ubat||'')}</td>
-      <td class="magnifiable"><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
+      <td class="cell-magnifiable" data-title="Harga" data-content="${price.replace(/<br>/g, '\n').replace(/<[^>]*>/g, '')}">${price}</td>
+      <td class="cell-magnifiable" data-title="Jenis Ubat" data-content="${escapeHtml(r.jenis_ubat||'')}">${escapeHtml(r.jenis_ubat||'')}</td>
+      <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
       <td class="actions">
         <button class="secondary btn-open" title="Buka laman panel"><i class="fas fa-external-link-alt"></i></button>
         ${state.tab==='inprocess'
@@ -1166,14 +1162,13 @@
   function wireRow(r){
     const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
     
-    // Tambah event listeners untuk kanta mikroskop pada semua sel yang boleh dibesarkan
-    const magnifiableCells = tr.querySelectorAll('.magnifiable');
-    magnifiableCells.forEach(cell => {
-      cell.addEventListener('click', () => {
-        const title = getColumnTitle(cell.cellIndex);
-        const content = cell.innerHTML;
-        magnifier.openMagnifier(title, content);
-      });
+    // Tambah fungsi kanta mikroskop pada semua sel data
+    const cells = tr.querySelectorAll('td[class*="cell-magnifiable"]');
+    cells.forEach(cell => {
+      const title = cell.getAttribute('data-title') || 'Butiran';
+      const content = cell.getAttribute('data-content') || cell.textContent;
+      
+      addMagnifierToElement(cell, title, content);
     });
     
     tr.querySelector('.btn-open').addEventListener('click', ()=>{
@@ -1207,15 +1202,6 @@
         await updateStatus(r.record_id, { status_claim: 'Rejected', notes: reason||'' });
       });
     }
-  }
-
-  // Fungsi untuk mendapatkan tajuk kolom berdasarkan indeks
-  function getColumnTitle(cellIndex) {
-    const headers = document.querySelectorAll('thead th');
-    if (headers[cellIndex]) {
-      return headers[cellIndex].textContent;
-    }
-    return 'Butiran';
   }
 
   // ===== POST util — x-www-form-urlencoded (elak preflight) =====
@@ -1300,12 +1286,12 @@
     const terms = parseInt(p.payment_terms_days,10) || '';
 
     return `<tr data-panel="${escapeHtml(p.panel_name||'')}">
-      <td class="cell-name magnifiable"><span class="view">${escapeHtml(p.panel_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.panel_name||'')}" /></td>
-      <td class="cell-link magnifiable"><span class="view"><a href="${link||'#'}" target="_blank" rel="noopener">Buka</a></span><input class="edit inline-input" style="display:none" value="${escapeHtml(link)}" /></td>
-      <td class="cell-picname magnifiable"><span class="view">${escapeHtml(p.pic_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_name||'')}" /></td>
-      <td class="cell-picphone magnifiable"><span class="view">${escapeHtml(p.pic_phone||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_phone||'')}" /></td>
-      <td class="cell-terms magnifiable"><span class="view">${escapeHtml(String(terms))}</span><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="${escapeHtml(String(terms))}" /></td>
-      <td class="cell-notes magnifiable"><span class="view">${escapeHtml(p.notes||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
+      <td class="cell-magnifiable cell-name" data-title="Nama Panel" data-content="${escapeHtml(p.panel_name||'')}"><span class="view">${escapeHtml(p.panel_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.panel_name||'')}" /></td>
+      <td class="cell-magnifiable cell-link" data-title="Link Panel" data-content="${escapeHtml(link)}"><span class="view"><a href="${link||'#'}" target="_blank" rel="noopener">Buka</a></span><input class="edit inline-input" style="display:none" value="${escapeHtml(link)}" /></td>
+      <td class="cell-magnifiable cell-picname" data-title="Nama PIC" data-content="${escapeHtml(p.pic_name||'')}"><span class="view">${escapeHtml(p.pic_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_name||'')}" /></td>
+      <td class="cell-magnifiable cell-picphone" data-title="Telefon PIC" data-content="${escapeHtml(p.pic_phone||'')}"><span class="view">${escapeHtml(p.pic_phone||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_phone||'')}" /></td>
+      <td class="cell-magnifiable cell-terms" data-title="Tempoh (hari)" data-content="${escapeHtml(String(terms))}"><span class="view">${escapeHtml(String(terms))}</span><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="${escapeHtml(String(terms))}" /></td>
+      <td class="cell-magnifiable cell-notes" data-title="Catatan" data-content="${escapeHtml(p.notes||'')}"><span class="view">${escapeHtml(p.notes||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
       <td>${waBtn}</td>
       <td class="actions">
         <button class="btn-warning btn-rp-edit"><i class="fas fa-edit"></i></button>
@@ -1322,16 +1308,13 @@
     const btnSave = tr.querySelector('.btn-save');
     const btnCancel=tr.querySelector('.btn-cancel');
 
-    // Tambah event listeners untuk kanta mikroskop pada sel yang boleh dibesarkan
-    const magnifiableCells = tr.querySelectorAll('.magnifiable');
-    magnifiableCells.forEach(cell => {
-      cell.addEventListener('click', () => {
-        const headers = document.querySelectorAll('#rp_tbody thead th');
-        const cellIndex = Array.from(cell.parentNode.cells).indexOf(cell);
-        const title = headers[cellIndex] ? headers[cellIndex].textContent : 'Butiran';
-        const content = cell.querySelector('.view').innerHTML;
-        magnifier.openMagnifier(title, content);
-      });
+    // Tambah fungsi kanta mikroskop pada semua sel data
+    const cells = tr.querySelectorAll('td[class*="cell-magnifiable"]');
+    cells.forEach(cell => {
+      const title = cell.getAttribute('data-title') || 'Butiran';
+      const content = cell.getAttribute('data-content') || cell.textContent;
+      
+      addMagnifierToElement(cell, title, content);
     });
 
     function setEditMode(on){
@@ -1428,7 +1411,7 @@
   });
 
   // INIT
-  setActiveTab('regpanel'); // buka Reg Panel dulu untuk uji edit inline dengan cepat
+  setActiveTab('regpanel');
   </script>
 </body>
 </html>
