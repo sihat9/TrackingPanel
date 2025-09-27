@@ -61,6 +61,8 @@
     .magnifier-tooltip.show{opacity:1;transform:scale(1)}
     .magnifier-title{font-weight:700;margin-bottom:8px;color:var(--primary);font-size:13px;border-bottom:1px solid var(--border);padding-bottom:4px}
     .magnifiable{cursor:pointer}
+    /* Inline edit inputs */
+    .inline-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px}
   </style>
 </head>
 <body>
@@ -177,7 +179,7 @@
 
   <script>
   // ====== CONFIG ======
-  const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec'; // contoh: https://script.google.com/macros/s/AKfy.../exec
+  const API_BASE = 'https://script.google.com/macros/s/AKfycbzkhLra1C5rg2HWY2oc3LlkLmBbKTtTbqThN7P0kpqC7z4b6yfMRJLXm4BBLkPzSko/exec';
 
   // ====== STATE ======
   let state = { tab:'inprocess', page:1, pageSize:50, q:'', sort:'tarikh_desc', filterPanelSelect:'', filterPanelText:'', filterSLA:'' };
@@ -435,10 +437,9 @@
       );
     }).join('');
     tbody.innerHTML = rows;
-    // Wire once via delegation
   }
 
-  // Delegated events for table actions (prevents inline onclick & reduces errors)
+  // Delegated events for table actions
   tbody.addEventListener('click', async (ev)=>{
     const tr = ev.target.closest('tr[data-id]'); if(!tr) return;
     const id = tr.getAttribute('data-id');
@@ -502,7 +503,6 @@
   }
   async function updateStatus(record_id, payload){
     try{
-      // optimistic chip
       const chip = tbody.querySelector('tr[data-id="'+CSS.escape(record_id)+'"] .chip');
       if(chip && payload.status_claim){
         chip.textContent = payload.status_claim;
@@ -526,7 +526,7 @@
     el('#badge-rejected').textContent=String(count.rejected);
   }
 
-  // ====== REG PANEL LIST/EDIT ======
+  // ====== REG PANEL LIST + INLINE EDIT ======
   async function loadRegPanel(){
     try{
       showLoading();
@@ -536,33 +536,104 @@
       const items = (json.data && (json.data.items || json.data)) || [];
       const tbodyRP = document.getElementById('rp_tbody');
       tbodyRP.innerHTML = items.map(p=> renderRegRow(p)).join('');
+      tbodyRP.querySelectorAll('tr').forEach(tr => wireRegRow(tr));
       await buildRegPanelMap();
       await populatePanelDropdown();
     }catch(e){ console.error(e); toast('Ralat memuat Reg Panel','error'); }
     finally{ hideLoading(); }
   }
+
   function renderRegRow(p){
     const link = String(p.panel_link || p.login_url || p.claim_url_template || '');
     const waHref = p.pic_phone ? buildWAUrl(p.pic_phone, 'Hi '+(p.pic_name||'PIC')+' — pesanan dari klinik') : '';
     const terms = parseInt(p.payment_terms_days,10) || '';
+    const safe = (x)=>escapeAttr(String(x||''));
     return (
-      '<tr data-panel="'+escapeAttr(p.panel_name||'')+'">'+
-        '<td class="magnifiable" data-title="Nama Panel" data-content="'+escapeAttr(p.panel_name||'')+'">'+escapeHTML(p.panel_name||'')+'</td>'+
-        '<td><a href="'+escapeAttr(link||'#')+'" target="_blank" rel="noopener">Buka</a></td>'+
-        '<td class="magnifiable" data-title="Nama PIC" data-content="'+escapeAttr(p.pic_name||'')+'">'+escapeHTML(p.pic_name||'')+'</td>'+
-        '<td class="magnifiable" data-title="Telefon PIC" data-content="'+escapeAttr(p.pic_phone||'')+'">'+escapeHTML(p.pic_phone||'')+'</td>'+
-        '<td>'+escapeHTML(String(terms))+'</td>'+
-        '<td>'+escapeHTML(p.notes||'')+'</td>'+
-        '<td>'+(waHref ? '<button class="wa btn-wa" type="button" data-url="'+escapeAttr(waHref)+'" title="WhatsApp PIC"><i class="fab fa-whatsapp"></i></button>' : '')+'</td>'+
+      '<tr data-panel="'+safe(p.panel_name)+'">'+
+        '<td class="magnifiable cell-name" data-title="Nama Panel" data-content="'+safe(p.panel_name)+'">'+
+          '<span class="view">'+escapeHTML(p.panel_name||'')+'</span>'+
+          '<input class="edit inline-input" style="display:none" value="'+safe(p.panel_name)+'" />'+
+        '</td>'+
+        '<td class="cell-link">'+
+          '<span class="view"><a href="'+safe(link||'#')+'" target="_blank" rel="noopener">Buka</a></span>'+
+          '<input class="edit inline-input" style="display:none" value="'+safe(link)+'" />'+
+        '</td>'+
+        '<td class="magnifiable cell-picname" data-title="Nama PIC" data-content="'+safe(p.pic_name)+'">'+
+          '<span class="view">'+escapeHTML(p.pic_name||'')+'</span>'+
+          '<input class="edit inline-input" style="display:none" value="'+safe(p.pic_name)+'" />'+
+        '</td>'+
+        '<td class="magnifiable cell-picphone" data-title="Telefon PIC" data-content="'+safe(p.pic_phone)+'">'+
+          '<span class="view">'+escapeHTML(p.pic_phone||'')+'</span>'+
+          '<input class="edit inline-input" style="display:none" value="'+safe(p.pic_phone)+'" />'+
+        '</td>'+
+        '<td class="cell-terms">'+
+          '<span class="view">'+escapeHTML(String(terms))+'</span>'+
+          '<input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="'+safe(String(terms))+'" />'+
+        '</td>'+
+        '<td class="cell-notes">'+
+          '<span class="view">'+escapeHTML(p.notes||'')+'</span>'+
+          '<input class="edit inline-input" style="display:none" value="'+safe(p.notes)+'" />'+
+        '</td>'+
+        '<td>'+(waHref ? '<button class="wa btn-wa" type="button" data-url="'+safe(waHref)+'" title="WhatsApp PIC"><i class="fab fa-whatsapp"></i></button>' : '')+'</td>'+
         '<td class="actions">'+
           '<button class="btn-rp-edit secondary" type="button"><i class="fas fa-edit"></i></button>'+
           '<button class="btn-rp-del" type="button" style="background:#e74c3c;border-color:#e74c3c"><i class="fas fa-trash"></i></button>'+
+          '<button class="btn-save" type="button" style="display:none"><i class="fas fa-save"></i></button>'+
+          '<button class="btn-cancel secondary" type="button" style="display:none"><i class="fas fa-times"></i></button>'+
         '</td>'+
       '</tr>'
     );
   }
 
-  // Inline add
+  function wireRegRow(tr){
+    const btnEdit = tr.querySelector('.btn-rp-edit');
+    const btnDel  = tr.querySelector('.btn-rp-del');
+    const btnSave = tr.querySelector('.btn-save');
+    const btnCancel=tr.querySelector('.btn-cancel');
+
+    function setEditMode(on){
+      tr.querySelectorAll('.view').forEach(e=> e.style.display = on ? 'none' : '');
+      tr.querySelectorAll('.edit').forEach(e=> e.style.display = on ? '' : 'none');
+      btnEdit.style.display = on ? 'none' : '';
+      btnDel.style.display  = on ? 'none' : '';
+      btnSave.style.display = on ? '' : 'none';
+      btnCancel.style.display= on ? '' : 'none';
+    }
+
+    btnEdit.addEventListener('click', ()=> setEditMode(true));
+    btnCancel.addEventListener('click', ()=> setEditMode(false));
+
+    btnSave.addEventListener('click', async ()=>{
+      const name = tr.getAttribute('data-panel'); // primary key (old name)
+      const newName = tr.querySelector('.cell-name .edit').value.trim();
+      const link = tr.querySelector('.cell-link .edit').value.trim();
+      const picn = tr.querySelector('.cell-picname .edit').value.trim();
+      const picp = tr.querySelector('.cell-picphone .edit').value.trim();
+      const terms= parseInt(tr.querySelector('.cell-terms .edit').value,10);
+      const notes= tr.querySelector('.cell-notes .edit').value.trim();
+      if(!newName || !link || !Number.isFinite(terms) || terms<=0){ toast('Isi Nama, Link & Tempoh hari','warning'); return; }
+      try{
+        await postJSON('updateregpanel', { panel_name:newName, panel_link:link, pic_name:picn, pic_phone:picp, payment_terms_days:terms, notes });
+        toast('Panel dikemas kini','success');
+        await loadRegPanel();
+      }catch(e){ toast('Gagal kemas panel','error'); }
+    });
+
+    btnDel.addEventListener('click', async ()=>{
+      const name = tr.getAttribute('data-panel');
+      if(!confirm('Padam panel "'+name+'"?')) return;
+      try{ await postJSON('deleteregpanel',{panel_name:name}); toast('Panel dipadam','success'); await loadRegPanel(); }
+      catch(e){ toast('Gagal padam panel','error'); }
+    });
+
+    // WhatsApp button (row-level)
+    tr.addEventListener('click', (ev)=>{
+      const btn = ev.target.closest('.btn-wa'); if(!btn) return;
+      const url = btn.dataset.url; if(url) openOrReusePanel(url);
+    });
+  }
+
+  // Inline add panel
   async function saveRegPanel(){
     const name = el('#rp_name').value.trim();
     const link = el('#rp_link').value.trim();
@@ -579,32 +650,6 @@
     }catch(e){ toast('Gagal simpan panel','error'); }
   }
   function clearRegPanelForm(){ ['#rp_name','#rp_link','#rp_pic_name','#rp_pic_phone','#rp_terms_days','#rp_notes'].forEach(id=> el(id).value=''); }
-
-  // Delegation for Reg Panel actions
-  document.getElementById('rp_tbody').addEventListener('click', async (ev)=>{
-    const tr = ev.target.closest('tr[data-panel]'); if(!tr) return;
-    const name = tr.getAttribute('data-panel');
-    if(ev.target.closest('.btn-rp-del')){
-      if(!confirm('Padam panel "'+name+'"?')) return;
-      try{ await postJSON('deleteregpanel',{panel_name:name}); toast('Panel dipadam','success'); await loadRegPanel(); }catch(e){ toast('Gagal padam panel','error'); }
-      return;
-    }
-    if(ev.target.closest('.btn-rp-edit')){
-      // Simple inline edit prompt (boleh ditingkatkan ke form baris penuh)
-      const newLink = prompt('Link Panel (URL):', tr.children[1].querySelector('a')?.getAttribute('href') || '');
-      if(newLink===null) return;
-      const picn = prompt('Nama PIC:', tr.children[2].textContent.trim()) ?? '';
-      const picp = prompt('Telefon PIC:', tr.children[3].textContent.trim()) ?? '';
-      const terms = prompt('Tempoh (hari):', tr.children[4].textContent.trim()) ?? '';
-      const notes = prompt('Catatan:', tr.children[5].textContent.trim()) ?? '';
-      const tNum = parseInt(terms,10);
-      if(!newLink || !Number.isFinite(tNum) || tNum<=0){ toast('Link & Tempoh mesti sah','warning'); return; }
-      try{
-        await postJSON('updateregpanel', { panel_name:name, panel_link:newLink, pic_name:picn, pic_phone:picp, payment_terms_days:tNum, notes });
-        toast('Panel dikemas kini','success'); await loadRegPanel();
-      }catch(e){ toast('Gagal kemas panel','error'); }
-    }
-  });
 
   // ====== Events ======
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
@@ -625,8 +670,7 @@
   });
 
   // INIT
-  setActiveTab('inprocess'); // buat beban awal pada rekod
-
+  setActiveTab('inprocess');
   </script>
 </body>
 </html>
