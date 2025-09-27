@@ -176,26 +176,25 @@
     @media(min-width: 1200px) {
       .container {
         grid-template-columns: 62% 38%;
+        align-items: stretch; /* Pastikan kedua-dua panel sama tinggi */
       }
     }
     
-    .left {
+    .left, .right {
       background: #fff;
       border-radius: 8px;
       box-shadow: var(--card-shadow);
       overflow: hidden;
+      min-height: 700px; /* Kedua-dua panel sama tinggi minimum */
+      display: flex;
+      flex-direction: column;
     }
     
     .right {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: var(--card-shadow);
-      overflow: hidden;
-      height: fit-content;
       position: sticky;
       top: 100px;
-      max-height: calc(60vh);
       overflow-y: auto;
+      max-height: calc(100vh - 140px); /* Panel kanan lebih panjang */
     }
     
     table {
@@ -441,6 +440,7 @@
       padding: 16px;
       border-top: 1px solid var(--border);
       background: var(--light);
+      margin-top: auto; /* Pastikan pagination sentiasa di bawah */
     }
     
     .page-info {
@@ -467,6 +467,7 @@
     
     .detail-content {
       padding: 16px;
+      flex-grow: 1; /* Isi ruang yang ada dalam panel kanan */
     }
     
     .form-grid {
@@ -526,6 +527,31 @@
     
     .tab-icon {
       font-size: 14px;
+    }
+    
+    /* Pastikan content memenuhi ruang dalam panel */
+    #recordsView, #regPanelView {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex-grow: 1;
+    }
+    
+    /* Table scrollable jika kandungan terlalu panjang */
+    table {
+      flex-grow: 1;
+    }
+    
+    tbody {
+      display: block;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    thead tr, tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
     }
   </style>
 </head>
