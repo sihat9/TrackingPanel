@@ -209,7 +209,6 @@
       text-align: left;
       font-size: 13px;
       vertical-align: top;
-      position: relative;
     }
     
     th {
@@ -555,32 +554,37 @@
       table-layout: fixed;
     }
     
-    /* STYLE UNTUK FUNGSI KANTA MIKROSKOP */
+    /* Styling untuk kanta mikroskop */
     .magnifier-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 9999;
-      display: none;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(2px);
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+    
+    .magnifier-overlay.active {
+      opacity: 1;
+      visibility: visible;
     }
     
     .magnifier-content {
       background: white;
       border-radius: 8px;
-      padding: 20px;
-      max-width: 80%;
-      max-height: 80%;
+      max-width: 90%;
+      max-height: 90%;
       overflow: auto;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      padding: 20px;
       position: relative;
-      font-size: 18px;
-      line-height: 1.6;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
     
     .magnifier-close {
@@ -592,25 +596,50 @@
       font-size: 24px;
       cursor: pointer;
       color: var(--muted);
+      z-index: 10;
     }
     
     .magnifier-close:hover {
       color: var(--danger);
     }
     
-    /* Highlight untuk sel yang boleh dibesarkan */
-    td.magnifiable, th.magnifiable {
-      cursor: zoom-in;
-      transition: background-color 0.2s;
+    .magnifier-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--darker);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
     }
     
-    td.magnifiable:hover, th.magnifiable:hover {
+    .magnifier-body {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    /* Styling untuk sel yang boleh dibesarkan */
+    td.magnifiable {
+      cursor: pointer;
+      transition: background-color 0.2s;
+      position: relative;
+    }
+    
+    td.magnifiable:hover {
       background-color: rgba(44, 62, 80, 0.05);
     }
     
-    /* Untuk input dan elemen lain yang boleh dibesarkan */
-    .magnifiable {
-      cursor: zoom-in;
+    td.magnifiable::after {
+      content: "🔍";
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 10px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    td.magnifiable:hover::after {
+      opacity: 0.7;
     }
   </style>
 </head>
@@ -671,14 +700,14 @@
         <table>
           <thead>
             <tr>
-              <th class="magnifiable">Nama</th>
-              <th class="magnifiable">IC</th>
-              <th class="magnifiable">Telefon</th>
-              <th class="magnifiable">Tarikh Hadir</th>
-              <th class="magnifiable">Panel / PIC</th>
-              <th class="magnifiable">Harga</th>
-              <th class="magnifiable">Ubat</th>
-              <th class="magnifiable">Status</th>
+              <th>Nama</th>
+              <th>IC</th>
+              <th>Telefon</th>
+              <th>Tarikh Hadir</th>
+              <th>Panel / PIC</th>
+              <th>Harga</th>
+              <th>Ubat</th>
+              <th>Status</th>
               <th>Tindakan</th>
             </tr>
           </thead>
@@ -704,27 +733,27 @@
           <div class="form-grid">
             <div class="form-group">
               <label for="rp_name">Nama Panel *</label>
-              <input id="rp_name" type="text" placeholder="Contoh: AIA" required class="magnifiable" />
+              <input id="rp_name" type="text" placeholder="Contoh: AIA" required />
             </div>
             <div class="form-group">
               <label for="rp_link">Link Panel (URL) *</label>
-              <input id="rp_link" type="url" placeholder="https://..." required class="magnifiable" />
+              <input id="rp_link" type="url" placeholder="https://..." required />
             </div>
             <div class="form-group">
               <label for="rp_pic_name">Nama PIC</label>
-              <input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" class="magnifiable" />
+              <input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" />
             </div>
             <div class="form-group">
               <label for="rp_pic_phone">No. Telefon PIC</label>
-              <input id="rp_pic_phone" type="tel" placeholder="0123456789" class="magnifiable" />
+              <input id="rp_pic_phone" type="tel" placeholder="0123456789" />
             </div>
             <div class="form-group">
               <label for="rp_terms_days">Tempoh (hari) *</label>
-              <input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" class="magnifiable" />
+              <input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" />
             </div>
             <div class="form-group full-width">
               <label for="rp_notes">Catatan</label>
-              <textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%; min-height: 80px;" class="magnifiable"></textarea>
+              <textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%; min-height: 80px;"></textarea>
             </div>
           </div>
           <div style="margin-top:16px;display:flex;gap:8px">
@@ -745,12 +774,12 @@
           <table>
             <thead>
               <tr>
-                <th class="magnifiable">Nama</th>
-                <th class="magnifiable">Link</th>
-                <th class="magnifiable">PIC</th>
-                <th class="magnifiable">Telefon PIC</th>
-                <th class="magnifiable">Tempoh (hari)</th>
-                <th class="magnifiable">Catatan</th>
+                <th>Nama</th>
+                <th>Link</th>
+                <th>PIC</th>
+                <th>Telefon PIC</th>
+                <th>Tempoh (hari)</th>
+                <th>Catatan</th>
                 <th>WhatsApp</th>
                 <th>Tindakan</th>
               </tr>
@@ -777,10 +806,11 @@
   <!-- Overlay untuk kanta mikroskop -->
   <div id="magnifierOverlay" class="magnifier-overlay">
     <div class="magnifier-content">
-      <button class="magnifier-close" aria-label="Tutup kanta">
+      <button id="magnifierClose" class="magnifier-close">
         <i class="fas fa-times"></i>
       </button>
-      <div id="magnifierText"></div>
+      <div id="magnifierTitle" class="magnifier-title"></div>
+      <div id="magnifierBody" class="magnifier-body"></div>
     </div>
   </div>
 
@@ -880,74 +910,45 @@
     panelWin.focus();
   }
 
-  // ===== FUNGSI KANTA MIKROSKOP =====
+  // ===== KANTA MIKROSKOP =====
   function initMagnifier() {
     const overlay = el('#magnifierOverlay');
-    const content = el('#magnifierText');
-    const closeBtn = overlay.querySelector('.magnifier-close');
+    const closeBtn = el('#magnifierClose');
+    const titleEl = el('#magnifierTitle');
+    const bodyEl = el('#magnifierBody');
     
-    // Fungsi untuk menutup kanta
+    // Fungsi untuk menutup kanta mikroskop
     function closeMagnifier() {
-      overlay.style.display = 'none';
+      overlay.classList.remove('active');
     }
     
-    // Fungsi untuk membuka kanta dengan kandungan
-    function openMagnifier(text) {
-      content.innerHTML = text || 'Tiada kandungan';
-      overlay.style.display = 'flex';
+    // Fungsi untuk membuka kanta mikroskop
+    function openMagnifier(title, content) {
+      titleEl.textContent = title;
+      bodyEl.innerHTML = content;
+      overlay.classList.add('active');
     }
     
-    // Event listener untuk menutup kanta
+    // Event listeners
     closeBtn.addEventListener('click', closeMagnifier);
-    overlay.addEventListener('click', function(e) {
-      if (e.target === overlay) closeMagnifier();
-    });
-    
-    // Event listener untuk menutup dengan Escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeMagnifier();
-    });
-    
-    // Tambah event listener untuk semua elemen dengan kelas 'magnifiable'
-    document.addEventListener('click', function(e) {
-      const target = e.target;
-      
-      // Jika klik pada elemen yang boleh dibesarkan
-      if (target.classList.contains('magnifiable')) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        let textContent = '';
-        
-        // Dapatkan kandungan berdasarkan jenis elemen
-        if (target.tagName === 'TD' || target.tagName === 'TH') {
-          // Untuk sel jadual, ambil semua teks dalam sel
-          textContent = target.textContent || target.innerText;
-        } else if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-          // Untuk input, ambil nilai
-          textContent = target.value;
-        } else {
-          // Untuk elemen lain, ambil teks
-          textContent = target.textContent || target.innerText;
-        }
-        
-        // Jika tiada kandungan, beri mesej default
-        if (!textContent.trim()) {
-          textContent = 'Tiada kandungan untuk dipaparkan';
-        }
-        
-        // Buka kanta dengan kandungan
-        openMagnifier(textContent);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        closeMagnifier();
       }
     });
     
-    // Tambah hover effect untuk menunjukkan elemen boleh dibesarkan
-    document.addEventListener('mouseover', function(e) {
-      if (e.target.classList.contains('magnifiable')) {
-        e.target.title = 'Klik untuk membesarkan';
+    // Escape key untuk menutup
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('active')) {
+        closeMagnifier();
       }
     });
+    
+    return { openMagnifier, closeMagnifier };
   }
+  
+  // Inisialisasi kanta mikroskop
+  const magnifier = initMagnifier();
 
   // ===== DATA: REG PANEL =====
   async function buildRegPanelMap(){
@@ -1164,6 +1165,17 @@
 
   function wireRow(r){
     const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
+    
+    // Tambah event listeners untuk kanta mikroskop pada semua sel yang boleh dibesarkan
+    const magnifiableCells = tr.querySelectorAll('.magnifiable');
+    magnifiableCells.forEach(cell => {
+      cell.addEventListener('click', () => {
+        const title = getColumnTitle(cell.cellIndex);
+        const content = cell.innerHTML;
+        magnifier.openMagnifier(title, content);
+      });
+    });
+    
     tr.querySelector('.btn-open').addEventListener('click', ()=>{
       const url = r.panel_claim_url || (()=>{
         const key = String(r.jenis_panel||'').toLowerCase().trim();
@@ -1195,6 +1207,15 @@
         await updateStatus(r.record_id, { status_claim: 'Rejected', notes: reason||'' });
       });
     }
+  }
+
+  // Fungsi untuk mendapatkan tajuk kolom berdasarkan indeks
+  function getColumnTitle(cellIndex) {
+    const headers = document.querySelectorAll('thead th');
+    if (headers[cellIndex]) {
+      return headers[cellIndex].textContent;
+    }
+    return 'Butiran';
   }
 
   // ===== POST util — x-www-form-urlencoded (elak preflight) =====
@@ -1301,6 +1322,18 @@
     const btnSave = tr.querySelector('.btn-save');
     const btnCancel=tr.querySelector('.btn-cancel');
 
+    // Tambah event listeners untuk kanta mikroskop pada sel yang boleh dibesarkan
+    const magnifiableCells = tr.querySelectorAll('.magnifiable');
+    magnifiableCells.forEach(cell => {
+      cell.addEventListener('click', () => {
+        const headers = document.querySelectorAll('#rp_tbody thead th');
+        const cellIndex = Array.from(cell.parentNode.cells).indexOf(cell);
+        const title = headers[cellIndex] ? headers[cellIndex].textContent : 'Butiran';
+        const content = cell.querySelector('.view').innerHTML;
+        magnifier.openMagnifier(title, content);
+      });
+    });
+
     function setEditMode(on){
       tr.querySelectorAll('.view').forEach(e=> e.style.display = on ? 'none' : '');
       tr.querySelectorAll('.edit').forEach(e=> e.style.display = on ? '' : 'none');
@@ -1396,7 +1429,6 @@
 
   // INIT
   setActiveTab('regpanel'); // buka Reg Panel dulu untuk uji edit inline dengan cepat
-  initMagnifier(); // Inisialisasi fungsi kanta mikroskop
   </script>
 </body>
 </html>
