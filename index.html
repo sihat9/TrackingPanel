@@ -208,7 +208,7 @@
   function pad2(n){ return String(n).padStart(2,'0'); }
   function formatDateDDMMYYYY_HHMM(v){
     if(!v) return '';
-    const d = (v instanceof Date) ? v : (/^\\d{4}-\\d{2}-\\d{2}$/.test(String(v)) ? new Date(String(v)+'T00:00:00') : new Date(v));
+    const d = (v instanceof Date) ? v : (/^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? new Date(String(v)+'T00:00:00') : new Date(v));
     if(isNaN(d.getTime())) return String(v);
     return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
   }
@@ -219,8 +219,8 @@
       .replace(/"/g,'&quot;')
       .replace(/</g,'&lt;')
       .replace(/>/g,'&gt;')
-      .replace(/[\\r\\n]+/g,' ')
-      .replace(/\\u2028|\\u2029/g,' ');
+      .replace(/[\r\n]+/g,' ')
+      .replace(/\u2028|\u2029/g,' ');
   }
 
   // ====== SINGLE SIDE WINDOW (reuse) ======
@@ -297,7 +297,7 @@
     const names = Array.from(regPanelMap.keys()).sort((a,b)=> a.localeCompare(b,'ms',{sensitivity:'base'}));
     for(const name of names){
       const opt = document.createElement('option');
-      opt.value = name; opt.textContent = name.replace(/\\b\\w/g, c=>c.toUpperCase());
+      opt.value = name; opt.textContent = name.replace(/\b\w/g, c=>c.toUpperCase());
       select.appendChild(opt);
     }
   }
@@ -365,7 +365,7 @@
 
   function parseDate(v){
     if(!v) return null; if(v instanceof Date) return v;
-    const s=String(v); if(/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) return new Date(s+'T00:00:00');
+    const s=String(v); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00');
     const d=new Date(s); return isNaN(d.getTime())?null:d;
   }
   function sortItems(items){
@@ -394,7 +394,7 @@
       const reg = regPanelMap.get(panelKey);
       const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, 'Assalamualaikum/Hi '+(r.nama_pesakit||'')) : '';
       const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, 'Hi '+(reg.pic_name||'PIC')+', rujukan tuntutan: '+(r.record_id||'')) : '';
-      const priceTxt = 'Consult RM'+num(r.harga_consultation)+' · Ubat RM'+num(r.harga_ubat)+' · Prosedur RM'+num(r.harga_prosedur)+'\\nJumlah RM'+num(r.harga_jumlah);
+      const priceTxt = 'Consult RM'+num(r.harga_consultation)+' · Ubat RM'+num(r.harga_ubat)+' · Prosedur RM'+num(r.harga_prosedur)+'\nJumlah RM'+num(r.harga_jumlah);
       const sla = deriveSLA(r);
       const slaBadge = sla.cls ? '<span class="sla '+sla.cls+'" title="Due: '+escapeAttr(sla.dueText)+'">'+sla.label+'</span>' : '';
 
@@ -409,7 +409,7 @@
             '</div>'+
           '</td>'+
           '<td class="magnifiable" data-title="Tarikh Hadir" data-content="'+escapeAttr(formatDateDDMMYYYY_HHMM(r.tarikh_hadir))+'">'+escapeHTML(formatDateDDMMYYYY_HHMM(r.tarikh_hadir))+'</td>'+
-          '<td class="magnifiable" data-title="Panel / PIC" data-content="'+escapeAttr((r.jenis_panel||'')+(reg?('\\nPIC: '+(reg.pic_name||'-')+'\\nTelefon: '+(reg.pic_phone||'')):''))+'">'+
+          '<td class="magnifiable" data-title="Panel / PIC" data-content="'+escapeAttr((r.jenis_panel||'')+(reg?('\nPIC: '+(reg.pic_name||'-')+'\nTelefon: '+(reg.pic_phone||'')):''))+'">'+
             '<div><b>'+escapeHTML(r.jenis_panel||'')+'</b>'+slaBadge+'</div>'+
             (reg ? '<div class="price" style="margin-top:4px">'+
               escapeHTML(reg.pic_name||'-')+'<br>'+
@@ -491,7 +491,8 @@
     return rp && rp.panel_link ? rp.panel_link : '';
   }
 
-  // ====== POST helper ======
+  // ====== POST helpers ======
+  // Keep JSON for claim status updates (already working for you)
   async function postJSON(action, obj){
     showLoading();
     try{
@@ -501,6 +502,19 @@
       return json;
     } finally { hideLoading(); }
   }
+  // NEW: form-urlencoded to avoid CORS preflight on Reg Panel save/delete
+  async function postForm(action, obj){
+    showLoading();
+    try{
+      const body = new URLSearchParams();
+      body.set('payload', JSON.stringify(obj||{}));
+      const res = await fetch(API_BASE+'?action='+encodeURIComponent(action), { method:'POST', body });
+      const json = await res.json().catch(()=>null);
+      if(!json || json.status!=='ok') throw new Error((json && json.message) || 'Request gagal');
+      return json;
+    } finally { hideLoading(); }
+  }
+
   async function updateStatus(record_id, payload){
     try{
       const chip = tbody.querySelector('tr[data-id="'+CSS.escape(record_id)+'"] .chip');
@@ -604,7 +618,6 @@
     btnCancel.addEventListener('click', ()=> setEditMode(false));
 
     btnSave.addEventListener('click', async ()=>{
-      const name = tr.getAttribute('data-panel'); // primary key (old name)
       const newName = tr.querySelector('.cell-name .edit').value.trim();
       const link = tr.querySelector('.cell-link .edit').value.trim();
       const picn = tr.querySelector('.cell-picname .edit').value.trim();
@@ -613,7 +626,8 @@
       const notes= tr.querySelector('.cell-notes .edit').value.trim();
       if(!newName || !link || !Number.isFinite(terms) || terms<=0){ toast('Isi Nama, Link & Tempoh hari','warning'); return; }
       try{
-        await postJSON('updateregpanel', { panel_name:newName, panel_link:link, pic_name:picn, pic_phone:picp, payment_terms_days:terms, notes });
+        // Switched to form POST to avoid preflight/CORS
+        await postForm('updateregpanel', { panel_name:newName, panel_link:link, pic_name:picn, pic_phone:picp, payment_terms_days:terms, notes });
         toast('Panel dikemas kini','success');
         await loadRegPanel();
       }catch(e){ toast('Gagal kemas panel','error'); }
@@ -622,8 +636,12 @@
     btnDel.addEventListener('click', async ()=>{
       const name = tr.getAttribute('data-panel');
       if(!confirm('Padam panel "'+name+'"?')) return;
-      try{ await postJSON('deleteregpanel',{panel_name:name}); toast('Panel dipadam','success'); await loadRegPanel(); }
-      catch(e){ toast('Gagal padam panel','error'); }
+      try{
+        // Switched to form POST to avoid preflight/CORS
+        await postForm('deleteregpanel',{panel_name:name});
+        toast('Panel dipadam','success');
+        await loadRegPanel();
+      }catch(e){ toast('Gagal padam panel','error'); }
     });
 
     // WhatsApp button (row-level)
@@ -643,7 +661,8 @@
     const notes = el('#rp_notes').value.trim();
     if(!name || !link || !Number.isFinite(termsDays) || termsDays<=0){ toast('Sila isi Nama Panel, Link dan Tempoh (hari).','warning'); return; }
     try{
-      await postJSON('updateregpanel', { panel_name:name, panel_link:link, pic_name:picName||'', pic_phone:picPhone||'', payment_terms_days:termsDays, notes:notes||'' });
+      // Switched to form POST to avoid preflight/CORS
+      await postForm('updateregpanel', { panel_name:name, panel_link:link, pic_name:picName||'', pic_phone:picPhone||'', payment_terms_days:termsDays, notes:notes||'' });
       toast('Panel disimpan.','success');
       clearRegPanelForm();
       await loadRegPanel();
