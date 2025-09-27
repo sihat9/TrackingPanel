@@ -64,8 +64,8 @@
     .toast.show{opacity:1;transform:translateY(0)}
     .price{font-size:11px;color:var(--muted);line-height:1.4}
     .card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;box-shadow:var(--card-shadow)}
-    .wa{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#ffffff;color:#2c3e50;text-decoration:none;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.1);border:none}
-    .wa:hover{background:transparent;transform:scale(1.05);box-shadow:none}
+    .wa{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fff;color:#2c3e50;text-decoration:none;transition:.2s;border:none}
+    .wa:hover{background:transparent;transform:scale(1.05)}
     .wa i{font-size:16px}
     .label-mini{font-size:10px;color:#333;background:#fff;border:1px solid var(--border);border-radius:4px;padding:2px 6px;margin-left:6px}
     .btn-danger{border-color:var(--danger);background:var(--danger)}
@@ -96,7 +96,7 @@
     table{flex-grow:1}
     tbody{display:block;max-height:500px;overflow-y:auto}
     thead tr,tbody tr{display:table;width:100%;table-layout:fixed}
-    .magnifier-tooltip{position:fixed;background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:10000;max-width:400px;font-size:16px;line-height:1.5;pointer-events:none;opacity:0;transform:scale(.95);transition:opacity .2s ease,transform .2s ease}
+    .magnifier-tooltip{position:fixed;background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:10000;max-width:400px;font-size:16px;line-height:1.5;pointer-events:none;opacity:0;transform:scale(.95);transition:opacity .2s,transform .2s}
     .magnifier-tooltip.show{opacity:1;transform:scale(1)}
     .magnifier-title{font-weight:bold;margin-bottom:8px;color:var(--primary);font-size:14px;border-bottom:1px solid var(--border);padding-bottom:5px}
     .magnifier-content{font-size:16px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
@@ -107,21 +107,11 @@
 <body>
   <header>
     <div class="tabs">
-      <div class="tab active" data-tab="inprocess">
-        <i class="fas fa-spinner tab-icon"></i> Panel (In Process) <span id="badge-inprocess" class="badge">0</span>
-      </div>
-      <div class="tab" data-tab="submitted">
-        <i class="fas fa-paper-plane tab-icon"></i> Panel (Submitted) <span id="badge-submitted" class="badge">0</span>
-      </div>
-      <div class="tab" data-tab="done">
-        <i class="fas fa-check-circle tab-icon"></i> Panel (Done) <span id="badge-done" class="badge">0</span>
-      </div>
-      <div class="tab" data-tab="rejected">
-        <i class="fas fa-times-circle tab-icon"></i> Panel (Rejected) <span id="badge-rejected" class="badge">0</span>
-      </div>
-      <div class="tab" data-tab="regpanel">
-        <i class="fas fa-cog tab-icon"></i> Reg Panel
-      </div>
+      <div class="tab active" data-tab="inprocess"><i class="fas fa-spinner tab-icon"></i> Panel (In Process) <span id="badge-inprocess" class="badge">0</span></div>
+      <div class="tab" data-tab="submitted"><i class="fas fa-paper-plane tab-icon"></i> Panel (Submitted) <span id="badge-submitted" class="badge">0</span></div>
+      <div class="tab" data-tab="done"><i class="fas fa-check-circle tab-icon"></i> Panel (Done) <span id="badge-done" class="badge">0</span></div>
+      <div class="tab" data-tab="rejected"><i class="fas fa-times-circle tab-icon"></i> Panel (Rejected) <span id="badge-rejected" class="badge">0</span></div>
+      <div class="tab" data-tab="regpanel"><i class="fas fa-cog tab-icon"></i> Reg Panel</div>
     </div>
     <div class="search" id="searchBar">
       <input id="search" type="text" placeholder="Cari nama/IC..." />
@@ -153,15 +143,7 @@
         <table>
           <thead>
             <tr>
-              <th>Nama</th>
-              <th>IC</th>
-              <th>Telefon</th>
-              <th>Tarikh Hadir</th>
-              <th>Panel / PIC</th>
-              <th>Harga</th>
-              <th>Ubat</th>
-              <th>Status</th>
-              <th>Tindakan</th>
+              <th>Nama</th><th>IC</th><th>Telefon</th><th>Tarikh Hadir</th><th>Panel / PIC</th><th>Harga</th><th>Ubat</th><th>Status</th><th>Tindakan</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -176,16 +158,14 @@
       <div id="regPanelView" style="display:none">
         <div class="section-title">Pendaftaran Panel</div>
         <div class="card" style="margin-bottom:16px">
-          <h3 style="margin:0 0 12px 0; display:flex; align-items:center; gap:8px;">
-            <i class="fas fa-plus-circle"></i> Daftar Panel Baharu
-          </h3>
+          <h3 style="margin:0 0 12px 0;display:flex;align-items:center;gap:8px;"><i class="fas fa-plus-circle"></i> Daftar Panel Baharu</h3>
           <div class="form-grid">
-            <div class="form-group"><label for="rp_name">Nama Panel *</label><input id="rp_name" type="text" placeholder="Contoh: AIA" required /></div>
-            <div class="form-group"><label for="rp_link">Link Panel (URL) *</label><input id="rp_link" type="url" placeholder="https://..." required /></div>
-            <div class="form-group"><label for="rp_pic_name">Nama PIC</label><input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad" /></div>
-            <div class="form-group"><label for="rp_pic_phone">No. Telefon PIC</label><input id="rp_pic_phone" type="tel" placeholder="0123456789" /></div>
-            <div class="form-group"><label for="rp_terms_days">Tempoh (hari) *</label><input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30" /></div>
-            <div class="form-group" style="grid-column:1/-1"><label for="rp_notes">Catatan</label><textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%; min-height:80px;"></textarea></div>
+            <div class="form-group"><label for="rp_name">Nama Panel *</label><input id="rp_name" type="text" placeholder="Contoh: AIA" required/></div>
+            <div class="form-group"><label for="rp_link">Link Panel (URL) *</label><input id="rp_link" type="url" placeholder="https://..." required/></div>
+            <div class="form-group"><label for="rp_pic_name">Nama PIC</label><input id="rp_pic_name" type="text" placeholder="Contoh: En. Ahmad"/></div>
+            <div class="form-group"><label for="rp_pic_phone">No. Telefon PIC</label><input id="rp_pic_phone" type="tel" placeholder="0123456789"/></div>
+            <div class="form-group"><label for="rp_terms_days">Tempoh (hari) *</label><input id="rp_terms_days" type="number" min="1" step="1" placeholder="cth: 30"/></div>
+            <div class="form-group" style="grid-column:1/-1"><label for="rp_notes">Catatan</label><textarea id="rp_notes" placeholder="Nota tambahan jika perlu" style="width:100%;min-height:80px"></textarea></div>
           </div>
           <div style="margin-top:16px;display:flex;gap:8px">
             <button id="rp_save"><i class="fas fa-save"></i> Simpan Panel</button>
@@ -194,21 +174,12 @@
         </div>
 
         <div class="card">
-          <h3 style="margin:0 0 12px 0; display:flex; align-items:center; gap:8px;">
-            <i class="fas fa-list"></i> Senarai Panel Berdaftar
-          </h3>
-          <p class="muted" style="margin-bottom:12px;">Klik Edit untuk ubah terus dalam baris</p>
+          <h3 style="margin:0 0 12px 0;display:flex;align-items:center;gap:8px;"><i class="fas fa-list"></i> Senarai Panel Berdaftar</h3>
+          <p class="muted" style="margin-bottom:12px">Klik Edit untuk ubah terus dalam baris</p>
           <table>
             <thead>
               <tr>
-                <th>Nama</th>
-                <th>Link</th>
-                <th>PIC</th>
-                <th>Telefon PIC</th>
-                <th>Tempoh (hari)</th>
-                <th>Catatan</th>
-                <th>WhatsApp</th>
-                <th>Tindakan</th>
+                <th>Nama</th><th>Link</th><th>PIC</th><th>Telefon PIC</th><th>Tempoh (hari)</th><th>Catatan</th><th>WhatsApp</th><th>Tindakan</th>
               </tr>
             </thead>
             <tbody id="rp_tbody"></tbody>
@@ -220,7 +191,7 @@
     <aside class="right">
       <div class="section-title">Panel Window</div>
       <div class="hint"><i class="fas fa-info-circle"></i> Klik <b>Open</b> atau ikon <b>WhatsApp</b>. Tetingkap kanan dibuka sekali & dikitar semula.</div>
-      <div class="detail-content" id="detail"><p style="text-align:center; color:var(--muted); padding:40px 20px;">Pilih rekod untuk melihat butiran</p></div>
+      <div class="detail-content" id="detail"><p style="text-align:center;color:var(--muted);padding:40px 20px">Pilih rekod untuk melihat butiran</p></div>
     </aside>
   </div>
 
@@ -228,7 +199,6 @@
     <div id="magnifierTitle" class="magnifier-title"></div>
     <div id="magnifierContent" class="magnifier-content"></div>
   </div>
-
   <div id="toast" class="toast" role="status" aria-live="polite"><i class="fas fa-check-circle"></i><span class="toast-message"></span></div>
   <div id="loading" class="loading" aria-live="polite"><div class="spinner" title="Loading..."></div></div>
 
@@ -239,6 +209,7 @@
   let panelWin = null, lastOpenTs = 0;
   let regPanelMap = new Map();
   let magnifierTimeout = null;
+  let currentMagnifierElement = null;
 
   const el = s => document.querySelector(s);
   const tbody = el('#tbody');
@@ -248,33 +219,45 @@
   const loader = el('#loading');
 
   function escapeHtml(s){
-    return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    return String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   }
   function escapeAttr(s){
-    return escapeHtml(s).replace(/'/g,'&#39;').replace(/\n/g,'&#10;');
+    // Escape for inclusion inside HTML attribute double-quotes
+    return String(s??'')
+      .replace(/&/g,'&amp;')
+      .replace(/"/g,'&quot;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/\r?\n/g,'&#10;');
   }
 
   function toast(m, type='info'){
-    const iconMap = { info:'fas fa-info-circle', success:'fas fa-check-circle', warning:'fas fa-exclamation-triangle', error:'fas fa-exclamation-circle' };
-    toastEl.innerHTML = '<i class=\"'+(iconMap[type]||iconMap.info)+'\"></i><span class=\"toast-message\"></span>';
-    toastEl.querySelector('.toast-message').textContent = m;
+    const iconMap={info:'fas fa-info-circle',success:'fas fa-check-circle',warning:'fas fa-exclamation-triangle',error:'fas fa-exclamation-circle'};
+    toastMsg.textContent=m;
+    toastEl.innerHTML = '<i class=\"'+(iconMap[type]||iconMap.info)+'\"></i><span class=\"toast-message\">'+escapeHtml(m)+'</span>';
     toastEl.classList.add('show');
-    setTimeout(()=>toastEl.classList.remove('show'), 3000);
+    setTimeout(()=>toastEl.classList.remove('show'),3000);
   }
   function showLoading(){ loader.classList.add('show'); }
   function hideLoading(){ loader.classList.remove('show'); }
 
   function formatDateDDMMYYYY_HHMM(v){
     if(!v) return '';
-    let d = (v instanceof Date)? v : new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v)+'T00:00:00' : String(v));
-    if(isNaN(d.getTime())) return escapeHtml(String(v));
+    let d;
+    if(v instanceof Date) d=v;
+    else {
+      const s=String(v);
+      if(/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) d=new Date(s+'T00:00:00');
+      else d=new Date(s);
+      if(isNaN(d.getTime())) return escapeHtml(s);
+    }
     const pad=n=>String(n).padStart(2,'0');
     return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes());
   }
-  const toDigits = s => String(s||'').replace(/[^\d]/g,'');
+  const toDigits = s => String(s||'').replace(/[^\\d]/g,'');
   function buildWAUrl(phone, text){
-    const p=toDigits(phone); const q=encodeURIComponent(text||''); if(!p) return '';
-    return 'https://web.whatsapp.com/send?phone='+p+(q?('&text='+q):'');
+    const p=toDigits(phone); const q=encodeURIComponent(text||'');
+    if(!p) return ''; return 'https://web.whatsapp.com/send?phone='+p+(q?('&text='+q):'');
   }
 
   function openOrReusePanel(url){
@@ -282,7 +265,7 @@
     const now=Date.now(); if(now-lastOpenTs<250) return; lastOpenTs=now;
     try{
       if(panelWin && !panelWin.closed){
-        try{ const current = String(panelWin.location && panelWin.location.href); if(current===String(url)){ panelWin.focus(); return; } }catch(e){}
+        try{ const current=panelWin.location && String(panelWin.location.href); if(current===String(url)){ panelWin.focus(); return; } }catch(e){}
         panelWin.location.href=url; panelWin.focus(); return;
       }
     }catch(e){}
@@ -291,7 +274,7 @@
     const left=Math.max(0, sw-w), top=0;
     const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes','width='+w,'height='+h,'left='+left,'top='+top].join(',');
     panelWin = window.open(url, 'panel_claim_window', features);
-    if(!panelWin){ toast('Sila benarkan pop-up untuk domain ini.', 'warning'); window.open(url, 'panel_claim_window'); return; }
+    if(!panelWin){ toast('Sila benarkan pop-up untuk domain ini.','warning'); window.open(url,'panel_claim_window'); return; }
     panelWin.focus();
   }
 
@@ -299,7 +282,7 @@
     const tooltip = el('#magnifierTooltip');
     const titleEl = el('#magnifierTitle');
     const contentEl = el('#magnifierContent');
-    function closeMagnifier(){ tooltip.classList.remove('show'); }
+    function closeMagnifier(){ tooltip.classList.remove('show'); currentMagnifierElement=null; }
     function openMagnifier(title, content, element){
       titleEl.textContent = title;
       contentEl.textContent = content;
@@ -312,7 +295,7 @@
       if(left < 10) left = 10; else if(left + tw > window.innerWidth - 10) left = window.innerWidth - tw - 10;
       tooltip.style.top = top+'px'; tooltip.style.left = left+'px';
     }
-    return {openMagnifier, closeMagnifier};
+    return { openMagnifier, closeMagnifier };
   }
   const magnifier = initMagnifier();
   function addMagnifierToElement(element, title, content){
@@ -320,10 +303,10 @@
     element.classList.add('magnifiable');
     element.addEventListener('mouseenter', function(){
       if(magnifierTimeout) clearTimeout(magnifierTimeout);
-      magnifierTimeout = setTimeout(()=> magnifier.openMagnifier(title, content, element), 500);
+      magnifierTimeout = setTimeout(()=>{ currentMagnifierElement=element; magnifier.openMagnifier(title, content, element); }, 500);
     });
     element.addEventListener('mouseleave', function(){
-      if(magnifierTimeout) { clearTimeout(magnifierTimeout); magnifierTimeout = null; }
+      if(magnifierTimeout){ clearTimeout(magnifierTimeout); magnifierTimeout=null; }
       magnifier.closeMagnifier();
     });
   }
@@ -353,26 +336,28 @@
     select.innerHTML = '<option value=\"\">Semua Panel</option>';
     const names = Array.from(regPanelMap.keys()).sort((a,b)=> a.localeCompare(b,'ms',{sensitivity:'base'}));
     for(const name of names){
-      const opt = document.createElement('option'); opt.value = name; opt.textContent = name.replace(/\b\w/g, c=>c.toUpperCase()); select.appendChild(opt);
+      const opt = document.createElement('option'); opt.value = name; opt.textContent = name.replace(/\\b\\w/g, c=>c.toUpperCase()); select.appendChild(opt);
     }
   }
 
   function deriveSLA(record){
-    const key = String(record.jenis_panel||'').toLowerCase().trim();
-    const rp = regPanelMap.get(key);
-    const terms = rp && rp.payment_terms_days ? rp.payment_terms_days : null;
+    const terms = (function(){
+      const key = String(record.jenis_panel||'').toLowerCase().trim();
+      const rp = regPanelMap.get(key);
+      return rp && rp.payment_terms_days ? rp.payment_terms_days : null;
+    })();
     let due = record.sla_due_at ? new Date(record.sla_due_at) : null;
     if((!due || isNaN(due)) && record.status_claim==='Submitted' && terms){
       const base = record.submitted_at ? new Date(record.submitted_at) : new Date();
-      if(!isNaN(base)) { due = new Date(base); due.setDate(due.getDate()+terms); }
+      if(!isNaN(base)){ due = new Date(base); due.setDate(due.getDate()+terms); }
     }
-    if(!due || isNaN(due)) return {label:'',cls:'',dueText:''};
+    if(!due || isNaN(due)) return { label:'', cls:'', dueText:'' };
     const today = new Date(); today.setHours(0,0,0,0);
     const dd = new Date(due); dd.setHours(0,0,0,0);
     let cls='on', label='On Track';
-    if(dd.getTime()<today.getTime()){ cls='over'; label='Overdue'; }
-    else if(dd.getTime()===today.getTime()){ cls='today'; label='Due Today'; }
-    return {label, cls, dueText: formatDateDDMMYYYY_HHMM(due)};
+    if(dd.getTime() < today.getTime()){ cls='over'; label='Overdue'; }
+    else if(dd.getTime() === today.getTime()){ cls='today'; label='Due Today'; }
+    return { label, cls, dueText: formatDateDDMMYYYY_HHMM(due) };
   }
 
   function setActiveTab(tab){
@@ -381,7 +366,7 @@
     const isReg = tab==='regpanel';
     el('#recordsView').style.display = isReg ? 'none' : '';
     el('#regPanelView').style.display = isReg ? '' : 'none';
-    el('#searchBar').style.display = isReg ? 'none' : '';
+    el('#searchBar').style.display   = isReg ? 'none' : '';
     if(isReg){ loadRegPanel(); } else { state.page=1; load(); }
   }
 
@@ -393,7 +378,7 @@
       const res = await fetch(url);
       const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat data');
-      const total = json.data.total, items = json.data.items;
+      const total = json.data.total; const items = json.data.items;
 
       let filtered = items.slice();
       if(state.filterPanelSelect){
@@ -411,7 +396,7 @@
       const sorted = sortItems(filtered);
       renderTable(sorted);
       updateBadgesApprox(sorted);
-      pageInfo.textContent = 'Halaman '+state.page+' • '+sorted.length+' rekod';
+      if(pageInfo) pageInfo.textContent = 'Halaman '+state.page+' • '+sorted.length+' rekod';
     }catch(e){ console.error(e); toast('Ralat memuat data','error'); }
     finally{ hideLoading(); }
   }
@@ -420,7 +405,7 @@
     if(!value) return null;
     if(value instanceof Date) return value;
     const s=String(value);
-    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00');
+    if(/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) return new Date(s+'T00:00:00');
     const d=new Date(s); return isNaN(d.getTime())?null:d;
   }
   function sortItems(items){
@@ -441,7 +426,7 @@
     if(m==='tarikh_asc') items.reverse();
     return items;
   }
-  function num(x){ const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; return n.toFixed(2); }
+  function num(x){ const n=parseFloat(String(x||'').replace(/[^\\d.]/g,''))||0; return n.toFixed(2); }
 
   function renderTable(items){
     tbody.innerHTML = items.map(r => renderRow(r)).join('');
@@ -452,79 +437,85 @@
     const status = (r.status_claim||'Not Started');
     const chipClass = status==='Done' ? 'done' : (status==='Rejected' ? 'rejected' : (status==='Submitted' ? 'submitted' : 'inprocess'));
     const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
-    const reg = regPanelMap.get(panelKey);
+    const reg = regPanelMap.get(panelKey) || null;
 
     const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, 'Assalamualaikum/Hi '+(r.nama_pesakit||'')) : '';
-    const waPatientIcon = waPatientURL ? ('<a class=\"wa\" href=\"javascript:void(0)\" aria-label=\"WhatsApp Pesakit\" title=\"WhatsApp Pesakit\" onclick=\"openOrReusePanel(\\''+waPatientURL.replace(/'/g,'%27')+'\\')\"><i class=\"fab fa-whatsapp\"></i></a>') : '';
+    const waPatientIcon = waPatientURL ? '<a class=\"wa\" href=\"javascript:void(0)\" aria-label=\"WhatsApp Pesakit\" title=\"WhatsApp Pesakit\" onclick=\"openOrReusePanel(\\''+waPatientURL.replace(/'/g,'%27')+'\\')\"><i class=\"fab fa-whatsapp\"></i></a>' : '';
 
     const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, 'Hi '+(reg.pic_name||'PIC')+', rujukan tuntutan: '+(r.record_id||'')) : '';
-    const waPICIcon = waPICURL ? ('<a class=\"wa\" href=\"javascript:void(0)\" aria-label=\"WhatsApp PIC Panel\" title=\"WhatsApp PIC Panel\" onclick=\"openOrReusePanel(\\''+waPICURL.replace(/'/g,'%27')+'\\')\"><i class=\"fab fa-whatsapp\"></i></a>') : '';
+    const waPICIcon = waPICURL ? '<a class=\"wa\" href=\"javascript:void(0)\" aria-label=\"WhatsApp PIC Panel\" title=\"WhatsApp PIC Panel\" onclick=\"openOrReusePanel(\\''+waPICURL.replace(/'/g,'%27')+'\\')\"><i class=\"fab fa-whatsapp\"></i></a>' : '';
 
-    const priceText = 'Consult RM'+num(r.harga_consultation)+' · Ubat RM'+num(r.harga_ubat)+' · Prosedur RM'+num(r.harga_prosedur)+'\nJumlah RM'+num(r.harga_jumlah);
-    const priceHtml = '<div class=\"price\">Consult RM'+num(r.harga_consultation)+' · Ubat RM'+num(r.harga_ubat)+' · Prosedur RM'+num(r.harga_prosedur)+'<br><b>Jumlah RM'+num(r.harga_jumlah)+'</b></div>';
+    const priceHtml = 'Consult RM'+num(r.harga_consultation)+' · Ubat RM'+num(r.harga_ubat)+' · Prosedur RM'+num(r.harga_prosedur)+'<br><b>Jumlah RM'+num(r.harga_jumlah)+'</b>';
+    const priceText = ('Consult RM'+num(r.harga_consultation)+' · Ubat RM'+num(r.harga_ubat)+' · Prosedur RM'+num(r.harga_prosedur)+'\nJumlah RM'+num(r.harga_jumlah));
 
     const sla = deriveSLA(r);
-    const slaBadge = sla.cls ? ('<span class=\"sla '+sla.cls+'\" title=\"Due: '+escapeAttr(sla.dueText)+'\">'+sla.label+'</span>') : '';
+    const slaBadge = sla.cls ? '<span class=\"sla '+sla.cls+'\" title=\"Due: '+escapeAttr(sla.dueText)+'\">'+escapeHtml(sla.label)+'</span>' : '';
 
-    const submittedActions = (state.tab==='submitted'
-      ? '<button class=\"secondary btn-pending\" title=\"Masih menunggu\"><i class=\"fas fa-clock\"></i></button>'
-        + '<button class=\"btn-done\" title=\"Tanda Done\"><i class=\"fas fa-check\"></i></button>'
-        + '<button class=\"btn-rejected\" title=\"Tanda Rejected\"><i class=\"fas fa-times\"></i></button>'
-      : '');
+    const submittedActions = state.tab==='submitted'
+      ? '<button class=\"secondary btn-pending\" title=\"Masih menunggu\"><i class=\"fas fa-clock\"></i></button>'+
+        '<button class=\"btn-done\" title=\"Tanda Done\"><i class=\"fas fa-check\"></i></button>'+
+        '<button class=\"btn-rejected\" title=\"Tanda Rejected\"><i class=\"fas fa-times\"></i></button>'
+      : '';
 
-    return (
-      '<tr data-id=\"'+escapeAttr(r.record_id)+'\">'
-        + '<td class=\"cell-magnifiable\" data-title=\"Nama Pesakit\" data-content=\"'+escapeAttr(r.nama_pesakit||'')+'\">'+escapeHtml(r.nama_pesakit||'')+'</td>'
-        + '<td class=\"cell-magnifiable\" data-title=\"No. IC\" data-content=\"'+escapeAttr(r.no_ic||'')+'\">'+escapeHtml(r.no_ic||'')+'</td>'
-        + '<td class=\"cell-magnifiable\" data-title=\"No. Telefon\" data-content=\"'+escapeAttr(r.no_telefon||'')+'\"><div style=\"display:flex;align-items:center;gap:8px\"><span>'+escapeHtml(r.no_telefon||'')+'</span>'+waPatientIcon+'</div></td>'
-        + '<td class=\"cell-magnifiable\" data-title=\"Tarikh Hadir\" data-content=\"'+escapeAttr(formatDateDDMMYYYY_HHMM(r.tarikh_hadir))+'\">'+formatDateDDMMYYYY_HHMM(r.tarikh_hadir)+'</td>'
-        + '<td class=\"cell-magnifiable\" data-title=\"Panel / PIC\" data-content=\"'+escapeAttr((r.jenis_panel||'')+(reg?('\\nPIC: '+(reg.pic_name||'-')+'\\nTelefon: '+(reg.pic_phone||'')):''))+'\">'
-            + '<div><b>'+escapeHtml(r.jenis_panel||'')+'</b>'+slaBadge+'</div>'
-            + (reg?('<div class=\"price\" style=\"margin-top:4px\">'+escapeHtml(reg.pic_name||'-')+'<br><div style=\"display:flex;align-items:center;gap:8px\"><small>'+escapeHtml(reg.pic_phone||'')+'</small>'+waPICIcon+'</div></div>'):'')
-        + '</td>'
-        + '<td class=\"cell-magnifiable\" data-title=\"Harga\" data-content=\"'+escapeAttr(priceText)+'\">'+priceHtml+'</td>'
-        + '<td class=\"cell-magnifiable\" data-title=\"Jenis Ubat\" data-content=\"'+escapeAttr(r.jenis_ubat||'')+'\">'+escapeHtml(r.jenis_ubat||'')+'</td>'
-        + '<td><span class=\"chip '+chipClass+'\">'+escapeHtml(status)+'</span></td>'
-        + '<td class=\"actions\">'
-            + '<button class=\"secondary btn-open\" title=\"Buka laman panel\"><i class=\"fas fa-external-link-alt\"></i></button>'
-            + (state.tab==='inprocess' ? '<button class=\"btn-submit\" title=\"Hantar ke Submitted\"><i class=\"fas fa-paper-plane\"></i></button>' : submittedActions)
-        + '</td>'
-      + '</tr>'
-    );
+    return '<tr data-id=\"'+escapeAttr(r.record_id)+'\">'+
+      '<td class=\"cell-magnifiable\" data-title=\"Nama Pesakit\" data-content=\"'+escapeAttr(r.nama_pesakit||'')+'\">'+escapeHtml(r.nama_pesakit||'')+'</td>'+
+      '<td class=\"cell-magnifiable\" data-title=\"No. IC\" data-content=\"'+escapeAttr(r.no_ic||'')+'\">'+escapeHtml(r.no_ic||'')+'</td>'+
+      '<td class=\"cell-magnifiable\" data-title=\"No. Telefon\" data-content=\"'+escapeAttr(r.no_telefon||'')+'\">'+
+        '<div style=\"display:flex;align-items:center;gap:8px\"><span>'+escapeHtml(r.no_telefon||'')+'</span>'+waPatientIcon+'</div>'+
+      '</td>'+
+      '<td class=\"cell-magnifiable\" data-title=\"Tarikh Hadir\" data-content=\"'+escapeAttr(formatDateDDMMYYYY_HHMM(r.tarikh_hadir))+'\">'+escapeHtml(formatDateDDMMYYYY_HHMM(r.tarikh_hadir))+'</td>'+
+      '<td class=\"cell-magnifiable\" data-title=\"Panel / PIC\" data-content=\"'+escapeAttr((r.jenis_panel||'')+(reg?('\\nPIC: '+(reg.pic_name||'-')+'\\nTelefon: '+(reg.pic_phone||'')):''))+'\">'+
+        '<div><b>'+escapeHtml(r.jenis_panel||'')+'</b>'+slaBadge+'</div>'+
+        (reg ? '<div class=\"price\" style=\"margin-top:4px\">'+escapeHtml(reg.pic_name||'-')+'<br><div style=\"display:flex;align-items:center;gap:8px\"><small>'+escapeHtml(reg.pic_phone||'')+'</small>'+waPICIcon+'</div></div>' : '')+
+      '</td>'+
+      '<td class=\"cell-magnifiable\" data-title=\"Harga\" data-content=\"'+escapeAttr(priceText)+'\"><div class=\"price\">'+priceHtml+'</div></td>'+
+      '<td class=\"cell-magnifiable\" data-title=\"Jenis Ubat\" data-content=\"'+escapeAttr(r.jenis_ubat||'')+'\">'+escapeHtml(r.jenis_ubat||'')+'</td>'+
+      '<td><span class=\"chip '+chipClass+'\">'+escapeHtml(status)+'</span></td>'+
+      '<td class=\"actions\">'+
+        '<button class=\"secondary btn-open\" title=\"Buka laman panel\"><i class=\"fas fa-external-link-alt\"></i></button>'+
+        (state.tab==='inprocess' ? '<button class=\"btn-submit\" title=\"Hantar ke Submitted\"><i class=\"fas fa-paper-plane\"></i></button>' : submittedActions)+
+      '</td>'+
+    '</tr>';
   }
 
   function wireRow(r){
     const tr = tbody.querySelector('tr[data-id=\"'+CSS.escape(String(r.record_id))+'\"]');
-    tr.querySelectorAll('td[class*=\"cell-magnifiable\"]').forEach(cell => {
+    if(!tr) return;
+
+    tr.querySelectorAll('td[class*=\"cell-magnifiable\"]').forEach(cell=>{
       const title = cell.getAttribute('data-title') || 'Butiran';
       const content = cell.getAttribute('data-content') || cell.textContent;
       addMagnifierToElement(cell, title, content);
     });
 
-    tr.querySelector('.btn-open').addEventListener('click', ()=>{
-      const url = r.panel_claim_url || (function(){ const key = String(r.jenis_panel||'').toLowerCase().trim(); const reg = regPanelMap.get(key); return (reg && reg.panel_link) ? reg.panel_link : ''; })();
-      if(!url){ toast('URL panel tiada','warning'); return; }
-      openOrReusePanel(url);
-    });
+    const btnOpen = tr.querySelector('.btn-open');
+    if(btnOpen){
+      btnOpen.addEventListener('click', ()=>{
+        const url = r.panel_claim_url || (function(){ const key=String(r.jenis_panel||'').toLowerCase().trim(); const reg=regPanelMap.get(key); return reg && reg.panel_link ? reg.panel_link : ''; })();
+        if(!url){ toast('URL panel tiada','warning'); return; }
+        openOrReusePanel(url);
+      });
+    }
 
     if(state.tab==='inprocess'){
-      const btn = tr.querySelector('.btn-submit');
-      if(btn) btn.addEventListener('click', async ()=>{
+      tr.querySelector('.btn-submit')?.addEventListener('click', async ()=>{
         const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
         if(ref===null){ toast('Dibatalkan.','info'); return; }
-        await updateStatus(r.record_id, { status_claim:'Submitted', claim_ref_id:ref });
+        await updateStatus(r.record_id, { status_claim:'Submitted', claim_ref_id: ref });
       });
-    }else if(state.tab==='submitted'){
-      tr.querySelector('.btn-pending')?.addEventListener('click', async ()=>{ await updateStatus(r.record_id, { status_claim:'Submitted' }); });
+    } else if(state.tab==='submitted'){
+      tr.querySelector('.btn-pending')?.addEventListener('click', async ()=>{
+        await updateStatus(r.record_id, { status_claim:'Submitted' });
+      });
       tr.querySelector('.btn-done')?.addEventListener('click', async ()=>{
         const ref = prompt('Masukkan Claim Ref/ID (jika belum diisi):', r.claim_ref_id||'');
         if(ref===null){ toast('Dibatalkan.','info'); return; }
-        await updateStatus(r.record_id, { status_claim:'Done', claim_ref_id:ref });
+        await updateStatus(r.record_id, { status_claim:'Done', claim_ref_id: ref });
       });
       tr.querySelector('.btn-rejected')?.addEventListener('click', async ()=>{
         const reason = prompt('Sebab Rejected (optional):','');
         if(reason===null){ toast('Dibatalkan.','info'); return; }
-        await updateStatus(r.record_id, { status_claim:'Rejected', notes:reason||'' });
+        await updateStatus(r.record_id, { status_claim:'Rejected', notes: reason||'' });
       });
     }
   }
@@ -537,15 +528,15 @@
       const json = await res.json().catch(()=>null);
       if(!json || json.status!=='ok') throw new Error((json && json.message) || 'Request gagal');
       return json;
-    }finally{ hideLoading(); }
+    } finally { hideLoading(); }
   }
   async function updateStatus(record_id, payload){
     try{
       const tr = tbody.querySelector('tr[data-id=\"'+CSS.escape(String(record_id))+'\"]');
       if(tr && payload.status_claim){
-        const chip = tr.querySelector('.chip');
+        const chip=tr.querySelector('.chip');
         chip.textContent = payload.status_claim;
-        chip.className = 'chip '+(payload.status_claim==='Rejected' ? 'rejected' : (payload.status_claim==='Done' ? 'done' : (payload.status_claim==='Submitted' ? 'submitted' : 'inprocess')));
+        chip.className = 'chip '+(payload.status_claim==='Rejected'?'rejected':(payload.status_claim==='Done'?'done':(payload.status_claim==='Submitted'?'submitted':'inprocess')));
       }
       await postForm('updateclaimstatus', { record_id, ...payload });
       toast('Status dikemas kini','success');
@@ -553,7 +544,7 @@
     }catch(e){ toast(e.message||'Gagal kemas status','error'); await load(); }
   }
   function updateBadgesApprox(items){
-    const count={inprocess:0, submitted:0, done:0, rejected:0};
+    const count={inprocess:0,submitted:0,done:0,rejected:0};
     items.forEach(r=>{
       const s=(r.status_claim||'Not Started');
       if(s==='Done') count.done++; else if(s==='Rejected') count.rejected++; else if(s==='Submitted') count.submitted++; else count.inprocess++;
@@ -574,7 +565,8 @@
       const tbodyRP = document.getElementById('rp_tbody');
       tbodyRP.innerHTML = items.map(p => renderRegRow(p)).join('');
       tbodyRP.querySelectorAll('tr').forEach(tr => wireRegRow(tr));
-      await buildRegPanelMap(); await populatePanelDropdown();
+      await buildRegPanelMap();
+      await populatePanelDropdown();
     }catch(e){ console.error(e); toast('Ralat memuat Reg Panel','error'); }
     finally{ hideLoading(); }
   }
@@ -582,26 +574,24 @@
   function renderRegRow(p){
     const link = escapeHtml(p.panel_link || p.login_url || p.claim_url_template || '');
     const waHref = p.pic_phone ? buildWAUrl(p.pic_phone, 'Hi '+(p.pic_name||'PIC')+' — pesanan dari klinik') : '';
-    const waBtn = waHref ? ('<a class=\"wa\" href=\"javascript:void(0)\" onclick=\"openOrReusePanel(\\''+waHref.replace(/'/g,'%27')+'\\')\" title=\"WhatsApp PIC\"><i class=\"fab fa-whatsapp\"></i></a>') : '';
+    const waBtn = waHref ? '<a class=\"wa\" href=\"javascript:void(0)\" onclick=\"openOrReusePanel(\\''+waHref.replace(/'/g,'%27')+'\\')\" title=\"WhatsApp PIC\"><i class=\"fab fa-whatsapp\"></i></a>' : '';
     const terms = parseInt(p.payment_terms_days,10) || '';
 
-    return (
-      '<tr data-panel=\"'+escapeAttr(p.panel_name||'')+'\">'
-        + '<td class=\"cell-magnifiable cell-name\" data-title=\"Nama Panel\" data-content=\"'+escapeAttr(p.panel_name||'')+'\"><span class=\"view\">'+escapeHtml(p.panel_name||'')+'</span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(p.panel_name||'')+'\" /></td>'
-        + '<td class=\"cell-magnifiable cell-link\" data-title=\"Link Panel\" data-content=\"'+escapeAttr(link)+'\"><span class=\"view\"><a href=\"'+(link or "#")+'\" target=\"_blank\" rel=\"noopener\">Buka</a></span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(link)+'\" /></td>'
-        + '<td class=\"cell-magnifiable cell-picname\" data-title=\"Nama PIC\" data-content=\"'+escapeAttr(p.pic_name||'')+'\"><span class=\"view\">'+escapeHtml(p.pic_name||'')+'</span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(p.pic_name||'')+'\" /></td>'
-        + '<td class=\"cell-magnifiable cell-picphone\" data-title=\"Telefon PIC\" data-content=\"'+escapeAttr(p.pic_phone||'')+'\"><span class=\"view\">'+escapeHtml(p.pic_phone||'')+'</span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(p.pic_phone||'')+'\" /></td>'
-        + '<td class=\"cell-magnifiable cell-terms\" data-title=\"Tempoh (hari)\" data-content=\"'+escapeAttr(String(terms))+'\"><span class=\"view\">'+escapeHtml(String(terms))+'</span><input class=\"edit inline-input\" style=\"display:none\" type=\"number\" min=\"1\" step=\"1\" value=\"'+escapeAttr(String(terms))+'\" /></td>'
-        + '<td class=\"cell-magnifiable cell-notes\" data-title=\"Catatan\" data-content=\"'+escapeAttr(p.notes||'')+'\"><span class=\"view\">'+escapeHtml(p.notes||'')+'</span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(p.notes||'')+'\" /></td>'
-        + '<td>'+waBtn+'</td>'
-        + '<td class=\"actions\">'
-            + '<button class=\"btn-warning btn-rp-edit\"><i class=\"fas fa-edit\"></i></button>'
-            + '<button class=\"btn-danger btn-rp-del\"><i class=\"fas fa-trash\"></i></button>'
-            + '<button class=\"btn-save\" style=\"display:none\"><i class=\"fas fa-save\"></i></button>'
-            + '<button class=\"secondary btn-cancel\" style=\"display:none\"><i class=\"fas fa-times\"></i></button>'
-        + '</td>'
-      + '</tr>'
-    );
+    return '<tr data-panel=\"'+escapeAttr(p.panel_name||'')+'\">'+
+      '<td class=\"cell-magnifiable cell-name\" data-title=\"Nama Panel\" data-content=\"'+escapeAttr(p.panel_name||'')+'\"><span class=\"view\">'+escapeHtml(p.panel_name||'')+'</span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(p.panel_name||'')+'\"/></td>'+
+      '<td class=\"cell-magnifiable cell-link\" data-title=\"Link Panel\" data-content=\"'+escapeAttr(link)+'\"><span class=\"view\"><a href=\"'+link+'\" target=\"_blank\" rel=\"noopener\">Buka</a></span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(link)+'\"/></td>'+
+      '<td class=\"cell-magnifiable cell-picname\" data-title=\"Nama PIC\" data-content=\"'+escapeAttr(p.pic_name||'')+'\"><span class=\"view\">'+escapeHtml(p.pic_name||'')+'</span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(p.pic_name||'')+'\"/></td>'+
+      '<td class=\"cell-magnifiable cell-picphone\" data-title=\"Telefon PIC\" data-content=\"'+escapeAttr(p.pic_phone||'')+'\"><span class=\"view\">'+escapeHtml(p.pic_phone||'')+'</span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(p.pic_phone||'')+'\"/></td>'+
+      '<td class=\"cell-magnifiable cell-terms\" data-title=\"Tempoh (hari)\" data-content=\"'+escapeAttr(String(terms))+'\"><span class=\"view\">'+escapeHtml(String(terms))+'</span><input class=\"edit inline-input\" style=\"display:none\" type=\"number\" min=\"1\" step=\"1\" value=\"'+escapeAttr(String(terms))+'\"/></td>'+
+      '<td class=\"cell-magnifiable cell-notes\" data-title=\"Catatan\" data-content=\"'+escapeAttr(p.notes||'')+'\"><span class=\"view\">'+escapeHtml(p.notes||'')+'</span><input class=\"edit inline-input\" style=\"display:none\" value=\"'+escapeAttr(p.notes||'')+'\"/></td>'+
+      '<td>'+waBtn+'</td>'+
+      '<td class=\"actions\">'+
+        '<button class=\"btn-warning btn-rp-edit\"><i class=\"fas fa-edit\"></i></button>'+
+        '<button class=\"btn-danger btn-rp-del\"><i class=\"fas fa-trash\"></i></button>'+
+        '<button class=\"btn-save\" style=\"display:none\"><i class=\"fas fa-save\"></i></button>'+
+        '<button class=\"secondary btn-cancel\" style=\"display:none\"><i class=\"fas fa-times\"></i></button>'+
+      '</td>'+
+    '</tr>';
   }
 
   function wireRegRow(tr){
@@ -610,7 +600,7 @@
     const btnSave = tr.querySelector('.btn-save');
     const btnCancel=tr.querySelector('.btn-cancel');
 
-    tr.querySelectorAll('td[class*=\"cell-magnifiable\"]').forEach(cell => {
+    tr.querySelectorAll('td[class*=\"cell-magnifiable\"]').forEach(cell=>{
       const title = cell.getAttribute('data-title') || 'Butiran';
       const content = cell.getAttribute('data-content') || cell.textContent;
       addMagnifierToElement(cell, title, content);
@@ -638,8 +628,7 @@
       if(!name || !link || !Number.isFinite(terms) || terms<=0){ toast('Isi Nama, Link & Tempoh hari','warning'); return; }
       try{
         await postForm('updateregpanel', { panel_name:name, panel_link:link, pic_name:picn, pic_phone:picp, payment_terms_days:terms, notes });
-        toast('Panel dikemas kini','success');
-        await loadRegPanel();
+        toast('Panel dikemas kini','success'); await loadRegPanel();
       }catch(e){ console.error(e); toast('Gagal kemas panel','error'); }
     });
 
@@ -682,7 +671,7 @@
     if(ev.target && ev.target.id==='rp_clear'){ clearRegPanelForm(); toast('Bersih.','info'); }
   });
 
-  setActiveTab('regpanel');
+  setActiveTab('inprocess');
   </script>
 </body>
 </html>
