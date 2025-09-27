@@ -234,29 +234,10 @@
       border: 1px solid;
     }
     
-    .chip.inprocess {
-      background: #fff9e6;
-      border-color: var(--warning);
-      color: #856404;
-    }
-    
-    .chip.done {
-      background: #e6ffed;
-      border-color: var(--success);
-      color: #155724;
-    }
-    
-    .chip.submitted {
-      background: #e6f3ff;
-      border-color: var(--primary);
-      color: #004085;
-    }
-    
-    .chip.rejected {
-      background: #ffe6e6;
-      border-color: var(--danger);
-      color: #721c24;
-    }
+    .chip.inprocess { background: #fff9e6; border-color: var(--warning); color: #856404; }
+    .chip.done { background: #e6ffed; border-color: var(--success); color: #155724; }
+    .chip.submitted { background: #e6f3ff; border-color: var(--primary); color: #004085; }
+    .chip.rejected { background: #ffe6e6; border-color: var(--danger); color: #721c24; }
     
     .sla {
       display: inline-flex;
@@ -268,31 +249,11 @@
       border: 1px solid;
       margin-left: 6px;
     }
+    .sla.on { background: #e6ffed; border-color: var(--success); color: #155724; }
+    .sla.today { background: #fffbe6; border-color: var(--warning); color: #856404; }
+    .sla.over { background: #ffe6e6; border-color: var(--danger); color: #721c24; }
     
-    .sla.on {
-      background: #e6ffed;
-      border-color: var(--success);
-      color: #155724;
-    }
-    
-    .sla.today {
-      background: #fffbe6;
-      border-color: var(--warning);
-      color: #856404;
-    }
-    
-    .sla.over {
-      background: #ffe6e6;
-      border-color: var(--danger);
-      color: #721c24;
-    }
-    
-    .actions {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     
     .toast {
       position: fixed;
@@ -312,245 +273,65 @@
       gap: 8px;
       font-size: 14px;
     }
+    .toast.show { opacity: 1; transform: translateY(0); }
     
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .price { font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px; box-shadow: var(--card-shadow); }
     
-    .price {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-    
-    .card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: var(--card-shadow);
-    }
-    
+    /* WhatsApp icon button */
     .wa {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       width: 32px;
       height: 32px;
-      border-radius: none;
       background: #ffffff;
       color: #2c3e50;
       text-decoration: none;
       transition: all 0.2s;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       border: none;
     }
-
-    .wa:hover {
-      background: transparent;
-      transform: scale(1.05);
-      box-shadow: none;
-    }
-
-    .wa i {
-      font-size: 16px;
-    }
+    .wa:hover { background: transparent; transform: scale(1.05); }
+    .wa i { font-size: 16px; }
     
-    .label-mini {
-      font-size: 10px;
-      color: #333;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2px 6px;
-      margin-left: 6px;
-    }
+    .label-mini { font-size: 10px; color: #333; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; margin-left: 6px; }
     
-    .btn-danger {
-      border-color: var(--danger);
-      background: var(--danger);
-    }
+    .btn-danger { border-color: var(--danger); background: var(--danger); }
+    .btn-danger:hover { background: #c82333; border-color: #bd2130; }
+    .btn-warning { border-color: var(--warning); background: var(--warning); color: #212529; }
+    .btn-warning:hover { background: #e0a800; border-color: #d39e00; }
     
-    .btn-danger:hover {
-      background: #c82333;
-      border-color: #bd2130;
-    }
+    .loading { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(4px); z-index: 9999; }
+    .loading.show { display: flex; }
+    .spinner { width: 48px; height: 48px; border-radius: 50%; border: 4px solid #ddd; border-top-color: var(--primary); animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     
-    .btn-warning {
-      border-color: var(--warning);
-      background: var(--warning);
-      color: #212529;
-    }
+    .muted { color: var(--muted); font-size: 12px; }
+    .inline-input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
     
-    .btn-warning:hover {
-      background: #e0a800;
-      border-color: #d39e00;
-    }
+    .pagination { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-top: 1px solid var(--border); background: var(--light); margin-top: auto; }
+    .page-info { font-size: 13px; color: var(--muted); }
     
-    .loading {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
-    }
+    .section-title { padding: 16px; border-bottom: 1px solid var(--border); background: var(--light); font-size: 16px; font-weight: 600; color: var(--darker); }
+    .hint { padding: 12px 16px; background: #e6f3ff; border-bottom: 1px solid var(--border); font-size: 13px; color: #004085; }
+    .detail-content { padding: 16px; flex-grow: 1; }
     
-    .loading.show {
-      display: flex;
-    }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media(min-width: 768px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-weight: 500; font-size: 13px; color: var(--darker); }
+    .form-group full-width { grid-column: 1 / -1; }
     
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 4px solid #ddd;
-      border-top-color: var(--primary);
-      animation: spin 0.8s linear infinite;
-    }
+    /* SLA Radar cards (only visible on Submitted tab) */
+    .sla-radar { display:none; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 12px 16px; background: #fff; border-bottom: 1px solid var(--border); }
+    .sla-card { padding: 12px; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; gap:10px; cursor:pointer; transition:.2s; }
+    .sla-card:hover { box-shadow: var(--hover-shadow); transform: translateY(-1px); }
+    .sla-card .num { font-size: 20px; font-weight: 700; }
+    .sla-card.over { background:#ffe6e6; border-color:var(--danger); }
+    .sla-card.today { background:#fffbe6; border-color:var(--warning); }
+    .sla-card.on { background:#e6ffed; border-color:var(--success); }
     
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-    
-    .muted {
-      color: var(--muted);
-      font-size: 12px;
-    }
-    
-    .inline-input {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 13px;
-    }
-    
-    .pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      border-top: 1px solid var(--border);
-      background: var(--light);
-      margin-top: auto;
-    }
-    
-    .page-info {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    
-    .section-title {
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
-      background: var(--light);
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--darker);
-    }
-    
-    .hint {
-      padding: 12px 16px;
-      background: #e6f3ff;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-      color: #004085;
-    }
-    
-    .detail-content {
-      padding: 16px;
-      flex-grow: 1;
-    }
-    
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    
-    @media(min-width: 768px) {
-      .form-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-    
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    
-    .form-group label {
-      font-weight: 500;
-      font-size: 13px;
-      color: var(--darker);
-    }
-    
-    .form-group full-width {
-      grid-column: 1 / -1;
-    }
-    
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    
-    .stat-card {
-      background: #fff;
-      border-radius: 6px;
-      padding: 12px;
-      text-align: center;
-      box-shadow: var(--card-shadow);
-    }
-    
-    .stat-value {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 4px;
-      color: var(--darker);
-    }
-    
-    .stat-label {
-      font-size: 11px;
-      color: var(--muted);
-    }
-    
-    .tab-icon {
-      font-size: 14px;
-    }
-    
-    #recordsView, #regPanelView {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      flex-grow: 1;
-    }
-    
-    table {
-      flex-grow: 1;
-    }
-    
-    tbody {
-      display: block;
-      max-height: 500px;
-      overflow-y: auto;
-    }
-    
-    thead tr, tbody tr {
-      display: table;
-      width: 100%;
-      table-layout: fixed;
-    }
-    
-    /* ===== STYLE UNTUK KANTA MIKROSKOP YANG DITAMBAH BAIK ===== */
+    /* Magnifier tooltip */
     .magnifier-tooltip {
       position: fixed;
       background: #fff;
@@ -567,12 +348,7 @@
       transform: scale(0.95);
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
-    
-    .magnifier-tooltip.show {
-      opacity: 1;
-      transform: scale(1);
-    }
-    
+    .magnifier-tooltip.show { opacity: 1; transform: scale(1); }
     .magnifier-title {
       font-weight: bold;
       margin-bottom: 8px;
@@ -581,24 +357,9 @@
       border-bottom: 1px solid var(--border);
       padding-bottom: 5px;
     }
-    
-    .magnifier-content {
-      font-size: 16px;
-      line-height: 1.5;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-    
-    /* Style untuk elemen yang boleh dibesarkan */
-    .magnifiable {
-      cursor: pointer;
-      transition: background-color 0.2s;
-      position: relative;
-    }
-    
-    .magnifiable:hover {
-      background-color: rgba(44, 62, 80, 0.05);
-    }
+    .magnifier-content { font-size: 16px; white-space: pre-wrap; word-wrap: break-word; }
+    .magnifiable { cursor: pointer; transition: background-color 0.2s; position: relative; }
+    .magnifiable:hover { background-color: rgba(44, 62, 80, 0.05); }
   </style>
 </head>
 <body>
@@ -648,6 +409,30 @@
       <button id="refresh" class="secondary" title="Muat semula">
         <i class="fas fa-sync-alt"></i> Refresh
       </button>
+    </div>
+    <!-- SLA Radar (muncul di tab Submitted sahaja) -->
+    <div id="slaRadar" class="sla-radar">
+      <div class="sla-card over" data-sla="over">
+        <i class="fas fa-bell"></i>
+        <div>
+          <div class="num" id="slaOverNum">0</div>
+          <div>Overdue</div>
+        </div>
+      </div>
+      <div class="sla-card today" data-sla="today">
+        <i class="fas fa-bell"></i>
+        <div>
+          <div class="num" id="slaTodayNum">0</div>
+          <div>Due Today</div>
+        </div>
+      </div>
+      <div class="sla-card on" data-sla="on">
+        <i class="fas fa-bell"></i>
+        <div>
+          <div class="num" id="slaOnNum">0</div>
+          <div>On Track</div>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -761,7 +546,7 @@
     </aside>
   </div>
 
-  <!-- Tooltip untuk kanta mikroskop yang ditambah baik -->
+  <!-- Tooltip untuk kanta mikroskop -->
   <div id="magnifierTooltip" class="magnifier-tooltip">
     <div id="magnifierTitle" class="magnifier-title"></div>
     <div id="magnifierContent" class="magnifier-content"></div>
@@ -793,6 +578,7 @@
   const toastEl = el('#toast');
   const toastMsg = el('.toast-message');
   const loader = el('#loading');
+  const slaRadar = el('#slaRadar');
   const escapeHtml = s => String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   
   function toast(m, type = 'info') {
@@ -804,7 +590,7 @@
     };
     
     toastMsg.textContent = m;
-    toastEl.innerHTML = `<i class="${iconMap[type] || iconMap.info}"></i><span class="toast-message">${m}</span>`;
+    toastEl.innerHTML = \`<i class="\${iconMap[type] || iconMap.info}"></i><span class="toast-message">\${m}</span>\`;
     toastEl.classList.add('show');
     setTimeout(() => toastEl.classList.remove('show'), 3000);
   }
@@ -818,20 +604,20 @@
     if(v instanceof Date) d=v;
     else {
       const s=String(v);
-      if(/^\d{4}-\d{2}-\d{2}$/.test(s)) d=new Date(s+'T00:00:00');
+      if(/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) d=new Date(s+'T00:00:00');
       else d=new Date(s);
       if(isNaN(d.getTime())) return escapeHtml(s);
     }
     const pad=n=>String(n).padStart(2,'0');
-    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return \`\${pad(d.getDate())}/\${pad(d.getMonth()+1)}/\${d.getFullYear()} \${pad(d.getHours())}:\${pad(d.getMinutes())}\`;
   }
   
-  const toDigits = s => String(s||'').replace(/[^\d]/g,'');
+  const toDigits = s => String(s||'').replace(/[^\\d]/g,'');
   function buildWAUrl(phone, text){ 
     const p=toDigits(phone); 
     const q=encodeURIComponent(text||''); 
     if(!p) return ''; 
-    return `https://web.whatsapp.com/send?phone=${p}${q?`&text=${q}`:''}`; 
+    return \`https://web.whatsapp.com/send?phone=\${p}\${q?\`&text=\${q}\`:''}\`; 
   }
 
   // ===== Single Window (kanan) Reuse =====
@@ -855,7 +641,7 @@
     const sw=window.screen.availWidth, sh=window.screen.availHeight;
     const w=Math.max(520, Math.round(sw*0.34)), h=Math.max(650, sh);
     const left=Math.max(0, sw-w), top=0;
-    const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',`width=${w}`,`height=${h}`,`left=${left}`,`top=${top}`].join(',');
+    const features=['popup=yes','toolbar=no','location=no','status=no','menubar=no','scrollbars=yes','resizable=yes',\`width=\${w}\`,\`height=\${h}\`,\`left=\${left}\`,\`top=\${top}\`].join(',');
     panelWin = window.open(url, 'panel_claim_window', features);
     if(!panelWin){ 
       toast('Sila benarkan pop-up untuk domain ini.', 'warning');
@@ -865,83 +651,38 @@
     panelWin.focus();
   }
 
-  // ====== FUNGSI KANTA MIKROSKOP YANG DITAMBAH BAIK ======
+  // ====== Magnifier ======
   function initMagnifier() {
     const tooltip = el('#magnifierTooltip');
     const titleEl = el('#magnifierTitle');
     const contentEl = el('#magnifierContent');
-    
-    // Fungsi untuk menutup kanta
-    function closeMagnifier() {
-      tooltip.classList.remove('show');
-      currentMagnifierElement = null;
-    }
-    
-    // Fungsi untuk membuka kanta
+    function closeMagnifier() { tooltip.classList.remove('show'); currentMagnifierElement = null; }
     function openMagnifier(title, content, element) {
       titleEl.textContent = title;
       contentEl.textContent = content;
       tooltip.classList.add('show');
-      
-      // Position the tooltip relative to the element
       const rect = element.getBoundingClientRect();
       const tooltipWidth = tooltip.offsetWidth;
       const tooltipHeight = tooltip.offsetHeight;
-      
-      // Position above the element if possible, otherwise below
       let top = rect.top - tooltipHeight - 10;
       let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
-      
-      // Adjust if tooltip would go off screen
-      if (top < 10) {
-        top = rect.bottom + 10;
-      }
-      
-      if (left < 10) {
-        left = 10;
-      } else if (left + tooltipWidth > window.innerWidth - 10) {
-        left = window.innerWidth - tooltipWidth - 10;
-      }
-      
-      tooltip.style.top = `${top}px`;
-      tooltip.style.left = `${left}px`;
+      if (top < 10) top = rect.bottom + 10;
+      if (left < 10) left = 10; else if (left + tooltipWidth > window.innerWidth - 10) left = window.innerWidth - tooltipWidth - 10;
+      tooltip.style.top = \`\${top}px\`; tooltip.style.left = \`\${left}px\`;
     }
-    
     return { openMagnifier, closeMagnifier };
   }
-  
-  // Inisialisasi kanta mikroskop
   const magnifier = initMagnifier();
-  
-  // Fungsi untuk menambah event listener magnifier pada elemen
+  let magnifierTimeout = null;
   function addMagnifierToElement(element, title, content) {
     if (!element) return;
-    
-    // Tambah class untuk styling
     element.classList.add('magnifiable');
-    
-    // Event listener untuk hover (akan dibuka selepas 500ms)
     element.addEventListener('mouseenter', function() {
-      // Clear timeout sebelumnya jika ada
-      if (magnifierTimeout) {
-        clearTimeout(magnifierTimeout);
-      }
-      
-      // Set timeout untuk membuka magnifier
-      magnifierTimeout = setTimeout(() => {
-        currentMagnifierElement = element;
-        magnifier.openMagnifier(title, content, element);
-      }, 500);
+      if (magnifierTimeout) clearTimeout(magnifierTimeout);
+      magnifierTimeout = setTimeout(() => { currentMagnifierElement = element; magnifier.openMagnifier(title, content, element); }, 500);
     });
-    
     element.addEventListener('mouseleave', function() {
-      // Clear timeout jika kursor meninggalkan elemen sebelum 500ms
-      if (magnifierTimeout) {
-        clearTimeout(magnifierTimeout);
-        magnifierTimeout = null;
-      }
-      
-      // Tutup tooltip serta-merta
+      if (magnifierTimeout) { clearTimeout(magnifierTimeout); magnifierTimeout = null; }
       magnifier.closeMagnifier();
     });
   }
@@ -950,7 +691,7 @@
   async function buildRegPanelMap(){
     regPanelMap.clear();
     try{
-      const res = await fetch(`${API_BASE}?action=listregpanel`);
+      const res = await fetch(\`\${API_BASE}?action=listregpanel\`);
       const json = await res.json();
       if(json.status!=='ok') return;
       const items = (json.data && (json.data.items || json.data)) || [];
@@ -975,7 +716,7 @@
     for(const name of names){
       const opt = document.createElement('option'); 
       opt.value = name; 
-      opt.textContent = name.replace(/\b\w/g, c=>c.toUpperCase()); 
+      opt.textContent = name.replace(/\\b\\w/g, c=>c.toUpperCase()); 
       select.appendChild(opt);
     }
   }
@@ -1009,6 +750,8 @@
     el('#recordsView').style.display = isReg ? 'none' : '';
     el('#regPanelView').style.display = isReg ? '' : 'none';
     el('#searchBar').style.display   = isReg ? 'none' : '';
+    // SLA radar hanya pada Submitted
+    slaRadar.style.display = tab==='submitted' ? 'grid' : 'none';
     if(isReg){ loadRegPanel(); } else { state.page=1; load(); }
   }
 
@@ -1018,7 +761,7 @@
       await buildRegPanelMap(); 
       await populatePanelDropdown(); 
     }
-    const url = `${API_BASE}?action=listrecords&statusTab=${encodeURIComponent(state.tab)}&page=${state.page}&pageSize=${state.pageSize}&q=${encodeURIComponent(state.q)}`;
+    const url = \`\${API_BASE}?action=listrecords&statusTab=\${encodeURIComponent(state.tab)}&page=\${state.page}&pageSize=\${state.pageSize}&q=\${encodeURIComponent(state.q)}\`;
     try{
       showLoading();
       const res = await fetch(url);
@@ -1042,6 +785,15 @@
       const sorted = sortItems(filtered);
       renderTable(sorted);
       updateBadgesApprox(sorted);
+
+      // Kira SLA Radar (Submitted sahaja)
+      if(state.tab==='submitted'){
+        const counts = {over:0, today:0, on:0};
+        sorted.forEach(r => { const s=deriveSLA(r).cls; if(s){ counts[s] = (counts[s]||0)+1; } });
+        el('#slaOverNum').textContent = counts.over||0;
+        el('#slaTodayNum').textContent = counts.today||0;
+        el('#slaOnNum').textContent = counts.on||0;
+      }
     }catch(e){ 
       console.error(e); 
       toast('Ralat memuat data', 'error'); 
@@ -1055,7 +807,7 @@
     if(!value) return null;
     if(value instanceof Date) return value;
     const s=String(value);
-    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(s+'T00:00:00');
+    if(/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) return new Date(s+'T00:00:00');
     const d=new Date(s); return isNaN(d.getTime())?null:d;
   }
   
@@ -1079,12 +831,12 @@
   }
 
   function num(x){ 
-    const n=parseFloat(String(x||'').replace(/[^\d.]/g,''))||0; 
+    const n=parseFloat(String(x||'').replace(/[^\\d.]/g,''))||0; 
     return n.toFixed(2); 
   }
 
   function renderTable(items){
-    if(pageInfo) pageInfo.textContent = `Halaman ${state.page} • ${items.length} rekod`;
+    if(pageInfo) pageInfo.textContent = \`Halaman \${state.page} • \${items.length} rekod\`;
     tbody.innerHTML = items.map(r => renderRow(r)).join('');
     items.forEach(r => wireRow(r));
   }
@@ -1100,77 +852,75 @@
     const panelKey = String(r.jenis_panel||'').toLowerCase().trim();
     const reg = regPanelMap.get(panelKey);
 
-    const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, `Assalamualaikum/Hi ${r.nama_pesakit||''}`) : '';
+    const waPatientURL = r.no_telefon ? buildWAUrl(r.no_telefon, \`Assalamualaikum/Hi \${r.nama_pesakit||''}\`) : '';
     const waPatientIcon = waPatientURL ? 
-      `<a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit" onclick="openOrReusePanel('${waPatientURL.replace(/'/g,"%27")}')">
+      \`<a class="wa" href="javascript:void(0)" aria-label="WhatsApp Pesakit" title="WhatsApp Pesakit" onclick="openOrReusePanel('\${waPatientURL.replace(/'/g,"%27")}')">
         <i class="fab fa-whatsapp"></i>
-      </a>` : '';
+      </a>\` : '';
 
-    const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, `Hi ${reg.pic_name||'PIC'}, rujukan tuntutan: ${r.record_id||''}`) : '';
+    const waPICURL = (reg && reg.pic_phone) ? buildWAUrl(reg.pic_phone, \`Hi \${reg.pic_name||'PIC'}, rujukan tuntutan: \${r.record_id||''}\`) : '';
     const waPICIcon = waPICURL ? 
-      `<a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel" onclick="openOrReusePanel('${waPICURL.replace(/'/g,"%27")}')">
+      \`<a class="wa" href="javascript:void(0)" aria-label="WhatsApp PIC Panel" title="WhatsApp PIC Panel" onclick="openOrReusePanel('\${waPICURL.replace(/'/g,"%27")}')">
         <i class="fab fa-whatsapp"></i>
-      </a>` : '';
+      </a>\` : '';
 
-    const price = `<div class="price">
-      Consult RM${num(r.harga_consultation)} · Ubat RM${num(r.harga_ubat)} · Prosedur RM${num(r.harga_prosedur)}<br>
-      <b>Jumlah RM${num(r.harga_jumlah)}</b>
-    </div>`;
+    const price = \`<div class="price">
+      Consult RM\${num(r.harga_consultation)} · Ubat RM\${num(r.harga_ubat)} · Prosedur RM\${num(r.harga_prosedur)}<br>
+      <b>Jumlah RM\${num(r.harga_jumlah)}</b>
+    </div>\`;
 
     const sla = deriveSLA(r);
-    const slaBadge = sla.cls ? `<span class="sla ${sla.cls}" title="Due: ${sla.dueText}">${sla.label}</span>` : '';
+    const slaBadge = sla.cls ? \`<span class="sla \${sla.cls}" title="Due: \${sla.dueText}">\${sla.label}</span>\` : '';
 
     const submittedActions = state.tab==='submitted'
-      ? `<button class="secondary btn-pending" title="Masih menunggu"><i class="fas fa-clock"></i></button>
+      ? \`<button class="secondary btn-pending" title="Masih menunggu"><i class="fas fa-clock"></i></button>
          <button class="btn-done" title="Tanda Done"><i class="fas fa-check"></i></button>
-         <button class="btn-rejected" title="Tanda Rejected"><i class="fas fa-times"></i></button>`
+         <button class="btn-rejected" title="Tanda Rejected"><i class="fas fa-times"></i></button>\`
       : '';
 
-    return `<tr data-id="${escapeHtml(r.record_id)}">
-      <td class="cell-magnifiable" data-title="Nama Pesakit" data-content="${escapeHtml(r.nama_pesakit||'')}">${escapeHtml(r.nama_pesakit||'')}</td>
-      <td class="cell-magnifiable" data-title="No. IC" data-content="${escapeHtml(r.no_ic||'')}">${escapeHtml(r.no_ic||'')}</td>
-      <td class="cell-magnifiable" data-title="No. Telefon" data-content="${escapeHtml(r.no_telefon||'')}">
+    return \`<tr data-id="\${escapeHtml(r.record_id)}">
+      <td class="cell-magnifiable" data-title="Nama Pesakit" data-content="\${escapeHtml(r.nama_pesakit||'')}">\${escapeHtml(r.nama_pesakit||'')}</td>
+      <td class="cell-magnifiable" data-title="No. IC" data-content="\${escapeHtml(r.no_ic||'')}">\${escapeHtml(r.no_ic||'')}</td>
+      <td class="cell-magnifiable" data-title="No. Telefon" data-content="\${escapeHtml(r.no_telefon||'')}">
         <div style="display:flex;align-items:center;gap:8px">
-          <span>${escapeHtml(r.no_telefon||'')}</span>
-          ${waPatientIcon || ''}
+          <span>\${escapeHtml(r.no_telefon||'')}</span>
+          \${waPatientIcon || ''}
         </div>
       </td>
-      <td class="cell-magnifiable" data-title="Tarikh Hadir" data-content="${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}">${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
-      <td class="cell-magnifiable" data-title="Panel / PIC" data-content="${escapeHtml(r.jenis_panel||'')}${reg ? `\nPIC: ${escapeHtml(reg.pic_name||'-')}\nTelefon: ${escapeHtml(reg.pic_phone||'')}` : ''}">
-        <div><b>${escapeHtml(r.jenis_panel||'')}</b>${slaBadge}</div>
-        ${reg ? `<div class="price" style="margin-top:4px">
-          ${escapeHtml(reg.pic_name||'-')}<br>
+      <td class="cell-magnifiable" data-title="Tarikh Hadir" data-content="\${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}">\${formatDateDDMMYYYY_HHMM(r.tarikh_hadir)}</td>
+      <td class="cell-magnifiable" data-title="Panel / PIC" data-content="\${escapeHtml(r.jenis_panel||'')}\${reg ? \`\\nPIC: \${escapeHtml(reg.pic_name||'-')}\\nTelefon: \${escapeHtml(reg.pic_phone||'')}\` : ''}">
+        <div><b>\${escapeHtml(r.jenis_panel||'')}</b>\${slaBadge}</div>
+        \${reg ? \`<div class="price" style="margin-top:4px">
+          \${escapeHtml(reg.pic_name||'-')}<br>
           <div style="display:flex;align-items:center;gap:8px">
-            <small>${escapeHtml(reg.pic_phone||'')}</small>
-            ${waPICIcon || ''}
+            <small>\${escapeHtml(reg.pic_phone||'')}</small>
+            \${waPICIcon || ''}
           </div>
-        </div>` : ''}
+        </div>\` : ''}
       </td>
-      <td class="cell-magnifiable" data-title="Harga" data-content="${price.replace(/<br>/g, '\n').replace(/<[^>]*>/g, '')}">${price}</td>
-      <td class="cell-magnifiable" data-title="Jenis Ubat" data-content="${escapeHtml(r.jenis_ubat||'')}">${escapeHtml(r.jenis_ubat||'')}</td>
-      <td><span class="chip ${chipClass}">${escapeHtml(status)}</span></td>
+      <td class="cell-magnifiable" data-title="Harga" data-content="\${price.replace(/<br>/g, '\\n').replace(/<[^>]*>/g, '')}">\${price}</td>
+      <td class="cell-magnifiable" data-title="Jenis Ubat" data-content="\${escapeHtml(r.jenis_ubat||'')}">\${escapeHtml(r.jenis_ubat||'')}</td>
+      <td><span class="chip \${chipClass}">\${escapeHtml(status)}</span></td>
       <td class="actions">
         <button class="secondary btn-open" title="Buka laman panel"><i class="fas fa-external-link-alt"></i></button>
-        ${state.tab==='inprocess'
-          ? `<button class="btn-submit" title="Hantar ke Submitted"><i class="fas fa-paper-plane"></i></button>`
+        \${state.tab==='inprocess'
+          ? \`<button class="btn-submit" title="Hantar ke Submitted"><i class="fas fa-paper-plane"></i></button>\`
           : submittedActions
         }
       </td>
-    </tr>`;
+    </tr>\`;
   }
 
   function wireRow(r){
-    const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(r.record_id))}"]`);
-    
-    // Tambah fungsi kanta mikroskop pada semua sel data
+    const tr = tbody.querySelector(\`tr[data-id="\${CSS.escape(String(r.record_id))}"]\`);
+    // Magnifier
     const cells = tr.querySelectorAll('td[class*="cell-magnifiable"]');
     cells.forEach(cell => {
       const title = cell.getAttribute('data-title') || 'Butiran';
       const content = cell.getAttribute('data-content') || cell.textContent;
-      
       addMagnifierToElement(cell, title, content);
     });
-    
+    // Open link
     tr.querySelector('.btn-open').addEventListener('click', ()=>{
       const url = r.panel_claim_url || (()=>{
         const key = String(r.jenis_panel||'').toLowerCase().trim();
@@ -1180,7 +930,6 @@
       if(!url){ toast('URL panel tiada', 'warning'); return; }
       openOrReusePanel(url);
     });
-
     if (state.tab==='inprocess') {
       tr.querySelector('.btn-submit')?.addEventListener('click', async ()=>{
         const ref = prompt('Masukkan Claim Ref/ID (jika ada):', r.claim_ref_id||'');
@@ -1204,13 +953,13 @@
     }
   }
 
-  // ===== POST util — x-www-form-urlencoded (elak preflight) =====
+  // ===== POST util — x-www-form-urlencoded =====
   async function postForm(action, obj){
     showLoading();
     try{
       const body = new URLSearchParams();
       body.set('payload', JSON.stringify(obj||{}));
-      const res = await fetch(`${API_BASE}?action=${encodeURIComponent(action)}`, { method:'POST', body });
+      const res = await fetch(\`\${API_BASE}?action=\${encodeURIComponent(action)}\`, { method:'POST', body });
       const json = await res.json().catch(()=>null);
       if(!json || json.status!=='ok') throw new Error((json && json.message) || 'Request gagal');
       return json;
@@ -1221,7 +970,7 @@
   
   async function updateStatus(record_id, payload){
     try{
-      const tr = tbody.querySelector(`tr[data-id="${CSS.escape(String(record_id))}"]`);
+      const tr = tbody.querySelector(\`tr[data-id="\${CSS.escape(String(record_id))}"]\`);
       if(tr && payload.status_claim){
         const chip=tr.querySelector('.chip');
         chip.textContent = payload.status_claim;
@@ -1254,11 +1003,11 @@
     el('#badge-rejected').textContent=String(count.rejected);
   }
 
-  // ====== REG PANEL VIEW (LIST + SAVE/CLEAR + INLINE EDIT) ======
+  // ====== REG PANEL VIEW ======
   async function loadRegPanel(){
     try{
       showLoading();
-      const res = await fetch(`${API_BASE}?action=listregpanel`);
+      const res = await fetch(\`\${API_BASE}?action=listregpanel\`);
       const json = await res.json();
       if(json.status!=='ok') throw new Error(json.message||'Gagal memuat Reg Panel');
       const items = (json.data && (json.data.items || json.data)) || [];
@@ -1278,28 +1027,28 @@
 
   function renderRegRow(p){
     const link = escapeHtml(p.panel_link || p.login_url || p.claim_url_template || '');
-    const waHref = p.pic_phone ? buildWAUrl(p.pic_phone, `Hi ${p.pic_name||'PIC'} — pesanan dari klinik`) : '';
+    const waHref = p.pic_phone ? buildWAUrl(p.pic_phone, \`Hi \${p.pic_name||'PIC'} — pesanan dari klinik\`) : '';
     const waBtn = waHref ? 
-      `<a class="wa" href="javascript:void(0)" onclick="openOrReusePanel('${waHref.replace(/'/g,"%27")}')" title="WhatsApp PIC">
+      \`<a class="wa" href="javascript:void(0)" onclick="openOrReusePanel('\${waHref.replace(/'/g,"%27")}')" title="WhatsApp PIC">
         <i class="fab fa-whatsapp"></i>
-      </a>` : '';
+      </a>\` : '';
     const terms = parseInt(p.payment_terms_days,10) || '';
 
-    return `<tr data-panel="${escapeHtml(p.panel_name||'')}">
-      <td class="cell-magnifiable cell-name" data-title="Nama Panel" data-content="${escapeHtml(p.panel_name||'')}"><span class="view">${escapeHtml(p.panel_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.panel_name||'')}" /></td>
-      <td class="cell-magnifiable cell-link" data-title="Link Panel" data-content="${escapeHtml(link)}"><span class="view"><a href="${link||'#'}" target="_blank" rel="noopener">Buka</a></span><input class="edit inline-input" style="display:none" value="${escapeHtml(link)}" /></td>
-      <td class="cell-magnifiable cell-picname" data-title="Nama PIC" data-content="${escapeHtml(p.pic_name||'')}"><span class="view">${escapeHtml(p.pic_name||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_name||'')}" /></td>
-      <td class="cell-magnifiable cell-picphone" data-title="Telefon PIC" data-content="${escapeHtml(p.pic_phone||'')}"><span class="view">${escapeHtml(p.pic_phone||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.pic_phone||'')}" /></td>
-      <td class="cell-magnifiable cell-terms" data-title="Tempoh (hari)" data-content="${escapeHtml(String(terms))}"><span class="view">${escapeHtml(String(terms))}</span><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="${escapeHtml(String(terms))}" /></td>
-      <td class="cell-magnifiable cell-notes" data-title="Catatan" data-content="${escapeHtml(p.notes||'')}"><span class="view">${escapeHtml(p.notes||'')}</span><input class="edit inline-input" style="display:none" value="${escapeHtml(p.notes||'')}" /></td>
-      <td>${waBtn}</td>
+    return \`<tr data-panel="\${escapeHtml(p.panel_name||'')}">
+      <td class="cell-magnifiable cell-name" data-title="Nama Panel" data-content="\${escapeHtml(p.panel_name||'')}"><span class="view">\${escapeHtml(p.panel_name||'')}</span><input class="edit inline-input" style="display:none" value="\${escapeHtml(p.panel_name||'')}" /></td>
+      <td class="cell-magnifiable cell-link" data-title="Link Panel" data-content="\${escapeHtml(link)}"><span class="view"><a href="\${link||'#'}" target="_blank" rel="noopener">Buka</a></span><input class="edit inline-input" style="display:none" value="\${escapeHtml(link)}" /></td>
+      <td class="cell-magnifiable cell-picname" data-title="Nama PIC" data-content="\${escapeHtml(p.pic_name||'')}"><span class="view">\${escapeHtml(p.pic_name||'')}</span><input class="edit inline-input" style="display:none" value="\${escapeHtml(p.pic_name||'')}" /></td>
+      <td class="cell-magnifiable cell-picphone" data-title="Telefon PIC" data-content="\${escapeHtml(p.pic_phone||'')}"><span class="view">\${escapeHtml(p.pic_phone||'')}</span><input class="edit inline-input" style="display:none" value="\${escapeHtml(p.pic_phone||'')}" /></td>
+      <td class="cell-magnifiable cell-terms" data-title="Tempoh (hari)" data-content="\${escapeHtml(String(terms))}"><span class="view">\${escapeHtml(String(terms))}</span><input class="edit inline-input" style="display:none" type="number" min="1" step="1" value="\${escapeHtml(String(terms))}" /></td>
+      <td class="cell-magnifiable cell-notes" data-title="Catatan" data-content="\${escapeHtml(p.notes||'')}"><span class="view">\${escapeHtml(p.notes||'')}</span><input class="edit inline-input" style="display:none" value="\${escapeHtml(p.notes||'')}" /></td>
+      <td>\${waBtn}</td>
       <td class="actions">
         <button class="btn-warning btn-rp-edit"><i class="fas fa-edit"></i></button>
         <button class="btn-danger btn-rp-del"><i class="fas fa-trash"></i></button>
         <button class="btn-save" style="display:none"><i class="fas fa-save"></i></button>
         <button class="secondary btn-cancel" style="display:none"><i class="fas fa-times"></i></button>
       </td>
-    </tr>`;
+    </tr>\`;
   }
 
   function wireRegRow(tr){
@@ -1308,12 +1057,10 @@
     const btnSave = tr.querySelector('.btn-save');
     const btnCancel=tr.querySelector('.btn-cancel');
 
-    // Tambah fungsi kanta mikroskop pada semua sel data
     const cells = tr.querySelectorAll('td[class*="cell-magnifiable"]');
     cells.forEach(cell => {
       const title = cell.getAttribute('data-title') || 'Butiran';
       const content = cell.getAttribute('data-content') || cell.textContent;
-      
       addMagnifierToElement(cell, title, content);
     });
 
@@ -1352,7 +1099,7 @@
 
     btnDel.addEventListener('click', async ()=>{
       const name = tr.getAttribute('data-panel');
-      if(!confirm(`Padam panel "${name}"?`)) return;
+      if(!confirm(\`Padam panel "\${name}"?\`)) return;
       try{ 
         await postForm('deleteregpanel', { panel_name:name }); 
         toast('Panel dipadam', 'success'); 
@@ -1404,6 +1151,14 @@
   el('#prev').addEventListener('click', ()=>{ if(state.page>1){ state.page--; load(); }});
   el('#next').addEventListener('click', ()=>{ state.page++; load(); });
 
+  // SLA radar click → set filter
+  document.querySelectorAll('.sla-card').forEach(card => {
+    card.addEventListener('click', () => {
+      state.filterSLA = card.getAttribute('data-sla') || '';
+      load();
+    });
+  });
+
   // Reg Panel buttons
   document.addEventListener('click', (ev)=>{
     if(ev.target && ev.target.id==='rp_save'){ saveRegPanel(); }
@@ -1411,7 +1166,7 @@
   });
 
   // INIT
-  setActiveTab('regpanel');
+  setActiveTab('regpanel'); // mula di Reg Panel untuk uji cepat
   </script>
 </body>
 </html>
